@@ -14,6 +14,8 @@ struct TriviaGameView: View {
     @State private var buttonTapTrigger = 0
     @State private var correctAnswerTrigger = false
     @State private var wrongAnswerTrigger = false
+    @State private var showCelebration = false
+    @State private var showWrong = false
 
     var body: some View {
         ZStack {
@@ -58,6 +60,19 @@ struct TriviaGameView: View {
 
                 Spacer()
             }
+
+            // Overlays
+            if showCelebration {
+                CelebrationOverlay {
+                    handleOverlayComplete(isCorrect: true)
+                }
+            }
+
+            if showWrong {
+                WrongAnswerOverlay {
+                    handleOverlayComplete(isCorrect: false)
+                }
+            }
         }
         .sensoryFeedback(.impact(weight: .light), trigger: buttonTapTrigger)
         .sensoryFeedback(.success, trigger: correctAnswerTrigger)
@@ -97,15 +112,23 @@ struct TriviaGameView: View {
 
         let isCorrect = index == question.correctIndex
 
-        // Trigger appropriate haptic feedback
+        // Show appropriate overlay with haptic
         if isCorrect {
             correctAnswerTrigger.toggle()
+            showCelebration = true
         } else {
             wrongAnswerTrigger.toggle()
+            showWrong = true
         }
+    }
 
-        // Delay to show feedback before calling onAnswer
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+    private func handleOverlayComplete(isCorrect: Bool) {
+        // Hide overlay
+        showCelebration = false
+        showWrong = false
+
+        // Small delay before dismissing to ensure smooth animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             onAnswer(isCorrect)
         }
     }
