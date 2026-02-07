@@ -11,74 +11,73 @@ struct GameMapView: View {
 
     @State private var questions: [TriviaQuestion] = []
     @State private var currentQuestion: TriviaQuestion?
-    @State private var showTriviaGame = false
     @State private var hasPlayedOnce = false
+
+    private let maxLevel = 50
+    private let nodeSpacing: CGFloat = 100
 
     var body: some View {
         ZStack {
             RetroGradientBackground()
 
-            VStack(spacing: 32) {
-                // Header with Back button
-                HStack {
-                    Button(action: onBackTapped) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "chevron.left")
-                            Text("Back")
+            VStack(spacing: 0) {
+                // Header with Back button and score
+                header
+
+                // Scrollable map
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            // Add top padding
+                            Color.clear.frame(height: 100)
+
+                            // Map nodes (reversed to show bottom-to-top)
+                            ForEach((0...maxLevel).reversed(), id: \.self) { level in
+                                VStack(spacing: 0) {
+                                    MapNodeView(
+                                        levelIndex: level,
+                                        isCurrentPosition: level == gameState.currentPosition,
+                                        currentPosition: gameState.currentPosition
+                                    )
+                                    .id(level)
+
+                                    // Connecting line (except for the last node)
+                                    if level > 0 {
+                                        Rectangle()
+                                            .fill(
+                                                LinearGradient(
+                                                    colors: [
+                                                        level <= gameState.currentPosition ? Color("ElectricBlue") : Color.white.opacity(0.2),
+                                                        level - 1 <= gameState.currentPosition ? Color("ElectricBlue") : Color.white.opacity(0.2)
+                                                    ],
+                                                    startPoint: .top,
+                                                    endPoint: .bottom
+                                                )
+                                            )
+                                            .frame(width: 3, height: nodeSpacing - 60)
+                                    }
+                                }
+                            }
+
+                            // Add bottom padding
+                            Color.clear.frame(height: 100)
                         }
-                        .retroBody()
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
                     }
-                    Spacer()
-                }
-                .padding()
-
-                Spacer()
-
-                // Current position display
-                VStack(spacing: 20) {
-                    Text("Current Position")
-                        .retroBody()
-                        .opacity(0.8)
-
-                    Text("\(gameState.currentPosition)")
-                        .font(.system(size: 72, weight: .black, design: .rounded))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [Color("NeonPink"), Color("ElectricBlue")],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .shadow(color: Color("NeonPink").opacity(0.8), radius: 20)
-
-                    if gameState.currentPosition > 0 {
-                        Text("High Score: \(gameState.highScorePosition)")
-                            .retroSubtitle()
+                    .onChange(of: gameState.currentPosition) { oldValue, newValue in
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            proxy.scrollTo(newValue, anchor: .center)
+                        }
+                    }
+                    .onAppear {
+                        // Scroll to current position on appear
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            proxy.scrollTo(gameState.currentPosition, anchor: .center)
+                        }
                     }
                 }
 
-                Spacer()
-
-                // Play button
-                RetroButton(hasPlayedOnce ? "Next Question" : "Play Trivia", variant: .primary) {
-                    startTrivia()
-                }
-                .disabled(questions.isEmpty)
-
-                if questions.isEmpty {
-                    Text("Loading questions...")
-                        .retroBody()
-                        .opacity(0.6)
-                } else {
-                    Text("\(questions.count) questions loaded")
-                        .retroBody()
-                        .opacity(0.6)
-                        .font(.caption)
-                }
-
-                Spacer()
+                // Play button at bottom
+                playButton
             }
         }
         .fullScreenCover(item: $currentQuestion) { question in
@@ -89,6 +88,65 @@ struct GameMapView: View {
         .onAppear {
             loadQuestions()
         }
+    }
+
+    private var header: some View {
+        HStack {
+            Button(action: onBackTapped) {
+                HStack(spacing: 8) {
+                    Image(systemName: "chevron.left")
+                    Text("Back")
+                }
+                .retroBody()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+            }
+
+            Spacer()
+
+            if gameState.currentPosition > 0 {
+                VStack(spacing: 4) {
+                    Text("Position")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.7))
+                    Text("\(gameState.currentPosition)")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundStyle(Color("NeonYellow"))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+            }
+        }
+        .padding()
+    }
+
+    private var playButton: some View {
+        VStack(spacing: 8) {
+            RetroButton(hasPlayedOnce ? "Next Question" : "Play Trivia", variant: .primary) {
+                startTrivia()
+            }
+            .disabled(questions.isEmpty)
+            .padding(.horizontal)
+
+            if questions.isEmpty {
+                Text("Loading questions...")
+                    .retroBody()
+                    .opacity(0.6)
+            }
+        }
+        .padding(.vertical, 20)
+        .background(
+            LinearGradient(
+                colors: [
+                    Color("RetroPurple").opacity(0.95),
+                    Color("RetroPurple")
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea(edges: .bottom)
+        )
     }
 
     private func loadQuestions() {
