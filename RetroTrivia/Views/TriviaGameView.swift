@@ -11,6 +11,9 @@ struct TriviaGameView: View {
 
     @State private var selectedIndex: Int? = nil
     @State private var hasAnswered = false
+    @State private var buttonTapTrigger = 0
+    @State private var correctAnswerTrigger = false
+    @State private var wrongAnswerTrigger = false
 
     var body: some View {
         ZStack {
@@ -56,6 +59,9 @@ struct TriviaGameView: View {
                 Spacer()
             }
         }
+        .sensoryFeedback(.impact(weight: .light), trigger: buttonTapTrigger)
+        .sensoryFeedback(.success, trigger: correctAnswerTrigger)
+        .sensoryFeedback(.error, trigger: wrongAnswerTrigger)
     }
 
     @ViewBuilder
@@ -83,10 +89,20 @@ struct TriviaGameView: View {
     private func handleAnswer(_ index: Int) {
         guard !hasAnswered else { return }
 
+        // Light tap feedback
+        buttonTapTrigger += 1
+
         selectedIndex = index
         hasAnswered = true
 
         let isCorrect = index == question.correctIndex
+
+        // Trigger appropriate haptic feedback
+        if isCorrect {
+            correctAnswerTrigger.toggle()
+        } else {
+            wrongAnswerTrigger.toggle()
+        }
 
         // Delay to show feedback before calling onAnswer
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
