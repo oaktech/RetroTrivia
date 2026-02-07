@@ -11,18 +11,41 @@ struct ContentView: View {
     @Environment(GameState.self) var gameState
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text("RetroTrivia")
-                .font(.largeTitle)
-                .fontWeight(.bold)
+        ZStack {
+            RetroGradientBackground()
 
-            Text("Stage 1 Complete")
-                .font(.title2)
+            VStack(spacing: 24) {
+                Text("RETROTRIVIA")
+                    .retroTitle()
 
-            Text("Position: \(gameState.currentPosition)")
-            Text("High Score: \(gameState.highScorePosition)")
+                Text("80s Music Challenge")
+                    .retroSubtitle()
+
+                Spacer()
+
+                VStack(spacing: 16) {
+                    Text("Position: \(gameState.currentPosition)")
+                        .retroBody()
+                    Text("High Score: \(gameState.highScorePosition)")
+                        .retroHeading()
+                }
+
+                Spacer()
+
+                RetroButton("Play Now", variant: .primary) {
+                    gameState.incrementPosition()
+                }
+
+                RetroButton("Reset", variant: .secondary) {
+                    gameState.resetGame()
+                }
+
+                Text("Stage 2 Complete")
+                    .retroBody()
+                    .padding(.top, 20)
+            }
+            .padding()
         }
-        .padding()
     }
 }
 
