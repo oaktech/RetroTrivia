@@ -14,9 +14,26 @@ struct GameMapView: View {
     @State private var currentQuestion: TriviaQuestion?
     @State private var hasPlayedOnce = false
     @State private var showQuitConfirmation = false
+    @State private var showLevelUp = false
+    @State private var levelUpTier = 0
 
     private let maxLevel = 25
     private let nodeSpacing: CGFloat = 100
+
+    private var currentTier: Int {
+        gameState.currentPosition / 3
+    }
+
+    private var tierColor: Color {
+        let intensity = Double(currentTier) / 8.0
+        if intensity < 0.4 {
+            return Color("ElectricBlue")
+        } else if intensity < 0.7 {
+            return Color("NeonPink")
+        } else {
+            return Color("HotMagenta")
+        }
+    }
 
     // MARK: - Progressive Intensity Helpers
 
@@ -111,6 +128,13 @@ struct GameMapView: View {
                 // Play button at bottom
                 playButton
             }
+
+            // Level up overlay
+            if showLevelUp {
+                LevelUpOverlay(newTier: levelUpTier) {
+                    showLevelUp = false
+                }
+            }
         }
         .fullScreenCover(item: $currentQuestion) { question in
             TriviaGameView(question: question) { isCorrect in
@@ -154,18 +178,44 @@ struct GameMapView: View {
 
             Spacer()
 
-            if gameState.currentPosition > 0 {
+            HStack(spacing: 16) {
+                // Tier indicator
                 VStack(spacing: 4) {
-                    Text("Position")
+                    Text("Level")
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.7))
-                    Text("\(gameState.currentPosition)")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundStyle(Color("NeonYellow"))
+                    HStack(spacing: 4) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(tierColor)
+                        Text("\(currentTier + 1)")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundStyle(tierColor)
+                    }
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 12)
                 .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(tierColor.opacity(0.15))
+                        .stroke(tierColor.opacity(0.4), lineWidth: 1)
+                )
+
+                // Correct answers indicator
+                if gameState.currentPosition > 0 {
+                    VStack(spacing: 4) {
+                        Text("Correct")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.7))
+                        Text("\(gameState.currentPosition)")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundStyle(Color("NeonYellow"))
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                }
             }
         }
         .padding()
@@ -239,13 +289,12 @@ struct GameMapView: View {
 
             print("DEBUG: Position \(gameState.currentPosition - 1) -> \(gameState.currentPosition), Tier \(oldTier) -> \(newTier)")
 
-            // Play unlock sound when reaching a new tier (every 3 levels)
+            // Show level-up overlay when reaching a new tier (every 3 levels)
             if newTier > oldTier {
-                print("DEBUG: Tier crossed! Scheduling node-unlock sound...")
-                let audio = audioManager // Capture before async
+                print("DEBUG: Tier crossed! Showing level-up overlay...")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    print("DEBUG: Playing node-unlock now!")
-                    audio.playSoundEffect(named: "node-unlock", withExtension: "wav", volume: 1.0)
+                    self.levelUpTier = newTier
+                    self.showLevelUp = true
                 }
             }
         } else {
