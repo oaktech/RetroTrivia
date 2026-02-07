@@ -2,10 +2,15 @@
 
 ## Music
 
-**Background Music:** "Afterglow Love"
-**Artist:** e s c p
-**Website:** https://www.escp.space
-**Bandcamp:** https://escp-music.bandcamp.com
+**Menu Music:** "Afterglow Love" by e s c p
+- Website: https://www.escp.space
+- Bandcamp: https://escp-music.bandcamp.com
+
+**Gameplay Music:** "Retro" by jiglr
+- SoundCloud: https://soundcloud.com/jiglrmusic
+- Music promoted by: https://www.free-stock-music.com
+- License: Creative Commons / Attribution 3.0 Unported (CC BY 3.0)
+- https://creativecommons.org/licenses/by/3.0/deed.en_US
 
 ## Assets
 

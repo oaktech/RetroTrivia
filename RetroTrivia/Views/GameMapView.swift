@@ -7,6 +7,7 @@ import SwiftUI
 
 struct GameMapView: View {
     @Environment(GameState.self) var gameState
+    @Environment(AudioManager.self) var audioManager
     let onBackTapped: () -> Void
 
     @State private var questions: [TriviaQuestion] = []
@@ -92,7 +93,10 @@ struct GameMapView: View {
 
     private var header: some View {
         HStack {
-            Button(action: onBackTapped) {
+            Button(action: {
+                audioManager.playMenuMusic()
+                onBackTapped()
+            }) {
                 HStack(spacing: 8) {
                     Image(systemName: "chevron.left")
                     Text("Back")
@@ -193,4 +197,5 @@ struct GameMapView: View {
 #Preview {
     GameMapView(onBackTapped: {})
         .environment(GameState())
+        .environment(AudioManager.shared)
 }

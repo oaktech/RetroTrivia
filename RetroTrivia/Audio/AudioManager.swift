@@ -12,12 +12,13 @@ class AudioManager {
 
     private var backgroundMusicPlayer: AVAudioPlayer?
     private var soundEffectPlayer: AVAudioPlayer?
+    private var currentMusicTrack: String?
 
     var isMusicEnabled: Bool {
         didSet {
             UserDefaults.standard.set(isMusicEnabled, forKey: "isMusicEnabled")
             if isMusicEnabled {
-                playBackgroundMusic()
+                playMenuMusic()
             } else {
                 stopBackgroundMusic()
             }
@@ -47,12 +48,20 @@ class AudioManager {
         }
     }
 
-    func playBackgroundMusic() {
+    func playBackgroundMusic(named trackName: String) {
         guard isMusicEnabled else { return }
 
-        // Try to load background music from bundle
-        guard let url = Bundle.main.url(forResource: "background-music", withExtension: "mp3") else {
-            print("Background music file not found. Add 'background-music.mp3' to the project.")
+        // Don't restart if already playing this track
+        if currentMusicTrack == trackName, backgroundMusicPlayer?.isPlaying == true {
+            return
+        }
+
+        // Stop current music
+        backgroundMusicPlayer?.stop()
+
+        // Try to load music from bundle
+        guard let url = Bundle.main.url(forResource: trackName, withExtension: "mp3") else {
+            print("Music file '\(trackName).mp3' not found.")
             return
         }
 
@@ -61,10 +70,19 @@ class AudioManager {
             backgroundMusicPlayer?.numberOfLoops = -1 // Loop indefinitely
             backgroundMusicPlayer?.volume = musicVolume
             backgroundMusicPlayer?.play()
-            print("Background music started")
+            currentMusicTrack = trackName
+            print("Playing music: \(trackName).mp3")
         } catch {
-            print("Failed to play background music: \(error)")
+            print("Failed to play music: \(error)")
         }
+    }
+
+    func playMenuMusic() {
+        playBackgroundMusic(named: "menu-music")
+    }
+
+    func playGameplayMusic() {
+        playBackgroundMusic(named: "gameplay-music")
     }
 
     func stopBackgroundMusic() {

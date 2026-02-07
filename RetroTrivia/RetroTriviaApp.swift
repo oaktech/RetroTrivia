@@ -37,7 +37,7 @@ struct RetroTriviaApp: App {
     }
 
     init() {
-        // Start background music when app launches
-        AudioManager.shared.playBackgroundMusic()
+        // Start menu music when app launches
+        AudioManager.shared.playMenuMusic()
     }
 }
