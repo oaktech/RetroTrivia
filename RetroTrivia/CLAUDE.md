@@ -8,6 +8,23 @@ RetroTrivia is an iOS trivia game built with SwiftUI, themed around 80s music. I
 
 **Tech stack**: SwiftUI, iOS 17+, UserDefaults for progress, bundled JSON for questions. No third-party dependencies.
 
+## Git Workflow
+
+**IMPORTANT: Commit frequently!**
+
+Create a git commit after:
+- Each completed stage (Stage 1, Stage 2, etc.)
+- Each major feature implementation
+- Each bug fix that resolves an issue
+- Before starting a new phase of work
+
+When a stage or feature is complete, **always ask the user if they want to create a commit**. Don't proceed to the next stage without committing first.
+
+Use descriptive commit messages following the existing pattern:
+- First line: Brief summary (50 chars or less)
+- Body: Bullet points describing changes
+- Footer: `Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>`
+
 ## Build & Run Commands
 
 ```bash
@@ -25,7 +42,7 @@ xcodebuild test -scheme RetroTrivia -destination 'platform=iOS Simulator,name=iP
 The project follows a staged build approach documented in `BUILD_PROMPTS.md`. Key architectural decisions:
 
 **Directory structure** (as implementation progresses):
-- `Models/` - TriviaQuestion (Codable struct), GameState (ObservableObject with UserDefaults persistence)
+- `Models/` - TriviaQuestion (Codable struct), GameState (@Observable with UserDefaults persistence)
 - `Views/` - HomeView, GameMapView, TriviaGameView, overlay views
 - `Components/` - RetroButton, RetroGradientBackground
 - `Data/` - questions.json (bundled trivia questions)
