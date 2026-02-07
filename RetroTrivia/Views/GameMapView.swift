@@ -13,6 +13,7 @@ struct GameMapView: View {
     @State private var questions: [TriviaQuestion] = []
     @State private var currentQuestion: TriviaQuestion?
     @State private var hasPlayedOnce = false
+    @State private var showQuitConfirmation = false
 
     private let maxLevel = 25
     private let nodeSpacing: CGFloat = 100
@@ -116,6 +117,15 @@ struct GameMapView: View {
                 handleAnswer(isCorrect: isCorrect)
             }
         }
+        .alert("Quit Game?", isPresented: $showQuitConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Quit", role: .destructive) {
+                audioManager.playMenuMusic()
+                onBackTapped()
+            }
+        } message: {
+            Text("Are you sure you want to quit? Your current position will be saved.")
+        }
         .onAppear {
             loadQuestions()
         }
@@ -125,16 +135,21 @@ struct GameMapView: View {
         HStack {
             Button(action: {
                 audioManager.playSoundEffect(named: "back-button")
-                audioManager.playMenuMusic()
-                onBackTapped()
+                showQuitConfirmation = true
             }) {
                 HStack(spacing: 8) {
-                    Image(systemName: "chevron.left")
-                    Text("Back")
+                    Image(systemName: "xmark.circle")
+                    Text("Quit Game")
                 }
-                .retroBody()
+                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .foregroundStyle(.red.opacity(0.9))
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(.red.opacity(0.15))
+                        .stroke(.red.opacity(0.4), lineWidth: 1)
+                )
             }
 
             Spacer()
