@@ -6,16 +6,15 @@
 //
 
 import SwiftUI
-import CoreData
 
 @main
 struct RetroTriviaApp: App {
-    let persistenceController = PersistenceController.shared
+    @State private var gameState = GameState()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environment(gameState)
         }
     }
 }
