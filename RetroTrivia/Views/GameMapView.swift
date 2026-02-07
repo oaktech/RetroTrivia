@@ -12,6 +12,7 @@ struct GameMapView: View {
     @State private var questions: [TriviaQuestion] = []
     @State private var currentQuestion: TriviaQuestion?
     @State private var showTriviaGame = false
+    @State private var hasPlayedOnce = false
 
     var body: some View {
         ZStack {
@@ -61,7 +62,7 @@ struct GameMapView: View {
                 Spacer()
 
                 // Play button
-                RetroButton("Play Trivia", variant: .primary) {
+                RetroButton(hasPlayedOnce ? "Next Question" : "Play Trivia", variant: .primary) {
                     startTrivia()
                 }
                 .disabled(questions.isEmpty)
@@ -117,6 +118,8 @@ struct GameMapView: View {
 
     private func handleAnswer(isCorrect: Bool) {
         print("DEBUG: Answer was \(isCorrect ? "correct" : "wrong")")
+
+        hasPlayedOnce = true
 
         if isCorrect {
             gameState.incrementPosition()
