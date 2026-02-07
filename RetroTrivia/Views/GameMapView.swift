@@ -8,14 +8,15 @@ import SwiftUI
 struct GameMapView: View {
     @Environment(GameState.self) var gameState
     @Environment(AudioManager.self) var audioManager
+    @Environment(QuestionManager.self) var questionManager
     let onBackTapped: () -> Void
 
-    @State private var questions: [TriviaQuestion] = []
     @State private var currentQuestion: TriviaQuestion?
     @State private var hasPlayedOnce = false
     @State private var showQuitConfirmation = false
     @State private var showLevelUp = false
     @State private var levelUpTier = 0
+    @State private var isLoadingQuestions = false
 
     private let maxLevel = 25
     private let nodeSpacing: CGFloat = 100
@@ -226,11 +227,15 @@ struct GameMapView: View {
             RetroButton(hasPlayedOnce ? "Next Question" : "Play Trivia", variant: .primary) {
                 startTrivia()
             }
-            .disabled(questions.isEmpty)
+            .disabled(isLoadingQuestions || questionManager.questionPool.isEmpty)
             .padding(.horizontal)
 
-            if questions.isEmpty {
+            if isLoadingQuestions {
                 Text("Loading questions...")
+                    .retroBody()
+                    .opacity(0.6)
+            } else if questionManager.questionPool.isEmpty {
+                Text("No questions available")
                     .retroBody()
                     .opacity(0.6)
             }
@@ -250,31 +255,26 @@ struct GameMapView: View {
     }
 
     private func loadQuestions() {
-        questions = TriviaQuestion.loadFromBundle()
-        print("DEBUG: Loaded \(questions.count) questions")
-        if questions.isEmpty {
-            print("DEBUG: WARNING - No questions loaded!")
+        Task {
+            isLoadingQuestions = true
+            await questionManager.loadQuestions()
+            isLoadingQuestions = false
+            print("DEBUG: \(questionManager.getPoolStatus())")
         }
     }
 
     private func startTrivia() {
-        guard !questions.isEmpty else {
-            print("DEBUG: ERROR - No questions available")
+        guard let question = questionManager.getNextQuestion() else {
+            print("DEBUG: No questions available")
             return
         }
 
         // Play button tap sound
         audioManager.playSoundEffect(named: "button-tap")
 
-        let selectedQuestion = questions.randomElement()
-        print("DEBUG: Selected question: \(selectedQuestion?.question ?? "nil")")
-
-        guard let selectedQuestion = selectedQuestion else {
-            print("DEBUG: ERROR - Failed to select random question")
-            return
-        }
-
-        currentQuestion = selectedQuestion
+        print("DEBUG: Selected question: \(question.question)")
+        questionManager.markQuestionAsked(question.id)
+        currentQuestion = question
     }
 
     private func handleAnswer(isCorrect: Bool) {
@@ -310,4 +310,5 @@ struct GameMapView: View {
     GameMapView(onBackTapped: {})
         .environment(GameState())
         .environment(AudioManager.shared)
+        .environment(QuestionManager())
 }

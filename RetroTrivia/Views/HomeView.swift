@@ -8,16 +8,32 @@ import SwiftUI
 struct HomeView: View {
     @Environment(GameState.self) var gameState
     @Environment(AudioManager.self) var audioManager
+    @Environment(QuestionManager.self) var questionManager
     let onPlayTapped: () -> Void
+
+    @State private var showSettings = false
 
     var body: some View {
         ZStack {
             RetroGradientBackground()
 
             VStack(spacing: 32) {
-                // Music toggle button
+                // Header buttons
                 HStack {
                     Spacer()
+
+                    // Settings button
+                    Button(action: {
+                        showSettings = true
+                    }) {
+                        Image(systemName: "gearshape.fill")
+                            .font(.title2)
+                            .foregroundStyle(Color("NeonPink"))
+                            .padding()
+                    }
+                    .sensoryFeedback(.impact(weight: .light), trigger: showSettings)
+
+                    // Music toggle button
                     Button(action: {
                         audioManager.playSoundEffect(named: "music-toggle")
                         audioManager.isMusicEnabled.toggle()
@@ -64,6 +80,7 @@ struct HomeView: View {
                 RetroButton("Play", variant: .primary) {
                     audioManager.playSoundEffect(named: "button-tap")
                     gameState.resetGame()
+                    questionManager.resetSession()
                     audioManager.playGameplayMusic()
                     onPlayTapped()
                 }
@@ -72,6 +89,9 @@ struct HomeView: View {
             }
             .padding()
         }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
     }
 }
 
@@ -79,4 +99,5 @@ struct HomeView: View {
     HomeView(onPlayTapped: {})
         .environment(GameState())
         .environment(AudioManager.shared)
+        .environment(QuestionManager())
 }

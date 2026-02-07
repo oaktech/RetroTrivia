@@ -11,6 +11,7 @@ import SwiftUI
 struct RetroTriviaApp: App {
     @State private var gameState = GameState()
     @State private var audioManager = AudioManager.shared
+    @State private var questionManager = QuestionManager()
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
@@ -18,6 +19,7 @@ struct RetroTriviaApp: App {
             ContentView()
                 .environment(gameState)
                 .environment(audioManager)
+                .environment(questionManager)
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             switch newPhase {
