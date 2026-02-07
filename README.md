@@ -6,10 +6,33 @@ An iOS trivia game themed around 80s music, built with SwiftUI.
 
 - **80s Music Trivia** - Questions about Madonna, Michael Jackson, Prince, Whitney Houston, Duran Duran, and more
 - **Candy Crush-style Progress Map** - Vertical map where correct answers move you up, wrong answers move you down
-- **Retro Aesthetic** - Neon colors, bold typography, and 80s vibes
-- **Background Music** - Synthwave soundtrack sets the mood
-- **Haptic Feedback** - Satisfying feedback on correct and wrong answers
-- **Celebration Animations** - Confetti for correct answers, shake effect for wrong ones
+- **Progressive Intensity System** - Visual effects and colors intensify as you climb higher, with 9 distinct tier levels
+- **Level-Up Celebrations** - Spectacular particle burst animations when reaching new tiers (Rising Star, On Fire, Hot Streak, Elite, Champion, Legendary, and more)
+- **Retro Aesthetic** - Neon colors, bold typography, and authentic 80s vibes
+- **Dynamic Music System** - Separate synthwave tracks for menu and gameplay that switch automatically
+- **Comprehensive Sound Effects** - Audio feedback for correct/wrong answers, button clicks, music toggles, and level-ups
+- **Audio Controls** - Toggle music and sound effects on/off with persistent settings
+- **Haptic Feedback** - Satisfying tactile feedback on correct and wrong answers
+- **Celebration Animations** - Confetti explosions for correct answers, shake effect for wrong ones
+- **Quit Confirmation** - Safety dialog to prevent accidental exits from the game
+
+## Gameplay
+
+Answer 80s music trivia questions to climb the vertical progress map. Correct answers move you up, wrong answers move you down (but never below level 0).
+
+**Tier System:**
+Every 3 levels, you advance to a new tier with increasing visual intensity:
+- **Level 1-2**: Beginner (Electric Blue)
+- **Level 3-5**: Rising Star
+- **Level 6-8**: On Fire
+- **Level 9-11**: Hot Streak (Neon Pink)
+- **Level 12-14**: Supercharged
+- **Level 15-17**: Elite
+- **Level 18-20**: Champion (Hot Magenta)
+- **Level 21-23**: Legendary
+- **Level 24-25**: Ultimate Master
+
+As you progress, the map's connecting lines grow thicker and colors shift from Electric Blue → Neon Pink → Hot Magenta, creating a sense of escalating excitement.
 
 ## Requirements
 
@@ -29,10 +52,12 @@ An iOS trivia game themed around 80s music, built with SwiftUI.
 RetroTrivia/
 ├── Models/          # TriviaQuestion, GameState
 ├── Views/           # HomeView, GameMapView, TriviaGameView
-├── Components/      # RetroButton, RetroGradientBackground
-├── Audio/           # AudioManager, background music
+│                    # MapNodeView, CelebrationOverlay, WrongAnswerOverlay, LevelUpOverlay
+├── Components/      # RetroButton, RetroGradientBackground, RetroTypography
+├── Audio/           # AudioManager, background music (menu-music.mp3, gameplay-music.mp3)
+│                    # Sound effects (correct-answer.wav, wrong-answer.wav, etc.)
 ├── Data/            # questions.json
-└── Assets.xcassets/ # Colors and images
+└── Assets.xcassets/ # Colors (NeonPink, ElectricBlue, HotMagenta, etc.) and images
 ```
 
 ## Development
@@ -41,11 +66,10 @@ See `BUILD_PROMPTS.md` for staged build instructions. The project is designed to
 
 ## Credits
 
-**Background Music:** "Afterglow Love" by e s c p
-- Website: https://www.escp.space
-- Bandcamp: https://escp-music.bandcamp.com
+**Menu Music:** "Electric Lullaby" by Electronic Senses
+**Gameplay Music:** "Retro" by jiglr
 
-See `CREDITS.md` for full attribution.
+See `CREDITS.md` for full music, sound effects, and asset attribution.
 
 ## License
 
