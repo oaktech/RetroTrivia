@@ -32,9 +32,23 @@ class AudioManager {
         }
     }
 
+    var isSoundEffectsEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(isSoundEffectsEnabled, forKey: "isSoundEffectsEnabled")
+        }
+    }
+
+    var soundEffectsVolume: Float {
+        didSet {
+            UserDefaults.standard.set(soundEffectsVolume, forKey: "soundEffectsVolume")
+        }
+    }
+
     private init() {
         self.isMusicEnabled = UserDefaults.standard.object(forKey: "isMusicEnabled") as? Bool ?? true
         self.musicVolume = UserDefaults.standard.object(forKey: "musicVolume") as? Float ?? 0.5
+        self.isSoundEffectsEnabled = UserDefaults.standard.object(forKey: "isSoundEffectsEnabled") as? Bool ?? true
+        self.soundEffectsVolume = UserDefaults.standard.object(forKey: "soundEffectsVolume") as? Float ?? 0.8
 
         setupAudioSession()
     }
@@ -99,18 +113,25 @@ class AudioManager {
         backgroundMusicPlayer?.play()
     }
 
-    func playSoundEffect(named name: String, withExtension ext: String = "mp3") {
+    func playSoundEffect(named name: String, withExtension ext: String = "mp3", volume: Float? = nil) {
+        // Check if sound effects are enabled
+        guard isSoundEffectsEnabled else {
+            print("DEBUG: Sound effects disabled, skipping \(name).\(ext)")
+            return
+        }
+
         guard let url = Bundle.main.url(forResource: name, withExtension: ext) else {
-            print("Sound effect '\(name).\(ext)' not found")
+            print("DEBUG: Sound effect '\(name).\(ext)' NOT FOUND in bundle!")
             return
         }
 
         do {
+            print("DEBUG: Playing sound effect: \(name).\(ext)")
             soundEffectPlayer = try AVAudioPlayer(contentsOf: url)
-            soundEffectPlayer?.volume = 0.8
+            soundEffectPlayer?.volume = volume ?? soundEffectsVolume
             soundEffectPlayer?.play()
         } catch {
-            print("Failed to play sound effect: \(error)")
+            print("DEBUG: Failed to play sound effect: \(error)")
         }
     }
 }

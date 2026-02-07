@@ -6,6 +6,8 @@
 import SwiftUI
 
 struct CelebrationOverlay: View {
+    @Environment(AudioManager.self) var audioManager
+
     let onComplete: () -> Void
 
     @State private var isAnimating = false
@@ -46,6 +48,9 @@ struct CelebrationOverlay: View {
             }
         }
         .onAppear {
+            // Play celebration sound
+            audioManager.playSoundEffect(named: "celebration")
+
             withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
                 isAnimating = true
             }
@@ -113,4 +118,5 @@ struct ConfettiPiece: View {
     CelebrationOverlay {
         print("Celebration complete")
     }
+    .environment(AudioManager.shared)
 }

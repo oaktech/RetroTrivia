@@ -19,6 +19,7 @@ struct HomeView: View {
                 HStack {
                     Spacer()
                     Button(action: {
+                        audioManager.playSoundEffect(named: "music-toggle")
                         audioManager.isMusicEnabled.toggle()
                     }) {
                         Image(systemName: audioManager.isMusicEnabled ? "speaker.wave.3.fill" : "speaker.slash.fill")
@@ -61,6 +62,7 @@ struct HomeView: View {
                 }
 
                 RetroButton("Play", variant: .primary) {
+                    audioManager.playSoundEffect(named: "button-tap")
                     gameState.resetGame()
                     audioManager.playGameplayMusic()
                     onPlayTapped()

@@ -14,6 +14,17 @@
 - License: Creative Commons / Attribution 3.0 Unported (CC BY 3.0)
 - https://creativecommons.org/licenses/by/3.0/deed.en_US
 
+## Sound Effects
+
+**Correct Answer Sound:** by [chrisiex1](https://pixabay.com/users/chrisiex1-38081926/)
+- Source: [Pixabay](https://pixabay.com/sound-effects/)
+
+**Wrong Answer Sound:** by [freesound_community](https://pixabay.com/users/freesound_community-46691455/)
+- Source: [Pixabay](https://pixabay.com/sound-effects/)
+
+**Button Click Sound:** by [CreatorsHome](https://pixabay.com/users/creatorshome-49707711/)
+- Source: [Pixabay](https://pixabay.com/sound-effects/)
+
 ## Assets
 
 **80s Retro Color Palette:**

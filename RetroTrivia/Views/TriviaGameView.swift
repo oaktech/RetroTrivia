@@ -6,6 +6,8 @@
 import SwiftUI
 
 struct TriviaGameView: View {
+    @Environment(AudioManager.self) var audioManager
+
     let question: TriviaQuestion
     let onAnswer: (Bool) -> Void
 
@@ -104,7 +106,8 @@ struct TriviaGameView: View {
     private func handleAnswer(_ index: Int) {
         guard !hasAnswered else { return }
 
-        // Light tap feedback
+        // Light tap feedback (sound + haptic)
+        audioManager.playSoundEffect(named: "button-tap")
         buttonTapTrigger += 1
 
         selectedIndex = index
@@ -112,7 +115,7 @@ struct TriviaGameView: View {
 
         let isCorrect = index == question.correctIndex
 
-        // Show appropriate overlay with haptic
+        // Show appropriate overlay with haptic (overlay handles the sound)
         if isCorrect {
             correctAnswerTrigger.toggle()
             showCelebration = true
@@ -189,4 +192,5 @@ struct TriviaGameView: View {
     return TriviaGameView(question: sampleQuestion) { isCorrect in
         print("Answer: \(isCorrect)")
     }
+    .environment(AudioManager.shared)
 }

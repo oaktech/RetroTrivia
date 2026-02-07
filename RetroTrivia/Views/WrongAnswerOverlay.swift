@@ -6,6 +6,8 @@
 import SwiftUI
 
 struct WrongAnswerOverlay: View {
+    @Environment(AudioManager.self) var audioManager
+
     let onComplete: () -> Void
 
     @State private var isAnimating = false
@@ -41,6 +43,9 @@ struct WrongAnswerOverlay: View {
             }
         }
         .onAppear {
+            // Play wrong buzzer sound
+            audioManager.playSoundEffect(named: "wrong-buzzer")
+
             withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
                 isAnimating = true
             }
@@ -65,4 +70,5 @@ struct WrongAnswerOverlay: View {
     WrongAnswerOverlay {
         print("Wrong answer overlay complete")
     }
+    .environment(AudioManager.shared)
 }

@@ -124,6 +124,7 @@ struct GameMapView: View {
     private var header: some View {
         HStack {
             Button(action: {
+                audioManager.playSoundEffect(named: "back-button")
                 audioManager.playMenuMusic()
                 onBackTapped()
             }) {
@@ -197,6 +198,9 @@ struct GameMapView: View {
             return
         }
 
+        // Play button tap sound
+        audioManager.playSoundEffect(named: "button-tap")
+
         let selectedQuestion = questions.randomElement()
         print("DEBUG: Selected question: \(selectedQuestion?.question ?? "nil")")
 
@@ -214,7 +218,21 @@ struct GameMapView: View {
         hasPlayedOnce = true
 
         if isCorrect {
+            let oldTier = gameState.currentPosition / 3
             gameState.incrementPosition()
+            let newTier = gameState.currentPosition / 3
+
+            print("DEBUG: Position \(gameState.currentPosition - 1) -> \(gameState.currentPosition), Tier \(oldTier) -> \(newTier)")
+
+            // Play unlock sound when reaching a new tier (every 3 levels)
+            if newTier > oldTier {
+                print("DEBUG: Tier crossed! Scheduling node-unlock sound...")
+                let audio = audioManager // Capture before async
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    print("DEBUG: Playing node-unlock now!")
+                    audio.playSoundEffect(named: "node-unlock", withExtension: "wav", volume: 1.0)
+                }
+            }
         } else {
             gameState.decrementPosition()
         }
