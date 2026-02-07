@@ -7,6 +7,7 @@ An iOS trivia game themed around 80s music, built with SwiftUI.
 - **80s Music Trivia** - Questions about Madonna, Michael Jackson, Prince, Whitney Houston, Duran Duran, and more
 - **Candy Crush-style Progress Map** - Vertical map where correct answers move you up, wrong answers move you down
 - **Retro Aesthetic** - Neon colors, bold typography, and 80s vibes
+- **Background Music** - Synthwave soundtrack sets the mood
 - **Haptic Feedback** - Satisfying feedback on correct and wrong answers
 - **Celebration Animations** - Confetti for correct answers, shake effect for wrong ones
 
@@ -29,6 +30,7 @@ RetroTrivia/
 ├── Models/          # TriviaQuestion, GameState
 ├── Views/           # HomeView, GameMapView, TriviaGameView
 ├── Components/      # RetroButton, RetroGradientBackground
+├── Audio/           # AudioManager, background music
 ├── Data/            # questions.json
 └── Assets.xcassets/ # Colors and images
 ```
@@ -36,6 +38,14 @@ RetroTrivia/
 ## Development
 
 See `BUILD_PROMPTS.md` for staged build instructions. The project is designed to be built incrementally across 8 stages, from data models through final polish.
+
+## Credits
+
+**Background Music:** "Afterglow Love" by e s c p
+- Website: https://www.escp.space
+- Bandcamp: https://escp-music.bandcamp.com
+
+See `CREDITS.md` for full attribution.
 
 ## License
 

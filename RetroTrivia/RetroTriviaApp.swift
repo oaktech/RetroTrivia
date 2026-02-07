@@ -10,18 +10,34 @@ import SwiftUI
 @main
 struct RetroTriviaApp: App {
     @State private var gameState = GameState()
+    @State private var audioManager = AudioManager.shared
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(gameState)
+                .environment(audioManager)
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
-            if newPhase == .background {
-                // Ensure state is persisted when app goes to background
+            switch newPhase {
+            case .active:
+                // Resume music when app becomes active
+                audioManager.resumeBackgroundMusic()
+            case .background:
+                // Pause music when app goes to background
+                audioManager.pauseBackgroundMusic()
                 print("App entering background - state persisted")
+            case .inactive:
+                break
+            @unknown default:
+                break
             }
         }
+    }
+
+    init() {
+        // Start background music when app launches
+        AudioManager.shared.playBackgroundMusic()
     }
 }

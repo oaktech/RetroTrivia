@@ -7,6 +7,7 @@ import SwiftUI
 
 struct HomeView: View {
     @Environment(GameState.self) var gameState
+    @Environment(AudioManager.self) var audioManager
     let onPlayTapped: () -> Void
 
     var body: some View {
@@ -14,6 +15,20 @@ struct HomeView: View {
             RetroGradientBackground()
 
             VStack(spacing: 32) {
+                // Music toggle button
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        audioManager.isMusicEnabled.toggle()
+                    }) {
+                        Image(systemName: audioManager.isMusicEnabled ? "speaker.wave.3.fill" : "speaker.slash.fill")
+                            .font(.title2)
+                            .foregroundStyle(audioManager.isMusicEnabled ? Color("NeonPink") : Color.white.opacity(0.5))
+                            .padding()
+                    }
+                    .sensoryFeedback(.impact(weight: .light), trigger: audioManager.isMusicEnabled)
+                }
+
                 Spacer()
 
                 VStack(spacing: 12) {
@@ -59,4 +74,5 @@ struct HomeView: View {
 #Preview {
     HomeView(onPlayTapped: {})
         .environment(GameState())
+        .environment(AudioManager.shared)
 }
