@@ -14,8 +14,37 @@ struct GameMapView: View {
     @State private var currentQuestion: TriviaQuestion?
     @State private var hasPlayedOnce = false
 
-    private let maxLevel = 50
+    private let maxLevel = 25
     private let nodeSpacing: CGFloat = 100
+
+    // MARK: - Progressive Intensity Helpers
+
+    private func intensityMultiplier(for level: Int) -> Double {
+        // Intensity increases every 3 levels (creates distinct tiers)
+        let tier = Double(level / 3)
+        let maxTier = Double(25 / 3) // 8 tiers total (0-8)
+        return tier / maxTier
+    }
+
+    private func lineWidth(for level: Int) -> CGFloat {
+        let baseWidth: CGFloat = 2
+        let maxWidth: CGFloat = 10
+        let intensity = intensityMultiplier(for: level)
+        return baseWidth + (maxWidth - baseWidth) * intensity
+    }
+
+    private func lineColor(for level: Int) -> Color {
+        let intensity = intensityMultiplier(for: level)
+
+        // First transition at tier 2 (0.25), then every 2 tiers (0.5, 0.75)
+        if intensity < 0.25 {
+            return Color("ElectricBlue")
+        } else if intensity < 0.5 {
+            return Color("NeonPink")
+        } else {
+            return Color("HotMagenta")
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -48,14 +77,15 @@ struct GameMapView: View {
                                             .fill(
                                                 LinearGradient(
                                                     colors: [
-                                                        level <= gameState.currentPosition ? Color("ElectricBlue") : Color.white.opacity(0.2),
-                                                        level - 1 <= gameState.currentPosition ? Color("ElectricBlue") : Color.white.opacity(0.2)
+                                                        level <= gameState.currentPosition ? lineColor(for: level) : Color.white.opacity(0.2),
+                                                        level - 1 <= gameState.currentPosition ? lineColor(for: level - 1) : Color.white.opacity(0.2)
                                                     ],
                                                     startPoint: .top,
                                                     endPoint: .bottom
                                                 )
                                             )
-                                            .frame(width: 3, height: nodeSpacing - 60)
+                                            .frame(width: lineWidth(for: level), height: nodeSpacing - 60)
+                                            .drawingGroup()
                                     }
                                 }
                             }

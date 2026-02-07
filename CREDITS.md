@@ -2,9 +2,11 @@
 
 ## Music
 
-**Menu Music:** "Afterglow Love" by e s c p
-- Website: https://www.escp.space
-- Bandcamp: https://escp-music.bandcamp.com
+**Menu Music:** "Electric Lullaby" by Electronic Senses
+- SoundCloud: https://soundcloud.com/electronicsenses
+- Music promoted by: https://www.free-stock-music.com
+- License: Creative Commons / Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
+- https://creativecommons.org/licenses/by-sa/3.0/deed.en_US
 
 **Gameplay Music:** "Retro" by jiglr
 - SoundCloud: https://soundcloud.com/jiglrmusic

@@ -61,6 +61,7 @@ struct HomeView: View {
                 }
 
                 RetroButton("Play", variant: .primary) {
+                    gameState.resetGame()
                     audioManager.playGameplayMusic()
                     onPlayTapped()
                 }
