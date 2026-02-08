@@ -19,19 +19,8 @@ struct HomeView: View {
 
             VStack(spacing: 32) {
                 // Header buttons
-                HStack {
+                HStack(spacing: 12) {
                     Spacer()
-
-                    // Settings button
-                    Button(action: {
-                        showSettings = true
-                    }) {
-                        Image(systemName: "gearshape.fill")
-                            .font(.title2)
-                            .foregroundStyle(Color("NeonPink"))
-                            .padding()
-                    }
-                    .sensoryFeedback(.impact(weight: .light), trigger: showSettings)
 
                     // Music toggle button
                     Button(action: {
@@ -39,11 +28,26 @@ struct HomeView: View {
                         audioManager.isMusicEnabled.toggle()
                     }) {
                         Image(systemName: audioManager.isMusicEnabled ? "speaker.wave.3.fill" : "speaker.slash.fill")
-                            .font(.title2)
-                            .foregroundStyle(audioManager.isMusicEnabled ? Color("NeonPink") : Color.white.opacity(0.5))
-                            .padding()
+                            .font(.system(size: 18))
+                            .foregroundStyle(audioManager.isMusicEnabled ? Color("NeonPink") : Color.white.opacity(0.4))
+                            .frame(width: 42, height: 42)
+                            .background(Color.white.opacity(0.08))
+                            .clipShape(Circle())
                     }
                     .sensoryFeedback(.impact(weight: .light), trigger: audioManager.isMusicEnabled)
+
+                    // Settings button
+                    Button(action: {
+                        showSettings = true
+                    }) {
+                        Image(systemName: "gearshape.fill")
+                            .font(.system(size: 18))
+                            .foregroundStyle(Color("NeonPink"))
+                            .frame(width: 42, height: 42)
+                            .background(Color.white.opacity(0.08))
+                            .clipShape(Circle())
+                    }
+                    .sensoryFeedback(.impact(weight: .light), trigger: showSettings)
                 }
 
                 Spacer()
