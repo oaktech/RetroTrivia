@@ -34,7 +34,7 @@ struct FilterConfiguration: Codable {
     private static let difficultyKey = "trivia.filter.difficulty"
     private static let onlineQuestionsKey = "trivia.filter.onlineQuestions"
 
-    init(difficulty: Difficulty = .any, enableOnlineQuestions: Bool = true) {
+    init(difficulty: Difficulty = .any, enableOnlineQuestions: Bool = false) {
         self.difficulty = difficulty
         self.enableOnlineQuestions = enableOnlineQuestions
     }
@@ -46,7 +46,7 @@ struct FilterConfiguration: Codable {
         let difficultyRawValue = defaults.string(forKey: difficultyKey) ?? Difficulty.any.rawValue
         let difficulty = Difficulty(rawValue: difficultyRawValue) ?? .any
 
-        let enableOnlineQuestions = defaults.object(forKey: onlineQuestionsKey) as? Bool ?? true
+        let enableOnlineQuestions = defaults.object(forKey: onlineQuestionsKey) as? Bool ?? false
 
         return FilterConfiguration(
             difficulty: difficulty,

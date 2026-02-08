@@ -93,11 +93,14 @@ struct SettingsView: View {
                 // Info text
                 VStack(spacing: 8) {
                     if questionManager.filterConfig.enableOnlineQuestions {
-                        Text("Questions from Open Trivia Database")
+                        Text("Online questions include all music eras")
                             .font(.caption)
                             .foregroundStyle(.white.opacity(0.6))
+                        Text("(not limited to 80s)")
+                            .font(.caption2)
+                            .foregroundStyle(.white.opacity(0.5))
                     } else {
-                        Text("Using bundled 80s music questions")
+                        Text("Using curated 80s music questions")
                             .font(.caption)
                             .foregroundStyle(.white.opacity(0.6))
                     }
