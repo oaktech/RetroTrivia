@@ -71,6 +71,10 @@ See `BUILD_PROMPTS.md` for staged build instructions. The project is designed to
 
 See `CREDITS.md` for full music, sound effects, and asset attribution.
 
+## Privacy Policy
+
+[Privacy Policy](https://gist.github.com/oaktech/dc4d99c3a4115ba743df84e3834dc03e)
+
 ## License
 
 MIT

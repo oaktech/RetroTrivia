@@ -25,6 +25,19 @@
 **Button Click Sound:** by [CreatorsHome](https://pixabay.com/users/creatorshome-49707711/)
 - Source: [Pixabay](https://pixabay.com/sound-effects/)
 
+**Music Toggle Sound:** by [Homemade_SFX](https://pixabay.com/users/homemade_sfx-47000485/)
+- Source: [Pixabay](https://pixabay.com/sound-effects/)
+
+**Wrong Buzzer Sound:** by [freesound_community](https://pixabay.com/users/freesound_community-46691455/)
+- Source: [Pixabay](https://pixabay.com/sound-effects/)
+
+**Back Button Sound:** by [Emiliano Dleon](https://pixabay.com/users/emilianodleon-41744987/)
+- Source: [Pixabay](https://pixabay.com/sound-effects/)
+
+**Node Unlock Sound:**
+- Source: [Mixkit](https://mixkit.co/free-sound-effects/)
+- License: [Mixkit Sound Effects Free License](https://mixkit.co/license/#sfxFree)
+
 ## Assets
 
 **80s Retro Color Palette:**
