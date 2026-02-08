@@ -288,7 +288,7 @@ struct GameMapView: View {
             loadQuestions()
             if gameState.gameSettings.gameTimerEnabled {
                 gameTimeRemaining = Double(gameState.gameSettings.gameTimerDuration)
-                gameTimerActive = true
+                // Don't start timer yet - wait for "Play Trivia" button
             }
         }
     }
@@ -530,6 +530,11 @@ struct GameMapView: View {
         guard let question = questionManager.getNextQuestion() else {
             print("DEBUG: No questions available")
             return
+        }
+
+        // Start game timer on first question
+        if gameState.gameSettings.gameTimerEnabled && !gameTimerActive {
+            gameTimerActive = true
         }
 
         // Play button tap sound
