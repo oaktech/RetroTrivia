@@ -9,9 +9,11 @@ struct MapNodeView: View {
     let levelIndex: Int
     let isCurrentPosition: Bool
     let currentPosition: Int
+    var isAnimatingTarget: Bool = false
 
     @State private var pulseScale: CGFloat = 1.0
     @State private var animationRotation: Double = 0
+    @State private var targetPulseScale: CGFloat = 1.0
 
     private var nodeState: NodeState {
         if levelIndex == currentPosition {
@@ -66,8 +68,19 @@ struct MapNodeView: View {
                     .foregroundStyle(iconColor)
             }
         }
-        .scaleEffect(scaleEffect)
+        .scaleEffect(scaleEffect * targetPulseScale)
         .animation(.spring(response: 0.3), value: currentPosition)
+        .onChange(of: isAnimatingTarget) { oldValue, newValue in
+            // Pulsate when this node is the target of movement
+            if newValue {
+                withAnimation(.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true)) {
+                    targetPulseScale = 1.3
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+                    self.targetPulseScale = 1.0
+                }
+            }
+        }
         .onChange(of: currentPosition) { oldValue, newValue in
             // Update pulse animation when state changes
             if shouldPulse && pulseScale == 1.0 {

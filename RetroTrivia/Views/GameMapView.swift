@@ -20,6 +20,22 @@ struct GameMapView: View {
     @State private var showAutoAdvance = false
     @State private var autoAdvanceProgress: CGFloat = 1.0
     @State private var questionCardScale: CGFloat = 1.0
+    @State private var animatingLineLevel: Int? = nil
+    @State private var animatingNodeLevel: Int? = nil
+    @State private var lineFlashIntensity: CGFloat = 0.0
+    @State private var scrollProxy: ScrollViewProxy? = nil
+    @State private var movementDirection: MovementDirection = .none
+    @State private var scoreAnimationScale: CGFloat = 1.0
+    @State private var showScoreChange: Bool = false
+    @State private var scoreChangeValue: Int = 0
+    @State private var scoreChangeOffset: CGFloat = 0
+    @State private var scoreChangeOpacity: CGFloat = 1.0
+
+    enum MovementDirection {
+        case none
+        case climbing
+        case falling
+    }
 
     private let maxLevel = 25
     private let nodeSpacing: CGFloat = 100
@@ -89,12 +105,14 @@ struct GameMapView: View {
                                     MapNodeView(
                                         levelIndex: level,
                                         isCurrentPosition: level == gameState.currentPosition,
-                                        currentPosition: gameState.currentPosition
+                                        currentPosition: gameState.currentPosition,
+                                        isAnimatingTarget: animatingNodeLevel == level
                                     )
                                     .id(level)
 
                                     // Connecting line (except for the last node)
                                     if level > 0 {
+                                        let isAnimatingLine = animatingLineLevel == level
                                         Rectangle()
                                             .fill(
                                                 LinearGradient(
@@ -106,7 +124,19 @@ struct GameMapView: View {
                                                     endPoint: .bottom
                                                 )
                                             )
-                                            .frame(width: lineWidth(for: level), height: nodeSpacing - 60)
+                                            .frame(width: lineWidth(for: level), height: nodeSpacing - 65)
+                                            .padding(.vertical, 2.5)
+                                            .overlay(
+                                                // Flash effect overlay
+                                                Rectangle()
+                                                    .fill(Color.white)
+                                                    .opacity(isAnimatingLine ? lineFlashIntensity : 0)
+                                                    .frame(width: lineWidth(for: level), height: nodeSpacing - 65)
+                                            )
+                                            .shadow(
+                                                color: isAnimatingLine ? Color("NeonYellow") : .clear,
+                                                radius: isAnimatingLine ? 10 * lineFlashIntensity : 0
+                                            )
                                             .drawingGroup()
                                     }
                                 }
@@ -117,12 +147,34 @@ struct GameMapView: View {
                         }
                     }
                     .onChange(of: gameState.currentPosition) { oldValue, newValue in
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            proxy.scrollTo(newValue, anchor: .center)
+                        // Dramatic camera movement based on direction
+                        let isClimbing = newValue > oldValue
+                        let isFalling = newValue < oldValue
+
+                        if isClimbing || isFalling {
+                            // First: Quick movement with overshoot
+                            let overshootTarget = isClimbing ? min(newValue + 2, maxLevel) : max(newValue - 2, 0)
+
+                            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                                proxy.scrollTo(overshootTarget, anchor: .center)
+                            }
+
+                            // Then: Settle back to actual position
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                                    proxy.scrollTo(newValue, anchor: .center)
+                                }
+                            }
+                        } else {
+                            // Normal scroll for initial positioning
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                proxy.scrollTo(newValue, anchor: .center)
+                            }
                         }
                     }
                     .onAppear {
-                        // Scroll to current position on appear
+                        // Store proxy and scroll to current position
+                        scrollProxy = proxy
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             proxy.scrollTo(gameState.currentPosition, anchor: .center)
                         }
@@ -216,17 +268,76 @@ struct GameMapView: View {
 
                 // Correct answers indicator
                 if gameState.currentPosition > 0 {
-                    VStack(spacing: 4) {
-                        Text("Correct")
-                            .font(.caption)
-                            .foregroundStyle(.white.opacity(0.7))
-                        Text("\(gameState.currentPosition)")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundStyle(Color("NeonYellow"))
+                    ZStack {
+                        VStack(spacing: 4) {
+                            Text("Correct")
+                                .font(.caption)
+                                .foregroundStyle(.white.opacity(0.7))
+                            Text("\(gameState.currentPosition)")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundStyle(Color("NeonYellow"))
+                                .contentTransition(.numericText())
+                        }
+                        .scaleEffect(scoreAnimationScale)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+
+                        // Floating score change indicator
+                        if showScoreChange {
+                            Text(scoreChangeValue > 0 ? "+\(scoreChangeValue)" : "\(scoreChangeValue)")
+                                .font(.title)
+                                .fontWeight(.black)
+                                .foregroundStyle(scoreChangeValue > 0 ? Color("NeonPink") : Color.red)
+                                .shadow(color: scoreChangeValue > 0 ? Color("NeonPink") : Color.red, radius: 8)
+                                .offset(y: scoreChangeOffset)
+                                .opacity(scoreChangeOpacity)
+                        }
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
+                    .onChange(of: gameState.currentPosition) { oldValue, newValue in
+                        let change = newValue - oldValue
+
+                        // Reset previous animation state
+                        showScoreChange = false
+                        scoreChangeOffset = 0
+                        scoreChangeOpacity = 1.0
+                        scoreAnimationScale = 1.0
+
+                        // Set up new animation
+                        scoreChangeValue = change
+                        showScoreChange = true
+
+                        if change > 0 {
+                            // Climbing: Bounce up with floating +1
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
+                                scoreAnimationScale = 1.3
+                            }
+                            withAnimation(.easeOut(duration: 0.8)) {
+                                scoreChangeOffset = -40
+                                scoreChangeOpacity = 0.0
+                            }
+                        } else if change < 0 {
+                            // Falling: Quick shake with floating -1
+                            withAnimation(.easeInOut(duration: 0.15).repeatCount(2, autoreverses: true)) {
+                                scoreAnimationScale = 0.9
+                            }
+                            withAnimation(.easeOut(duration: 0.8)) {
+                                scoreChangeOffset = 40
+                                scoreChangeOpacity = 0.0
+                            }
+                        }
+
+                        // Reset animations
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                self.scoreAnimationScale = 1.0
+                            }
+                        }
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                            self.showScoreChange = false
+                        }
+                    }
                 }
             }
         }
@@ -339,12 +450,17 @@ struct GameMapView: View {
         hasPlayedOnce = true
         var didLevelUp = false
 
+        let oldPosition = gameState.currentPosition
+
         if isCorrect {
             let oldTier = gameState.currentPosition / 3
             gameState.incrementPosition()
             let newTier = gameState.currentPosition / 3
 
-            print("DEBUG: Position \(gameState.currentPosition - 1) -> \(gameState.currentPosition), Tier \(oldTier) -> \(newTier)")
+            // Trigger climbing animation (line above and target node above)
+            animateClimbing(from: oldPosition, to: gameState.currentPosition)
+
+            print("DEBUG: Position \(oldPosition) -> \(gameState.currentPosition), Tier \(oldTier) -> \(newTier)")
 
             // Show level-up overlay when reaching a new tier (every 3 levels)
             if newTier > oldTier {
@@ -357,6 +473,9 @@ struct GameMapView: View {
             }
         } else {
             gameState.decrementPosition()
+
+            // Trigger falling animation (line below and target node below)
+            animateFalling(from: oldPosition, to: gameState.currentPosition)
         }
 
         // Clear current question to dismiss the sheet
@@ -364,6 +483,42 @@ struct GameMapView: View {
 
         // Start auto-advance immediately for fluid flow
         startAutoAdvance(extendedDuration: didLevelUp)
+    }
+
+    private func animateClimbing(from: Int, to: Int) {
+        // Animate the line going UP (the line from 'from' to 'to')
+        animatingLineLevel = to
+        animatingNodeLevel = to
+
+        // Flash animation for line
+        withAnimation(.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true)) {
+            lineFlashIntensity = 0.6
+        }
+
+        // Reset after animation completes
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+            self.lineFlashIntensity = 0.0
+            self.animatingLineLevel = nil
+            self.animatingNodeLevel = nil
+        }
+    }
+
+    private func animateFalling(from: Int, to: Int) {
+        // Animate the line going DOWN (the line from 'from' to 'to')
+        animatingLineLevel = from
+        animatingNodeLevel = to
+
+        // Flash animation for line (red-tinted for falling)
+        withAnimation(.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true)) {
+            lineFlashIntensity = 0.4
+        }
+
+        // Reset after animation completes
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+            self.lineFlashIntensity = 0.0
+            self.animatingLineLevel = nil
+            self.animatingNodeLevel = nil
+        }
     }
 
     private func startAutoAdvance(extendedDuration: Bool = false) {
