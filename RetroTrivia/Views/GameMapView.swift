@@ -124,14 +124,14 @@ struct GameMapView: View {
                                                     endPoint: .bottom
                                                 )
                                             )
-                                            .frame(width: lineWidth(for: level), height: nodeSpacing - 65)
-                                            .padding(.vertical, 2.5)
+                                            .frame(width: lineWidth(for: level), height: 30)
+                                            .padding(.vertical, 8)
                                             .overlay(
                                                 // Flash effect overlay
                                                 Rectangle()
                                                     .fill(Color.white)
                                                     .opacity(isAnimatingLine ? lineFlashIntensity : 0)
-                                                    .frame(width: lineWidth(for: level), height: nodeSpacing - 65)
+                                                    .frame(width: lineWidth(for: level), height: 30)
                                             )
                                             .shadow(
                                                 color: isAnimatingLine ? Color("NeonYellow") : .clear,
@@ -408,6 +408,7 @@ struct GameMapView: View {
                     .padding(.bottom, 20)
             }
         }
+        .fixedSize(horizontal: false, vertical: true)
         .background(
             LinearGradient(
                 colors: [
@@ -417,7 +418,6 @@ struct GameMapView: View {
                 startPoint: .top,
                 endPoint: .bottom
             )
-            .ignoresSafeArea(edges: .bottom)
         )
     }
 
