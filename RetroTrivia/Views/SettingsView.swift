@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(GameState.self) private var gameState
     @Environment(QuestionManager.self) private var questionManager
     @Environment(AudioManager.self) private var audioManager
 
@@ -41,6 +42,51 @@ struct SettingsView: View {
                         .sensoryFeedback(.impact(weight: .light), trigger: questionManager.filterConfig.enableOnlineQuestions)
                     }
                     .padding(.horizontal, 30)
+
+                    // Timer Toggle
+                    HStack {
+                        Text("Countdown Timer")
+                            .retroBody()
+                            .foregroundStyle(.white)
+
+                        Spacer()
+
+                        Toggle("", isOn: Binding(
+                            get: { gameState.gameSettings.timerEnabled },
+                            set: { newValue in
+                                audioManager.playSoundEffect(named: "button-tap")
+                                gameState.gameSettings.timerEnabled = newValue
+                            }
+                        ))
+                        .tint(Color("NeonPink"))
+                        .sensoryFeedback(.impact(weight: .light), trigger: gameState.gameSettings.timerEnabled)
+                    }
+                    .padding(.horizontal, 30)
+
+                    // Timer Duration Picker (only when timer is enabled)
+                    if gameState.gameSettings.timerEnabled {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Time per Question")
+                                .retroBody()
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 30)
+
+                            Picker("Duration", selection: Binding(
+                                get: { gameState.gameSettings.timerDuration },
+                                set: { newValue in
+                                    audioManager.playSoundEffect(named: "button-tap")
+                                    gameState.gameSettings.timerDuration = newValue
+                                }
+                            )) {
+                                Text("10s").tag(10)
+                                Text("15s").tag(15)
+                                Text("20s").tag(20)
+                            }
+                            .pickerStyle(.segmented)
+                            .padding(.horizontal, 30)
+                            .sensoryFeedback(.selection, trigger: gameState.gameSettings.timerDuration)
+                        }
+                    }
 
                     // Difficulty Picker
                     VStack(alignment: .leading, spacing: 12) {
@@ -126,6 +172,7 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
+        .environment(GameState())
         .environment(QuestionManager())
         .environment(AudioManager.shared)
 }

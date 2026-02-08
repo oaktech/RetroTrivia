@@ -7,6 +7,7 @@ import SwiftUI
 
 struct TriviaGameView: View {
     @Environment(AudioManager.self) var audioManager
+    @Environment(GameState.self) var gameState
 
     let question: TriviaQuestion
     let onAnswer: (Bool) -> Void
@@ -18,6 +19,11 @@ struct TriviaGameView: View {
     @State private var wrongAnswerTrigger = false
     @State private var showCelebration = false
     @State private var showWrong = false
+    @State private var showTimeout = false
+    @State private var timeRemaining: Double = 15.0
+    @State private var timerIsActive = false
+
+    private let countdownTimer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         ZStack {
@@ -35,6 +41,14 @@ struct TriviaGameView: View {
 
             VStack(spacing: 40) {
                 Spacer()
+
+                // Timer
+                if gameState.gameSettings.timerEnabled {
+                    CountdownTimerView(
+                        timeRemaining: timeRemaining,
+                        totalTime: Double(gameState.gameSettings.timerDuration)
+                    )
+                }
 
                 // Question
                 Text(question.question)
@@ -75,10 +89,38 @@ struct TriviaGameView: View {
                     handleOverlayComplete(isCorrect: false)
                 }
             }
+
+            if showTimeout {
+                TimeoutOverlay {
+                    handleOverlayComplete(isCorrect: false)
+                }
+            }
         }
         .sensoryFeedback(.impact(weight: .light), trigger: buttonTapTrigger)
         .sensoryFeedback(.success, trigger: correctAnswerTrigger)
         .sensoryFeedback(.error, trigger: wrongAnswerTrigger)
+        .onAppear {
+            if gameState.gameSettings.timerEnabled {
+                timeRemaining = Double(gameState.gameSettings.timerDuration)
+                timerIsActive = true
+            }
+        }
+        .onReceive(countdownTimer) { _ in
+            guard timerIsActive, !hasAnswered else { return }
+            if timeRemaining > 0.1 {
+                timeRemaining -= 0.1
+            } else {
+                handleTimeout()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+            timerIsActive = false
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            if !hasAnswered && gameState.gameSettings.timerEnabled {
+                timerIsActive = true
+            }
+        }
     }
 
     @ViewBuilder
@@ -103,8 +145,17 @@ struct TriviaGameView: View {
         .disabled(hasAnswered)
     }
 
+    private func handleTimeout() {
+        guard !hasAnswered else { return }
+        timerIsActive = false
+        hasAnswered = true
+        wrongAnswerTrigger.toggle()
+        showTimeout = true
+    }
+
     private func handleAnswer(_ index: Int) {
         guard !hasAnswered else { return }
+        timerIsActive = false
 
         // Light tap feedback (sound + haptic)
         audioManager.playSoundEffect(named: "button-tap")
@@ -126,9 +177,10 @@ struct TriviaGameView: View {
     }
 
     private func handleOverlayComplete(isCorrect: Bool) {
-        // Hide overlay
+        // Hide overlays
         showCelebration = false
         showWrong = false
+        showTimeout = false
 
         // Small delay before dismissing to ensure smooth animation
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -193,4 +245,5 @@ struct TriviaGameView: View {
         print("Answer: \(isCorrect)")
     }
     .environment(AudioManager.shared)
+    .environment(GameState())
 }

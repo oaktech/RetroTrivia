@@ -27,6 +27,12 @@ class GameState {
         }
     }
 
+    var gameSettings: GameSettings = GameSettings.load() {
+        didSet {
+            gameSettings.save()
+        }
+    }
+
     init() {
         self.currentPosition = UserDefaults.standard.integer(forKey: Self.currentPositionKey)
         self.highScorePosition = UserDefaults.standard.integer(forKey: Self.highScorePositionKey)
