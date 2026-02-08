@@ -1,2 +1,0 @@
-Target dependency graph (1 target)
-Target 'RetroTrivia' in project 'RetroTrivia' (no dependencies)
