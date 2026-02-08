@@ -134,6 +134,52 @@ struct SettingsView: View {
                         }
                     }
 
+                    // Lives Mode Toggle
+                    HStack {
+                        Text("Lives Mode")
+                            .retroBody()
+                            .foregroundStyle(.white)
+
+                        Spacer()
+
+                        Toggle("", isOn: Binding(
+                            get: { gameState.gameSettings.livesEnabled },
+                            set: { newValue in
+                                audioManager.playSoundEffect(named: "button-tap")
+                                gameState.gameSettings.livesEnabled = newValue
+                            }
+                        ))
+                        .tint(Color("NeonPink"))
+                        .sensoryFeedback(.impact(weight: .light), trigger: gameState.gameSettings.livesEnabled)
+                    }
+                    .padding(.horizontal, 30)
+
+                    // Lives Count Picker (only when lives enabled)
+                    if gameState.gameSettings.livesEnabled {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Starting Lives")
+                                .retroBody()
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 30)
+
+                            Picker("Starting Lives", selection: Binding(
+                                get: { gameState.gameSettings.startingLives },
+                                set: { newValue in
+                                    audioManager.playSoundEffect(named: "button-tap")
+                                    gameState.gameSettings.startingLives = newValue
+                                }
+                            )) {
+                                Text("1").tag(1)
+                                Text("2").tag(2)
+                                Text("3").tag(3)
+                                Text("5").tag(5)
+                            }
+                            .pickerStyle(.segmented)
+                            .padding(.horizontal, 30)
+                            .sensoryFeedback(.selection, trigger: gameState.gameSettings.startingLives)
+                        }
+                    }
+
                     // Difficulty Picker
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Difficulty")

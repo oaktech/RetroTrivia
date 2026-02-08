@@ -12,6 +12,7 @@ struct RetroTriviaApp: App {
     @State private var gameState = GameState()
     @State private var audioManager = AudioManager.shared
     @State private var questionManager = QuestionManager()
+    @State private var gameCenterManager = GameCenterManager.shared
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
@@ -20,6 +21,10 @@ struct RetroTriviaApp: App {
                 .environment(gameState)
                 .environment(audioManager)
                 .environment(questionManager)
+                .environment(gameCenterManager)
+                .onAppear {
+                    gameCenterManager.authenticate()
+                }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             switch newPhase {

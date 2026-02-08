@@ -6,10 +6,32 @@
 import SwiftUI
 
 struct GameOverOverlay: View {
+    enum Reason {
+        case timerExpired
+        case livesExhausted
+    }
+
     let score: Int
+    var reason: Reason = .timerExpired
     let onComplete: () -> Void
 
+    @Environment(GameCenterManager.self) private var gameCenterManager
     @State private var isAnimating = false
+    @State private var showLeaderboard = false
+
+    private var titleText: String {
+        switch reason {
+        case .timerExpired: return "TIME'S UP!"
+        case .livesExhausted: return "GAME OVER!"
+        }
+    }
+
+    private var iconName: String {
+        switch reason {
+        case .timerExpired: return "clock.badge.xmark"
+        case .livesExhausted: return "heart.slash.fill"
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -17,14 +39,14 @@ struct GameOverOverlay: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 24) {
-                Image(systemName: "clock.badge.xmark")
+                Image(systemName: iconName)
                     .font(.system(size: 72))
                     .foregroundStyle(Color("NeonPink"))
                     .shadow(color: Color("NeonPink"), radius: 20)
                     .scaleEffect(isAnimating ? 1.0 : 0.3)
                     .opacity(isAnimating ? 1 : 0)
 
-                Text("TIME'S UP!")
+                Text(titleText)
                     .font(.system(size: 48, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(
@@ -50,8 +72,16 @@ struct GameOverOverlay: View {
                 .scaleEffect(isAnimating ? 1.0 : 0.5)
                 .opacity(isAnimating ? 1 : 0)
 
-                RetroButton("Back to Menu", variant: .primary) {
-                    onComplete()
+                VStack(spacing: 12) {
+                    if gameCenterManager.isAuthenticated {
+                        RetroButton("Leaderboard", variant: .secondary) {
+                            showLeaderboard = true
+                        }
+                    }
+
+                    RetroButton("Back to Menu", variant: .primary) {
+                        onComplete()
+                    }
                 }
                 .opacity(isAnimating ? 1 : 0)
                 .padding(.top, 8)
@@ -63,6 +93,9 @@ struct GameOverOverlay: View {
                 isAnimating = true
             }
         }
+        .sheet(isPresented: $showLeaderboard) {
+            GameCenterLeaderboardView()
+        }
     }
 }
 
@@ -70,4 +103,5 @@ struct GameOverOverlay: View {
     GameOverOverlay(score: 12) {
         print("dismissed")
     }
+    .environment(GameCenterManager.shared)
 }

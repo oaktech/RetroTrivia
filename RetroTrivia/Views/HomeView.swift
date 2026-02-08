@@ -9,9 +9,11 @@ struct HomeView: View {
     @Environment(GameState.self) var gameState
     @Environment(AudioManager.self) var audioManager
     @Environment(QuestionManager.self) var questionManager
+    @Environment(GameCenterManager.self) var gameCenterManager
     let onPlayTapped: () -> Void
 
     @State private var showSettings = false
+    @State private var showLeaderboard = false
 
     var body: some View {
         ZStack {
@@ -35,6 +37,21 @@ struct HomeView: View {
                             .clipShape(Circle())
                     }
                     .sensoryFeedback(.impact(weight: .light), trigger: audioManager.isMusicEnabled)
+
+                    // Leaderboard button (only when authenticated)
+                    if gameCenterManager.isAuthenticated {
+                        Button(action: {
+                            showLeaderboard = true
+                        }) {
+                            Image(systemName: "trophy.fill")
+                                .font(.system(size: 18))
+                                .foregroundStyle(Color("NeonYellow"))
+                                .frame(width: 42, height: 42)
+                                .background(Color.white.opacity(0.08))
+                                .clipShape(Circle())
+                        }
+                        .sensoryFeedback(.impact(weight: .light), trigger: showLeaderboard)
+                    }
 
                     // Settings button
                     Button(action: {
@@ -96,6 +113,9 @@ struct HomeView: View {
         .sheet(isPresented: $showSettings) {
             SettingsView()
         }
+        .sheet(isPresented: $showLeaderboard) {
+            GameCenterLeaderboardView()
+        }
     }
 }
 
@@ -104,4 +124,5 @@ struct HomeView: View {
         .environment(GameState())
         .environment(AudioManager.shared)
         .environment(QuestionManager())
+        .environment(GameCenterManager.shared)
 }

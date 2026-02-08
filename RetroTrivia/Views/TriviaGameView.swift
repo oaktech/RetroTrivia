@@ -13,6 +13,8 @@ struct TriviaGameView: View {
     let question: TriviaQuestion
     var gameTimeRemaining: Double? = nil
     var gameTimerDuration: Double = 180
+    var livesRemaining: Int? = nil
+    var startingLives: Int = 3
     let onAnswer: (Bool) -> Void
 
     @State private var selectedIndex: Int? = nil
@@ -56,6 +58,17 @@ struct TriviaGameView: View {
                         timeRemaining: timeRemaining,
                         totalTime: Double(gameState.gameSettings.timerDuration)
                     )
+                }
+
+                // Lives display
+                if let lives = livesRemaining {
+                    HStack(spacing: 6) {
+                        ForEach(0..<startingLives, id: \.self) { i in
+                            Image(systemName: i < lives ? "heart.fill" : "heart")
+                                .font(.system(size: 20))
+                                .foregroundStyle(Color("NeonPink"))
+                        }
+                    }
                 }
 
                 // Question

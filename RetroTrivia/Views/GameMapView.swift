@@ -10,6 +10,7 @@ struct GameMapView: View {
     @Environment(GameState.self) var gameState
     @Environment(AudioManager.self) var audioManager
     @Environment(QuestionManager.self) var questionManager
+    @Environment(GameCenterManager.self) var gameCenterManager
     let onBackTapped: () -> Void
 
     @State private var currentQuestion: TriviaQuestion?
@@ -34,6 +35,7 @@ struct GameMapView: View {
     @State private var gameTimeRemaining: Double = 0
     @State private var gameTimerActive = false
     @State private var showGameOver = false
+    @State private var gameOverReason: GameOverOverlay.Reason = .timerExpired
 
     private let gameTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -244,7 +246,7 @@ struct GameMapView: View {
 
             // Game over overlay
             if showGameOver {
-                GameOverOverlay(score: gameState.currentPosition) {
+                GameOverOverlay(score: gameState.currentPosition, reason: gameOverReason) {
                     audioManager.playMenuMusic()
                     onBackTapped()
                 }
@@ -255,14 +257,16 @@ struct GameMapView: View {
             if gameTimeRemaining > 0 {
                 gameTimeRemaining -= 1
             } else {
-                handleGameOver()
+                handleGameOver(reason: .timerExpired)
             }
         }
         .fullScreenCover(item: $currentQuestion) { question in
             TriviaGameView(
                 question: question,
                 gameTimeRemaining: gameState.gameSettings.gameTimerEnabled ? gameTimeRemaining : nil,
-                gameTimerDuration: Double(gameState.gameSettings.gameTimerDuration)
+                gameTimerDuration: Double(gameState.gameSettings.gameTimerDuration),
+                livesRemaining: gameState.gameSettings.livesEnabled ? gameState.livesRemaining : nil,
+                startingLives: gameState.gameSettings.startingLives
             ) { isCorrect in
                 handleAnswer(isCorrect: isCorrect)
             }
@@ -293,12 +297,16 @@ struct GameMapView: View {
         }
     }
 
-    private func handleGameOver() {
+    private func handleGameOver(reason: GameOverOverlay.Reason = .timerExpired) {
         gameTimerActive = false
         showAutoAdvance = false
         currentQuestion = nil
         audioManager.playSoundEffect(named: "wrong-buzzer")
+        gameOverReason = reason
         showGameOver = true
+        Task {
+            await gameCenterManager.submitScore(gameState.currentPosition)
+        }
     }
 
     private var header: some View {
@@ -418,6 +426,18 @@ struct GameMapView: View {
             // Game timer full-width row
             if gameState.gameSettings.gameTimerEnabled {
                 gameTimerDisplay
+            }
+
+            // Lives display row
+            if gameState.gameSettings.livesEnabled {
+                HStack(spacing: 6) {
+                    ForEach(0..<gameState.gameSettings.startingLives, id: \.self) { i in
+                        Image(systemName: i < gameState.livesRemaining ? "heart.fill" : "heart")
+                            .font(.system(size: 18))
+                            .foregroundStyle(Color("NeonPink"))
+                            .shadow(color: Color("NeonPink").opacity(i < gameState.livesRemaining ? 0.6 : 0), radius: 4)
+                    }
+                }
             }
         }
         .padding()
@@ -555,6 +575,16 @@ struct GameMapView: View {
 
             // Trigger falling animation (line below and target node below)
             animateFalling(from: oldPosition, to: gameState.currentPosition)
+
+            // Check lives
+            if gameState.gameSettings.livesEnabled {
+                gameState.livesRemaining -= 1
+                if gameState.livesRemaining <= 0 {
+                    currentQuestion = nil
+                    handleGameOver(reason: .livesExhausted)
+                    return
+                }
+            }
         }
 
         // Clear current question to dismiss the sheet
@@ -637,4 +667,5 @@ struct GameMapView: View {
         .environment(GameState())
         .environment(AudioManager.shared)
         .environment(QuestionManager())
+        .environment(GameCenterManager.shared)
 }

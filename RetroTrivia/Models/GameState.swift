@@ -33,6 +33,9 @@ class GameState {
         }
     }
 
+    // In-memory only — resets each game
+    var livesRemaining: Int = 3
+
     init() {
         self.currentPosition = UserDefaults.standard.integer(forKey: Self.currentPositionKey)
         self.highScorePosition = UserDefaults.standard.integer(forKey: Self.highScorePositionKey)
@@ -50,5 +53,6 @@ class GameState {
 
     func resetGame() {
         currentPosition = 0
+        livesRemaining = gameSettings.startingLives
     }
 }
