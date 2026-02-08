@@ -17,6 +17,9 @@ struct GameMapView: View {
     @State private var showLevelUp = false
     @State private var levelUpTier = 0
     @State private var isLoadingQuestions = false
+    @State private var showAutoAdvance = false
+    @State private var autoAdvanceProgress: CGFloat = 1.0
+    @State private var questionCardScale: CGFloat = 1.0
 
     private let maxLevel = 25
     private let nodeSpacing: CGFloat = 100
@@ -141,6 +144,14 @@ struct GameMapView: View {
             TriviaGameView(question: question) { isCorrect in
                 handleAnswer(isCorrect: isCorrect)
             }
+            .scaleEffect(questionCardScale)
+            .onAppear {
+                // Snap effect: start slightly larger, then spring to normal
+                questionCardScale = 1.15
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0)) {
+                    questionCardScale = 1.0
+                }
+            }
         }
         .alert("Quit Game?", isPresented: $showQuitConfirmation) {
             Button("Cancel", role: .cancel) { }
@@ -223,24 +234,69 @@ struct GameMapView: View {
     }
 
     private var playButton: some View {
-        VStack(spacing: 8) {
-            RetroButton(hasPlayedOnce ? "Next Question" : "Play Trivia", variant: .primary) {
-                startTrivia()
+        VStack(spacing: 0) {
+            // Auto-advance progress bar
+            if showAutoAdvance {
+                // Single continuous gradient line burning from both ends
+                GeometryReader { geometry in
+                    ZStack {
+                        // Background track
+                        Rectangle()
+                            .fill(Color.white.opacity(0.1))
+                            .frame(height: 6)
+
+                        // Single continuous gradient line
+                        Rectangle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color("NeonPink"), Color("ElectricBlue"), Color("HotMagenta")],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .frame(height: 6)
+                            .mask(
+                                // Mask that burns from outside edges toward center
+                                HStack(spacing: 0) {
+                                    Spacer()
+
+                                    // Center portion (what remains visible as edges burn away)
+                                    Rectangle()
+                                        .frame(width: geometry.size.width * autoAdvanceProgress)
+
+                                    Spacer()
+                                }
+                            )
+                    }
+                    .frame(height: 6)
+                    .clipShape(RoundedRectangle(cornerRadius: 3))
+                }
+                .frame(height: 6)
+                .padding(.horizontal, 40)
+                .padding(.vertical, 16)
+                .transition(.opacity.combined(with: .scale))
+            } else if !hasPlayedOnce {
+                // Initial play button
+                RetroButton("Play Trivia", variant: .primary) {
+                    startTrivia()
+                }
+                .disabled(isLoadingQuestions || questionManager.questionPool.isEmpty)
+                .padding(.horizontal)
+                .padding(.vertical, 20)
             }
-            .disabled(isLoadingQuestions || questionManager.questionPool.isEmpty)
-            .padding(.horizontal)
 
             if isLoadingQuestions {
                 Text("Loading questions...")
                     .retroBody()
                     .opacity(0.6)
+                    .padding(.bottom, 20)
             } else if questionManager.questionPool.isEmpty {
                 Text("No questions available")
                     .retroBody()
                     .opacity(0.6)
+                    .padding(.bottom, 20)
             }
         }
-        .padding(.vertical, 20)
         .background(
             LinearGradient(
                 colors: [
@@ -281,6 +337,7 @@ struct GameMapView: View {
         print("DEBUG: Answer was \(isCorrect ? "correct" : "wrong")")
 
         hasPlayedOnce = true
+        var didLevelUp = false
 
         if isCorrect {
             let oldTier = gameState.currentPosition / 3
@@ -291,6 +348,7 @@ struct GameMapView: View {
 
             // Show level-up overlay when reaching a new tier (every 3 levels)
             if newTier > oldTier {
+                didLevelUp = true
                 print("DEBUG: Tier crossed! Showing level-up overlay...")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     self.levelUpTier = newTier
@@ -303,6 +361,42 @@ struct GameMapView: View {
 
         // Clear current question to dismiss the sheet
         currentQuestion = nil
+
+        // Start auto-advance after a brief moment, with extended time for level-ups
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.startAutoAdvance(extendedDuration: didLevelUp)
+        }
+    }
+
+    private func startAutoAdvance(extendedDuration: Bool = false) {
+        // Reset progress
+        autoAdvanceProgress = 1.0
+        showAutoAdvance = true
+
+        // Use extended duration for level-up celebration, normal duration otherwise
+        let duration: Double = extendedDuration ? 2.5 : 1.0
+
+        // Animate progress bar collapsing
+        withAnimation(.linear(duration: duration)) {
+            autoAdvanceProgress = 0.0
+        }
+
+        // Auto-load next question after duration completes
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+            if self.showAutoAdvance {
+                self.loadNextQuestion()
+            }
+        }
+    }
+
+    private func loadNextQuestion() {
+        showAutoAdvance = false
+        autoAdvanceProgress = 1.0
+
+        // Small delay for visual snap effect
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.startTrivia()
+        }
     }
 }
 
