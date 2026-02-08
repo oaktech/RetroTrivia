@@ -274,7 +274,7 @@ struct GameMapView: View {
                 .frame(height: 6)
                 .padding(.horizontal, 40)
                 .padding(.vertical, 16)
-                .transition(.opacity.combined(with: .scale))
+                .transition(.opacity)
             } else if !hasPlayedOnce {
                 // Initial play button
                 RetroButton("Play Trivia", variant: .primary) {
@@ -362,10 +362,8 @@ struct GameMapView: View {
         // Clear current question to dismiss the sheet
         currentQuestion = nil
 
-        // Start auto-advance after a brief moment, with extended time for level-ups
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.startAutoAdvance(extendedDuration: didLevelUp)
-        }
+        // Start auto-advance immediately for fluid flow
+        startAutoAdvance(extendedDuration: didLevelUp)
     }
 
     private func startAutoAdvance(extendedDuration: Bool = false) {
