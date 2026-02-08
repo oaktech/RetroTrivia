@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct GameMapView: View {
     @Environment(GameState.self) var gameState
@@ -30,6 +31,11 @@ struct GameMapView: View {
     @State private var scoreChangeValue: Int = 0
     @State private var scoreChangeOffset: CGFloat = 0
     @State private var scoreChangeOpacity: CGFloat = 1.0
+    @State private var gameTimeRemaining: Double = 0
+    @State private var gameTimerActive = false
+    @State private var showGameOver = false
+
+    private let gameTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     enum MovementDirection {
         case none
@@ -53,6 +59,43 @@ struct GameMapView: View {
         } else {
             return Color("HotMagenta")
         }
+    }
+
+    // MARK: - Game Timer Helpers
+
+    private var gameTimerColor: Color {
+        let fraction = gameTimeRemaining / Double(gameState.gameSettings.gameTimerDuration)
+        if fraction > 0.5 { return Color("ElectricBlue") }
+        if fraction > 0.25 { return Color("NeonYellow") }
+        return Color("NeonPink")
+    }
+
+    private var gameTimerDisplay: some View {
+        VStack(spacing: 4) {
+            Text("Time")
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.7))
+            Text(formattedTime(gameTimeRemaining))
+                .font(.system(size: 20, weight: .bold, design: .monospaced))
+                .monospacedDigit()
+                .foregroundStyle(gameTimerColor)
+                .neonGlow(color: gameTimerColor, radius: 4)
+                .contentTransition(.numericText())
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(gameTimerColor.opacity(0.15))
+                .stroke(gameTimerColor.opacity(0.4), lineWidth: 1)
+        )
+    }
+
+    private func formattedTime(_ seconds: Double) -> String {
+        let total = max(0, Int(seconds))
+        let m = total / 60
+        let s = total % 60
+        return String(format: "%d:%02d", m, s)
     }
 
     // MARK: - Progressive Intensity Helpers
@@ -191,6 +234,22 @@ struct GameMapView: View {
                     showLevelUp = false
                 }
             }
+
+            // Game over overlay
+            if showGameOver {
+                GameOverOverlay(score: gameState.currentPosition) {
+                    audioManager.playMenuMusic()
+                    onBackTapped()
+                }
+            }
+        }
+        .onReceive(gameTimer) { _ in
+            guard gameTimerActive else { return }
+            if gameTimeRemaining > 0 {
+                gameTimeRemaining -= 1
+            } else {
+                handleGameOver()
+            }
         }
         .fullScreenCover(item: $currentQuestion) { question in
             TriviaGameView(question: question) { isCorrect in
@@ -216,7 +275,19 @@ struct GameMapView: View {
         }
         .onAppear {
             loadQuestions()
+            if gameState.gameSettings.gameTimerEnabled {
+                gameTimeRemaining = Double(gameState.gameSettings.gameTimerDuration)
+                gameTimerActive = true
+            }
         }
+    }
+
+    private func handleGameOver() {
+        gameTimerActive = false
+        showAutoAdvance = false
+        currentQuestion = nil
+        audioManager.playSoundEffect(named: "wrong-buzzer")
+        showGameOver = true
     }
 
     private var header: some View {
@@ -243,6 +314,11 @@ struct GameMapView: View {
             Spacer()
 
             HStack(spacing: 16) {
+                // Game timer indicator
+                if gameState.gameSettings.gameTimerEnabled {
+                    gameTimerDisplay
+                }
+
                 // Tier indicator
                 VStack(spacing: 4) {
                     Text("Level")

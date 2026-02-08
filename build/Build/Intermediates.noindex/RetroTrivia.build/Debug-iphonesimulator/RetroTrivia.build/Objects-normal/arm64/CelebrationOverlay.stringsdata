@@ -1,0 +1,16 @@
+{
+  "source": "/Users/oaktech/src/RetroTrivia/RetroTrivia/Views/CelebrationOverlay.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "CORRECT!",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 25
+        }
+      }
+    ]
+  },
+  "version": 1
+}

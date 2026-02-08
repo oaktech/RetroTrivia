@@ -99,7 +99,7 @@ struct ConfettiPiece: View {
                     .linear(duration: 2.0)
                     .delay(delay)
                 ) {
-                    yOffset = UIScreen.main.bounds.height + 100
+                    yOffset = 1100
                     xOffset = endX
                 }
 

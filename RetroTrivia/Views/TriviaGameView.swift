@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct TriviaGameView: View {
     @Environment(AudioManager.self) var audioManager

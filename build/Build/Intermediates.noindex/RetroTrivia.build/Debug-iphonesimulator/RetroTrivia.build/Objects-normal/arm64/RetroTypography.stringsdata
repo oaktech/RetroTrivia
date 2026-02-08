@@ -1,0 +1,40 @@
+{
+  "source": "/Users/oaktech/src/RetroTrivia/RetroTrivia/Components/RetroTypography.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "RETROTRIVIA",
+        "location": {
+          "startingColumn": 1,
+          "startingLine": 50
+        }
+      },
+      {
+        "comment": "",
+        "key": "80s Music Challenge",
+        "location": {
+          "startingColumn": 1,
+          "startingLine": 50
+        }
+      },
+      {
+        "comment": "",
+        "key": "Test your knowledge of the greatest decade in music!",
+        "location": {
+          "startingColumn": 1,
+          "startingLine": 50
+        }
+      },
+      {
+        "comment": "",
+        "key": "High Score: 42",
+        "location": {
+          "startingColumn": 1,
+          "startingLine": 50
+        }
+      }
+    ]
+  },
+  "version": 1
+}

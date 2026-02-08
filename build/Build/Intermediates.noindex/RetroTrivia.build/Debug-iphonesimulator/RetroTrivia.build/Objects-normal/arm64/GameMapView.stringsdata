@@ -1,0 +1,40 @@
+{
+  "source": "/Users/oaktech/src/RetroTrivia/RetroTrivia/Views/GameMapView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Back",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 132
+        }
+      },
+      {
+        "comment": "",
+        "key": "Position",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 143
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 146
+        }
+      },
+      {
+        "comment": "",
+        "key": "Loading questions...",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 167
+        }
+      }
+    ]
+  },
+  "version": 1
+}
