@@ -11,6 +11,8 @@ struct TriviaGameView: View {
     @Environment(GameState.self) var gameState
 
     let question: TriviaQuestion
+    var gameTimeRemaining: Double? = nil
+    var gameTimerDuration: Double = 180
     let onAnswer: (Bool) -> Void
 
     @State private var selectedIndex: Int? = nil
@@ -41,9 +43,14 @@ struct TriviaGameView: View {
             .ignoresSafeArea()
 
             VStack(spacing: 40) {
+                // Game timer bar at top
+                if let remaining = gameTimeRemaining {
+                    gameTimerBar(remaining: remaining)
+                }
+
                 Spacer()
 
-                // Timer
+                // Per-question timer
                 if gameState.gameSettings.timerEnabled {
                     CountdownTimerView(
                         timeRemaining: timeRemaining,
@@ -144,6 +151,45 @@ struct TriviaGameView: View {
                 )
         }
         .disabled(hasAnswered)
+    }
+
+    @ViewBuilder
+    private func gameTimerBar(remaining: Double) -> some View {
+        let fraction = max(0, min(1, remaining / gameTimerDuration))
+        let color: Color = fraction > 0.5 ? Color("ElectricBlue") : fraction > 0.25 ? Color("NeonYellow") : Color("NeonPink")
+
+        HStack(spacing: 10) {
+            Image(systemName: "clock")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(color)
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color.white.opacity(0.1))
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(color)
+                        .frame(width: geo.size.width * fraction)
+                        .animation(.linear(duration: 1), value: fraction)
+                }
+            }
+            .frame(height: 6)
+
+            Text(formattedGameTime(remaining))
+                .font(.system(size: 13, weight: .bold, design: .monospaced))
+                .monospacedDigit()
+                .foregroundStyle(color)
+                .frame(width: 38, alignment: .trailing)
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 8)
+    }
+
+    private func formattedGameTime(_ seconds: Double) -> String {
+        let total = max(0, Int(seconds))
+        let m = total / 60
+        let s = total % 60
+        return String(format: "%d:%02d", m, s)
     }
 
     private func handleTimeout() {

@@ -71,24 +71,31 @@ struct GameMapView: View {
     }
 
     private var gameTimerDisplay: some View {
-        VStack(spacing: 4) {
-            Text("Time")
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.7))
+        HStack(spacing: 12) {
+            Image(systemName: "clock")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(gameTimerColor)
+
+            // Progress bar
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color.white.opacity(0.1))
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(gameTimerColor)
+                        .frame(width: geo.size.width * (gameTimeRemaining / Double(gameState.gameSettings.gameTimerDuration)))
+                        .animation(.linear(duration: 1), value: gameTimeRemaining)
+                }
+            }
+            .frame(height: 6)
+
             Text(formattedTime(gameTimeRemaining))
-                .font(.system(size: 20, weight: .bold, design: .monospaced))
+                .font(.system(size: 14, weight: .bold, design: .monospaced))
                 .monospacedDigit()
                 .foregroundStyle(gameTimerColor)
-                .neonGlow(color: gameTimerColor, radius: 4)
-                .contentTransition(.numericText())
+                .frame(width: 40, alignment: .trailing)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(gameTimerColor.opacity(0.15))
-                .stroke(gameTimerColor.opacity(0.4), lineWidth: 1)
-        )
+        .padding(.horizontal, 4)
     }
 
     private func formattedTime(_ seconds: Double) -> String {
@@ -252,7 +259,11 @@ struct GameMapView: View {
             }
         }
         .fullScreenCover(item: $currentQuestion) { question in
-            TriviaGameView(question: question) { isCorrect in
+            TriviaGameView(
+                question: question,
+                gameTimeRemaining: gameState.gameSettings.gameTimerEnabled ? gameTimeRemaining : nil,
+                gameTimerDuration: Double(gameState.gameSettings.gameTimerDuration)
+            ) { isCorrect in
                 handleAnswer(isCorrect: isCorrect)
             }
             .scaleEffect(questionCardScale)
@@ -291,130 +302,122 @@ struct GameMapView: View {
     }
 
     private var header: some View {
-        HStack {
-            Button(action: {
-                audioManager.playSoundEffect(named: "back-button")
-                showQuitConfirmation = true
-            }) {
-                HStack(spacing: 8) {
-                    Image(systemName: "xmark.circle")
-                    Text("Quit Game")
-                }
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                .foregroundStyle(.red.opacity(0.9))
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(.red.opacity(0.15))
-                        .stroke(.red.opacity(0.4), lineWidth: 1)
-                )
-            }
-
-            Spacer()
-
-            HStack(spacing: 16) {
-                // Game timer indicator
-                if gameState.gameSettings.gameTimerEnabled {
-                    gameTimerDisplay
-                }
-
-                // Tier indicator
-                VStack(spacing: 4) {
-                    Text("Level")
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
-                    HStack(spacing: 4) {
-                        Image(systemName: "star.fill")
-                            .font(.system(size: 12))
-                            .foregroundStyle(tierColor)
-                        Text("\(currentTier + 1)")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundStyle(tierColor)
+        VStack(spacing: 8) {
+            HStack {
+                Button(action: {
+                    audioManager.playSoundEffect(named: "back-button")
+                    showQuitConfirmation = true
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "xmark.circle")
+                        Text("Quit Game")
                     }
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.red.opacity(0.9))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(.red.opacity(0.15))
+                            .stroke(.red.opacity(0.4), lineWidth: 1)
+                    )
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(tierColor.opacity(0.15))
-                        .stroke(tierColor.opacity(0.4), lineWidth: 1)
-                )
 
-                // Correct answers indicator
-                if gameState.currentPosition > 0 {
-                    ZStack {
-                        VStack(spacing: 4) {
-                            Text("Correct")
-                                .font(.caption)
-                                .foregroundStyle(.white.opacity(0.7))
-                            Text("\(gameState.currentPosition)")
+                Spacer()
+
+                HStack(spacing: 16) {
+                    // Tier indicator
+                    VStack(spacing: 4) {
+                        Text("Level")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.7))
+                        HStack(spacing: 4) {
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 12))
+                                .foregroundStyle(tierColor)
+                            Text("\(currentTier + 1)")
                                 .font(.title2)
                                 .fontWeight(.bold)
-                                .foregroundStyle(Color("NeonYellow"))
-                                .contentTransition(.numericText())
-                        }
-                        .scaleEffect(scoreAnimationScale)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-
-                        // Floating score change indicator
-                        if showScoreChange {
-                            Text(scoreChangeValue > 0 ? "+\(scoreChangeValue)" : "\(scoreChangeValue)")
-                                .font(.title)
-                                .fontWeight(.black)
-                                .foregroundStyle(scoreChangeValue > 0 ? Color("NeonPink") : Color.red)
-                                .shadow(color: scoreChangeValue > 0 ? Color("NeonPink") : Color.red, radius: 8)
-                                .offset(y: scoreChangeOffset)
-                                .opacity(scoreChangeOpacity)
+                                .foregroundStyle(tierColor)
                         }
                     }
-                    .onChange(of: gameState.currentPosition) { oldValue, newValue in
-                        let change = newValue - oldValue
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(tierColor.opacity(0.15))
+                            .stroke(tierColor.opacity(0.4), lineWidth: 1)
+                    )
 
-                        // Reset previous animation state
-                        showScoreChange = false
-                        scoreChangeOffset = 0
-                        scoreChangeOpacity = 1.0
-                        scoreAnimationScale = 1.0
+                    // Correct answers indicator
+                    if gameState.currentPosition > 0 {
+                        ZStack {
+                            VStack(spacing: 4) {
+                                Text("Correct")
+                                    .font(.caption)
+                                    .foregroundStyle(.white.opacity(0.7))
+                                Text("\(gameState.currentPosition)")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(Color("NeonYellow"))
+                                    .contentTransition(.numericText())
+                            }
+                            .scaleEffect(scoreAnimationScale)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
 
-                        // Set up new animation
-                        scoreChangeValue = change
-                        showScoreChange = true
-
-                        if change > 0 {
-                            // Climbing: Bounce up with floating +1
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
-                                scoreAnimationScale = 1.3
-                            }
-                            withAnimation(.easeOut(duration: 0.8)) {
-                                scoreChangeOffset = -40
-                                scoreChangeOpacity = 0.0
-                            }
-                        } else if change < 0 {
-                            // Falling: Quick shake with floating -1
-                            withAnimation(.easeInOut(duration: 0.15).repeatCount(2, autoreverses: true)) {
-                                scoreAnimationScale = 0.9
-                            }
-                            withAnimation(.easeOut(duration: 0.8)) {
-                                scoreChangeOffset = 40
-                                scoreChangeOpacity = 0.0
-                            }
-                        }
-
-                        // Reset animations
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                self.scoreAnimationScale = 1.0
+                            // Floating score change indicator
+                            if showScoreChange {
+                                Text(scoreChangeValue > 0 ? "+\(scoreChangeValue)" : "\(scoreChangeValue)")
+                                    .font(.title)
+                                    .fontWeight(.black)
+                                    .foregroundStyle(scoreChangeValue > 0 ? Color("NeonPink") : Color.red)
+                                    .shadow(color: scoreChangeValue > 0 ? Color("NeonPink") : Color.red, radius: 8)
+                                    .offset(y: scoreChangeOffset)
+                                    .opacity(scoreChangeOpacity)
                             }
                         }
-
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            self.showScoreChange = false
+                        .onChange(of: gameState.currentPosition) { oldValue, newValue in
+                            let change = newValue - oldValue
+                            showScoreChange = false
+                            scoreChangeOffset = 0
+                            scoreChangeOpacity = 1.0
+                            scoreAnimationScale = 1.0
+                            scoreChangeValue = change
+                            showScoreChange = true
+                            if change > 0 {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
+                                    scoreAnimationScale = 1.3
+                                }
+                                withAnimation(.easeOut(duration: 0.8)) {
+                                    scoreChangeOffset = -40
+                                    scoreChangeOpacity = 0.0
+                                }
+                            } else if change < 0 {
+                                withAnimation(.easeInOut(duration: 0.15).repeatCount(2, autoreverses: true)) {
+                                    scoreAnimationScale = 0.9
+                                }
+                                withAnimation(.easeOut(duration: 0.8)) {
+                                    scoreChangeOffset = 40
+                                    scoreChangeOpacity = 0.0
+                                }
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    self.scoreAnimationScale = 1.0
+                                }
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                self.showScoreChange = false
+                            }
                         }
                     }
                 }
+            }
+
+            // Game timer full-width row
+            if gameState.gameSettings.gameTimerEnabled {
+                gameTimerDisplay
             }
         }
         .padding()
