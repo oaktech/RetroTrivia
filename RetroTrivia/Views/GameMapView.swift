@@ -15,7 +15,6 @@ struct GameMapView: View {
 
     @State private var currentQuestion: TriviaQuestion?
     @State private var hasPlayedOnce = false
-    @State private var showQuitConfirmation = false
     @State private var showLevelUp = false
     @State private var levelUpTier = 0
     @State private var isLoadingQuestions = false
@@ -266,10 +265,16 @@ struct GameMapView: View {
                 gameTimeRemaining: gameState.gameSettings.gameTimerEnabled ? gameTimeRemaining : nil,
                 gameTimerDuration: Double(gameState.gameSettings.gameTimerDuration),
                 livesRemaining: gameState.gameSettings.livesEnabled ? gameState.livesRemaining : nil,
-                startingLives: gameState.gameSettings.startingLives
-            ) { isCorrect in
-                handleAnswer(isCorrect: isCorrect)
-            }
+                startingLives: gameState.gameSettings.startingLives,
+                onAnswer: { isCorrect in
+                    handleAnswer(isCorrect: isCorrect)
+                },
+                onQuit: {
+                    currentQuestion = nil
+                    audioManager.playMenuMusic()
+                    onBackTapped()
+                }
+            )
             .scaleEffect(questionCardScale)
             .onAppear {
                 // Snap effect: start slightly larger, then spring to normal
@@ -278,15 +283,6 @@ struct GameMapView: View {
                     questionCardScale = 1.0
                 }
             }
-        }
-        .alert("Quit Game?", isPresented: $showQuitConfirmation) {
-            Button("Cancel", role: .cancel) { }
-            Button("Quit", role: .destructive) {
-                audioManager.playMenuMusic()
-                onBackTapped()
-            }
-        } message: {
-            Text("Are you sure you want to quit? Your current position will be saved.")
         }
         .onAppear {
             loadQuestions()
@@ -314,11 +310,12 @@ struct GameMapView: View {
             HStack {
                 Button(action: {
                     audioManager.playSoundEffect(named: "back-button")
-                    showQuitConfirmation = true
+                    audioManager.playMenuMusic()
+                    onBackTapped()
                 }) {
                     HStack(spacing: 8) {
                         Image(systemName: "xmark.circle")
-                        Text("Quit Game")
+                        Text("Quit")
                     }
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .foregroundStyle(.red.opacity(0.9))

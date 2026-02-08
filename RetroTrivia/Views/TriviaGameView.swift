@@ -16,6 +16,7 @@ struct TriviaGameView: View {
     var livesRemaining: Int? = nil
     var startingLives: Int = 3
     let onAnswer: (Bool) -> Void
+    var onQuit: (() -> Void)? = nil
 
     @State private var selectedIndex: Int? = nil
     @State private var hasAnswered = false
@@ -45,7 +46,34 @@ struct TriviaGameView: View {
             .ignoresSafeArea()
 
             VStack(spacing: 40) {
-                // Game timer bar at top
+                // Header with quit button and game timer
+                HStack {
+                    if let quit = onQuit {
+                        Button(action: {
+                            audioManager.playSoundEffect(named: "back-button")
+                            quit()
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "xmark.circle")
+                                Text("Quit")
+                            }
+                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.red.opacity(0.9))
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(.red.opacity(0.15))
+                                    .stroke(.red.opacity(0.4), lineWidth: 1)
+                            )
+                        }
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 8)
+
+                // Game timer bar
                 if let remaining = gameTimeRemaining {
                     gameTimerBar(remaining: remaining)
                 }

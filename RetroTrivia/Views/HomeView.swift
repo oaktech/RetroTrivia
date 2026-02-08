@@ -12,8 +12,19 @@ struct HomeView: View {
     @Environment(GameCenterManager.self) var gameCenterManager
     let onPlayTapped: () -> Void
 
-    @State private var showSettings = false
-    @State private var showLeaderboard = false
+    enum SheetType: Identifiable {
+        case settings
+        case leaderboard
+
+        var id: Int {
+            switch self {
+            case .settings: return 0
+            case .leaderboard: return 1
+            }
+        }
+    }
+
+    @State private var activeSheet: SheetType?
 
     var body: some View {
         ZStack {
@@ -41,7 +52,7 @@ struct HomeView: View {
                     // Leaderboard button (only when authenticated)
                     if gameCenterManager.isAuthenticated {
                         Button(action: {
-                            showLeaderboard = true
+                            activeSheet = .leaderboard
                         }) {
                             Image(systemName: "trophy.fill")
                                 .font(.system(size: 18))
@@ -50,12 +61,12 @@ struct HomeView: View {
                                 .background(Color.white.opacity(0.08))
                                 .clipShape(Circle())
                         }
-                        .sensoryFeedback(.impact(weight: .light), trigger: showLeaderboard)
+                        .sensoryFeedback(.impact(weight: .light), trigger: activeSheet == .leaderboard)
                     }
 
                     // Settings button
                     Button(action: {
-                        showSettings = true
+                        activeSheet = .settings
                     }) {
                         Image(systemName: "gearshape.fill")
                             .font(.system(size: 18))
@@ -64,7 +75,7 @@ struct HomeView: View {
                             .background(Color.white.opacity(0.08))
                             .clipShape(Circle())
                     }
-                    .sensoryFeedback(.impact(weight: .light), trigger: showSettings)
+                    .sensoryFeedback(.impact(weight: .light), trigger: activeSheet == .settings)
                 }
 
                 Spacer()
@@ -110,11 +121,16 @@ struct HomeView: View {
             }
             .padding()
         }
-        .sheet(isPresented: $showSettings) {
-            SettingsView()
+        .fullScreenCover(item: $activeSheet) { sheetType in
+            switch sheetType {
+            case .settings:
+                SettingsView()
+            case .leaderboard:
+                GameCenterLeaderboardView()
+            }
         }
-        .sheet(isPresented: $showLeaderboard) {
-            GameCenterLeaderboardView()
+        .onAppear {
+            activeSheet = nil
         }
     }
 }
