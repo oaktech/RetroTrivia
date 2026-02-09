@@ -64,6 +64,7 @@ class CloudKitUploader {
                 } catch {
                     errorCount += batch.count
                     progress = "Batch \(batchIndex + 1) failed: \(error.localizedDescription)"
+                    print("DEBUG: Batch \(batchIndex + 1) error: \(error)")
                 }
 
                 // Rate limiting
@@ -93,7 +94,7 @@ class CloudKitUploader {
             record["category"] = question.category ?? "Music"
             record["difficulty"] = question.difficulty ?? "medium"
             record["isActive"] = Int64(1)
-            record["sortOrder"] = Int64((startingSortOrder + index) % 10000)
+            record["sortOrder"] = Int64((startingSortOrder + index) % 5000 + 1)
             records.append(record)
         }
 
@@ -106,12 +107,15 @@ class CloudKitUploader {
         var saved = 0
         var failed = 0
 
-        for (_, result) in modifyResult.saveResults {
+        for (recordID, result) in modifyResult.saveResults {
             switch result {
             case .success:
                 saved += 1
-            case .failure:
+            case .failure(let error):
                 failed += 1
+                if failed <= 3 {
+                    print("DEBUG: CloudKit upload error for \(recordID): \(error)")
+                }
             }
         }
 
@@ -124,7 +128,8 @@ class CloudKitUploader {
         progress = "Fetching records to delete..."
 
         do {
-            let predicate = NSPredicate(value: true)
+            // Use isActive field (queryable) to match all records
+            let predicate = NSPredicate(format: "isActive >= 0")
             let query = CKQuery(recordType: "Question", predicate: predicate)
 
             var recordIDs: [CKRecord.ID] = []

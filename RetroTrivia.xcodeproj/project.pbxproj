@@ -24,6 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2A6BF22B2F3989DC00DC399F /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/System/Library/Frameworks/CloudKit.framework; sourceTree = DEVELOPER_DIR; };
 		2ADB32D32F33FBF600EFA7E9 /* RetroTrivia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RetroTrivia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2ADB32E72F33FBF600EFA7E9 /* RetroTriviaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RetroTriviaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2ADB32F12F33FBF600EFA7E9 /* RetroTriviaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RetroTriviaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -85,12 +86,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2A6BF22A2F3989DC00DC399F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2A6BF22B2F3989DC00DC399F /* CloudKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		2ADB32CA2F33FBF600EFA7E9 = {
 			isa = PBXGroup;
 			children = (
 				2ADB32D52F33FBF600EFA7E9 /* RetroTrivia */,
 				2ADB32EA2F33FBF600EFA7E9 /* RetroTriviaTests */,
 				2ADB32F42F33FBF600EFA7E9 /* RetroTriviaUITests */,
+				2A6BF22A2F3989DC00DC399F /* Frameworks */,
 				2ADB32D42F33FBF600EFA7E9 /* Products */,
 			);
 			sourceTree = "<group>";

@@ -190,6 +190,16 @@ struct HomeView: View {
     private func startGame(leaderboardMode: Bool) {
         audioManager.playSoundEffect(named: "button-tap")
         gameState.gameSettings.leaderboardMode = leaderboardMode
+
+        // Timer is always enabled (10 seconds per question)
+        gameState.gameSettings.timerEnabled = true
+
+        // Leaderboard mode uses 5 lives + 2 minute game timer
+        if leaderboardMode {
+            gameState.gameSettings.livesEnabled = true
+            gameState.gameSettings.startingLives = GameSettings.leaderboardLives
+        }
+
         gameState.gameSettings.save()
         gameState.resetGame()
         questionManager.resetSession()

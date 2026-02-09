@@ -28,31 +28,6 @@ struct SettingsView: View {
                     .padding(.horizontal)
 
                 VStack(spacing: 25) {
-                    // Timer Toggle (fixed at 10 seconds)
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Countdown Timer")
-                                .retroBody()
-                                .foregroundStyle(.white)
-                            Text("10 seconds per question")
-                                .font(.caption)
-                                .foregroundStyle(.white.opacity(0.6))
-                        }
-
-                        Spacer()
-
-                        Toggle("", isOn: Binding(
-                            get: { gameState.gameSettings.timerEnabled },
-                            set: { newValue in
-                                audioManager.playSoundEffect(named: "button-tap")
-                                gameState.gameSettings.timerEnabled = newValue
-                            }
-                        ))
-                        .tint(Color("NeonPink"))
-                        .sensoryFeedback(.impact(weight: .light), trigger: gameState.gameSettings.timerEnabled)
-                    }
-                    .padding(.horizontal, 30)
-
                     // Lives Mode Toggle
                     HStack {
                         Text("Lives Mode")
@@ -72,32 +47,6 @@ struct SettingsView: View {
                         .sensoryFeedback(.impact(weight: .light), trigger: gameState.gameSettings.livesEnabled)
                     }
                     .padding(.horizontal, 30)
-
-                    // Lives Count Picker (only when lives enabled)
-                    if gameState.gameSettings.livesEnabled {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Starting Lives")
-                                .retroBody()
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 30)
-
-                            Picker("Starting Lives", selection: Binding(
-                                get: { gameState.gameSettings.startingLives },
-                                set: { newValue in
-                                    audioManager.playSoundEffect(named: "button-tap")
-                                    gameState.gameSettings.startingLives = newValue
-                                }
-                            )) {
-                                Text("1").tag(1)
-                                Text("2").tag(2)
-                                Text("3").tag(3)
-                                Text("5").tag(5)
-                            }
-                            .pickerStyle(.segmented)
-                            .padding(.horizontal, 30)
-                            .sensoryFeedback(.selection, trigger: gameState.gameSettings.startingLives)
-                        }
-                    }
 
                     // Difficulty Picker
                     VStack(alignment: .leading, spacing: 12) {
@@ -168,13 +117,13 @@ struct SettingsView: View {
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal)
 
-                            HStack(spacing: 20) {
+                            HStack(spacing: 12) {
                                 Button(action: {
                                     Task { await uploader.uploadAllQuestions() }
                                 }) {
-                                    Text("Upload Questions")
+                                    Text("Upload")
                                         .font(.caption)
-                                        .padding(.horizontal, 12)
+                                        .padding(.horizontal, 10)
                                         .padding(.vertical, 8)
                                         .background(Color("NeonPink").opacity(0.3))
                                         .foregroundStyle(Color("NeonPink"))
@@ -187,13 +136,25 @@ struct SettingsView: View {
                                 }) {
                                     Text("Delete All")
                                         .font(.caption)
-                                        .padding(.horizontal, 12)
+                                        .padding(.horizontal, 10)
                                         .padding(.vertical, 8)
                                         .background(Color.red.opacity(0.3))
                                         .foregroundStyle(.red)
                                         .cornerRadius(8)
                                 }
                                 .disabled(uploader.isUploading)
+
+                                Button(action: {
+                                    questionManager.clearCache()
+                                }) {
+                                    Text("Clear Cache")
+                                        .font(.caption)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 8)
+                                        .background(Color.orange.opacity(0.3))
+                                        .foregroundStyle(.orange)
+                                        .cornerRadius(8)
+                                }
                             }
 
                             Button(action: { showDevTools = false }) {

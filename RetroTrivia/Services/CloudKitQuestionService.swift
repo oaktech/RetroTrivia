@@ -2,7 +2,7 @@
 //  CloudKitQuestionService.swift
 //  RetroTrivia
 //
-//  Optimized for large question pools (10K+ questions)
+//  Optimized for large question pools (5K+ questions)
 //
 
 import CloudKit
@@ -36,7 +36,7 @@ enum CloudKitQuestionError: Error {
 }
 
 /// Service for fetching trivia questions from CloudKit Public Database
-/// Optimized for large datasets (10,000+ questions)
+/// Optimized for large datasets (5,000+ questions)
 @Observable
 class CloudKitQuestionService {
     // MARK: - Properties
@@ -66,9 +66,9 @@ class CloudKitQuestionService {
     // MARK: - Public Methods
 
     /// Fetch random questions using sortOrder field for efficient random sampling
-    /// This is the preferred method for large datasets (10K+ questions)
+    /// This is the preferred method for large datasets (5K+ questions)
     ///
-    /// Requires `sortOrder` field (Int64, 0-9999) on Question records for true randomization.
+    /// Requires `sortOrder` field (Int64, 1-5000) on Question records for true randomization.
     /// Falls back to createdAt sorting if sortOrder not available.
     ///
     /// - Parameters:
@@ -81,10 +81,10 @@ class CloudKitQuestionService {
         difficulty: String? = nil,
         excludeIDs: Set<String> = []
     ) async throws -> [TriviaQuestion] {
-        // Generate a random range to sample from (for 10K questions with sortOrder 0-9999)
-        let rangeSize = 1000  // Sample from a random 10% slice
-        let maxSortOrder = 9999
-        let rangeStart = Int.random(in: 0...(maxSortOrder - rangeSize))
+        // Generate a random range to sample from (for 5K questions with sortOrder 1-5000)
+        let rangeSize = 500  // Sample from a random 10% slice
+        let maxSortOrder = 5000
+        let rangeStart = Int.random(in: 1...(maxSortOrder - rangeSize))
         let rangeEnd = rangeStart + rangeSize
 
         // Build predicate for active questions in random range
