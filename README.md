@@ -8,19 +8,26 @@ An iOS trivia game themed around 80s music, built with SwiftUI.
 
 - **80s Music Trivia** - Questions about Madonna, Michael Jackson, Prince, Whitney Houston, Duran Duran, and more
 - **Candy Crush-style Progress Map** - Vertical map where correct answers move you up, wrong answers move you down
+- **Game Center Leaderboard** - Compete globally with 2-minute timed leaderboard mode
+- **Lives System** - Optional lives mode (1/2/3/5 lives) for added challenge
 - **Progressive Intensity System** - Visual effects and colors intensify as you climb higher, with 9 distinct tier levels
-- **Level-Up Celebrations** - Spectacular particle burst animations when reaching new tiers (Rising Star, On Fire, Hot Streak, Elite, Champion, Legendary, and more)
+- **Urgency Effects** - Escalating visual tension at 30s, 20s, and 10s remaining with pulsing timer and screen vignette
+- **Level-Up Celebrations** - Spectacular particle burst animations when reaching new tiers
+- **Countdown Timer** - Optional per-question timer to keep the pace up
 - **Retro Aesthetic** - Neon colors, bold typography, and authentic 80s vibes
-- **Dynamic Music System** - Separate synthwave tracks for menu and gameplay that switch automatically
-- **Comprehensive Sound Effects** - Audio feedback for correct/wrong answers, button clicks, music toggles, and level-ups
-- **Audio Controls** - Toggle music and sound effects on/off with persistent settings
-- **Haptic Feedback** - Satisfying tactile feedback on correct and wrong answers
+- **Dynamic Music System** - Separate synthwave tracks for menu and gameplay
+- **Comprehensive Sound Effects** - Audio feedback for answers, buttons, and level-ups
+- **Haptic Feedback** - Satisfying tactile feedback throughout
 - **Celebration Animations** - Confetti explosions for correct answers, shake effect for wrong ones
-- **Quit Confirmation** - Safety dialog to prevent accidental exits from the game
 
 ## Gameplay
 
 Answer 80s music trivia questions to climb the vertical progress map. Correct answers move you up, wrong answers move you down (but never below level 0).
+
+**Game Modes:**
+- **Leaderboard Mode** - 2-minute timed game with scores submitted to Game Center. Tap the trophy icon to enable and compete globally.
+- **Practice Mode** - Play at your own pace without time pressure.
+- **Lives Mode** - Enable lives (1/2/3/5) in Settings for an extra challenge. Game ends when you run out!
 
 **Tier System:**
 Every 3 levels, you advance to a new tier with increasing visual intensity:
@@ -52,14 +59,14 @@ As you progress, the map's connecting lines grow thicker and colors shift from E
 
 ```
 RetroTrivia/
-├── Models/          # TriviaQuestion, GameState
-├── Views/           # HomeView, GameMapView, TriviaGameView
+├── Models/          # TriviaQuestion, GameState, GameSettings
+├── Views/           # HomeView, GameMapView, TriviaGameView, GameCenterLeaderboardView
 │                    # MapNodeView, CelebrationOverlay, WrongAnswerOverlay, LevelUpOverlay
 ├── Components/      # RetroButton, RetroGradientBackground, RetroTypography
-├── Audio/           # AudioManager, background music (menu-music.mp3, gameplay-music.mp3)
-│                    # Sound effects (correct-answer.wav, wrong-answer.wav, etc.)
+├── Managers/        # AudioManager, GameCenterManager, QuestionManager
+├── Audio/           # Background music and sound effects
 ├── Data/            # questions.json
-└── Assets.xcassets/ # Colors (NeonPink, ElectricBlue, HotMagenta, etc.) and images
+└── Assets.xcassets/ # Colors, images, and app icon
 ```
 
 ## Development
