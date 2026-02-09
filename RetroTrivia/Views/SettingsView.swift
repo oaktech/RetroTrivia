@@ -43,11 +43,16 @@ struct SettingsView: View {
                     }
                     .padding(.horizontal, 30)
 
-                    // Timer Toggle
+                    // Timer Toggle (fixed at 10 seconds)
                     HStack {
-                        Text("Countdown Timer")
-                            .retroBody()
-                            .foregroundStyle(.white)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Countdown Timer")
+                                .retroBody()
+                                .foregroundStyle(.white)
+                            Text("10 seconds per question")
+                                .font(.caption)
+                                .foregroundStyle(.white.opacity(0.6))
+                        }
 
                         Spacer()
 
@@ -62,31 +67,6 @@ struct SettingsView: View {
                         .sensoryFeedback(.impact(weight: .light), trigger: gameState.gameSettings.timerEnabled)
                     }
                     .padding(.horizontal, 30)
-
-                    // Timer Duration Picker (only when timer is enabled)
-                    if gameState.gameSettings.timerEnabled {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Time per Question")
-                                .retroBody()
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 30)
-
-                            Picker("Duration", selection: Binding(
-                                get: { gameState.gameSettings.timerDuration },
-                                set: { newValue in
-                                    audioManager.playSoundEffect(named: "button-tap")
-                                    gameState.gameSettings.timerDuration = newValue
-                                }
-                            )) {
-                                Text("10s").tag(10)
-                                Text("15s").tag(15)
-                                Text("20s").tag(20)
-                            }
-                            .pickerStyle(.segmented)
-                            .padding(.horizontal, 30)
-                            .sensoryFeedback(.selection, trigger: gameState.gameSettings.timerDuration)
-                        }
-                    }
 
                     // Lives Mode Toggle
                     HStack {

@@ -21,11 +21,14 @@ struct GameSettings {
     private static let livesEnabledKey = "game.settings.livesEnabled"
     private static let startingLivesKey = "game.settings.startingLives"
 
-    init(timerEnabled: Bool = false, timerDuration: Int = 15,
+    // Timer is fixed at 10 seconds per question
+    static let fixedTimerDuration: Int = 10
+
+    init(timerEnabled: Bool = false, timerDuration: Int = 10,
          leaderboardMode: Bool = false,
          livesEnabled: Bool = false, startingLives: Int = 3) {
         self.timerEnabled = timerEnabled
-        self.timerDuration = timerDuration
+        self.timerDuration = Self.fixedTimerDuration  // Always use fixed duration
         self.leaderboardMode = leaderboardMode
         self.livesEnabled = livesEnabled
         self.startingLives = startingLives
@@ -33,11 +36,10 @@ struct GameSettings {
 
     static func load() -> GameSettings {
         let enabled = UserDefaults.standard.object(forKey: timerEnabledKey) as? Bool ?? false
-        let duration = UserDefaults.standard.object(forKey: timerDurationKey) as? Int ?? 15
         let leaderboardMode = UserDefaults.standard.object(forKey: leaderboardModeKey) as? Bool ?? false
         let livesEnabled = UserDefaults.standard.object(forKey: livesEnabledKey) as? Bool ?? false
         let startingLives = UserDefaults.standard.object(forKey: startingLivesKey) as? Int ?? 3
-        return GameSettings(timerEnabled: enabled, timerDuration: max(5, duration),
+        return GameSettings(timerEnabled: enabled, timerDuration: fixedTimerDuration,
                             leaderboardMode: leaderboardMode,
                             livesEnabled: livesEnabled, startingLives: max(1, startingLives))
     }
