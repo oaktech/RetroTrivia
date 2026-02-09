@@ -13,6 +13,7 @@
 - [x] Feature: Add app icon to home screen
 - [x] Feature: Add scrolling 80s phrases to home screen
 - [x] Feature: Fix question timer at 10 seconds
+- [x] Feature: Dim/blur questions screen during answer animations
 
 ### Pending
 - [ ] Feature: Display leaderboard in-app

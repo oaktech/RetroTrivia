@@ -30,6 +30,10 @@ struct TriviaGameView: View {
     @State private var timerIsActive = false
     @State private var urgencyPulse = false
 
+    private var isShowingOverlay: Bool {
+        showCelebration || showWrong || showTimeout
+    }
+
     private let countdownTimer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
 
     // Urgency level based on game time remaining
@@ -165,6 +169,14 @@ struct TriviaGameView: View {
                 .padding(.horizontal, 20)
 
                 Spacer()
+            }
+
+            // Dim overlay when showing answer feedback
+            if isShowingOverlay {
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+                    .transition(.opacity)
             }
 
             // Overlays
