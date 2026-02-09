@@ -53,20 +53,13 @@ struct HomeView: View {
                     if gameCenterManager.isAuthenticated {
                         Button(action: {
                             audioManager.playSoundEffect(named: "button-tap")
-                            // Auto-enable leaderboard mode when viewing leaderboard
-                            if !gameState.gameSettings.leaderboardMode {
-                                gameState.gameSettings.leaderboardMode = true
-                                gameState.gameSettings.save()
-                            }
                             activeSheet = .leaderboard
                         }) {
                             Image(systemName: "trophy.fill")
                                 .font(.system(size: 18))
                                 .foregroundStyle(Color("NeonYellow"))
                                 .frame(width: 42, height: 42)
-                                .background(gameState.gameSettings.leaderboardMode
-                                    ? Color("NeonYellow").opacity(0.2)
-                                    : Color.white.opacity(0.08))
+                                .background(Color.white.opacity(0.08))
                                 .clipShape(Circle())
                         }
                         .sensoryFeedback(.impact(weight: .medium), trigger: activeSheet == .leaderboard)
@@ -117,12 +110,26 @@ struct HomeView: View {
                     .padding(.bottom, 20)
                 }
 
-                RetroButton("Play", variant: .primary) {
-                    audioManager.playSoundEffect(named: "button-tap")
-                    gameState.resetGame()
-                    questionManager.resetSession()
-                    audioManager.playGameplayMusic()
-                    onPlayTapped()
+                HStack(spacing: 16) {
+                    // Play button (leaderboard mode)
+                    VStack(spacing: 4) {
+                        RetroButton("Play", variant: .primary) {
+                            startGame(leaderboardMode: true)
+                        }
+                        Text("2-minute challenge")
+                            .font(.caption)
+                            .foregroundStyle(Color("NeonPink").opacity(0.7))
+                    }
+
+                    // Practice button (casual mode)
+                    VStack(spacing: 4) {
+                        RetroButton("Practice", variant: .secondary) {
+                            startGame(leaderboardMode: false)
+                        }
+                        Text("No time limit")
+                            .font(.caption)
+                            .foregroundStyle(Color("ElectricBlue").opacity(0.7))
+                    }
                 }
 
                 Spacer()
@@ -140,6 +147,16 @@ struct HomeView: View {
         .onAppear {
             activeSheet = nil
         }
+    }
+
+    private func startGame(leaderboardMode: Bool) {
+        audioManager.playSoundEffect(named: "button-tap")
+        gameState.gameSettings.leaderboardMode = leaderboardMode
+        gameState.gameSettings.save()
+        gameState.resetGame()
+        questionManager.resetSession()
+        audioManager.playGameplayMusic()
+        onPlayTapped()
     }
 }
 

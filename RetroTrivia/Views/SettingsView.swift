@@ -88,31 +88,6 @@ struct SettingsView: View {
                         }
                     }
 
-                    // Leaderboard Mode Toggle
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Leaderboard Mode")
-                                .retroBody()
-                                .foregroundStyle(.white)
-                            Text("2-minute timed game")
-                                .font(.caption)
-                                .foregroundStyle(.white.opacity(0.6))
-                        }
-
-                        Spacer()
-
-                        Toggle("", isOn: Binding(
-                            get: { gameState.gameSettings.leaderboardMode },
-                            set: { newValue in
-                                audioManager.playSoundEffect(named: "button-tap")
-                                gameState.gameSettings.leaderboardMode = newValue
-                            }
-                        ))
-                        .tint(Color("NeonYellow"))
-                        .sensoryFeedback(.impact(weight: .light), trigger: gameState.gameSettings.leaderboardMode)
-                    }
-                    .padding(.horizontal, 30)
-
                     // Lives Mode Toggle
                     HStack {
                         Text("Lives Mode")
