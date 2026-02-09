@@ -32,7 +32,7 @@ struct RetroButton: View {
                 .foregroundStyle(textColor)
                 .padding(.horizontal, 32)
                 .padding(.vertical, 16)
-                .frame(minWidth: 200)
+                .frame(maxWidth: .infinity)
                 .background(background)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .overlay(

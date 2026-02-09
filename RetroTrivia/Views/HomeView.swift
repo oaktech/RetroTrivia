@@ -145,7 +145,7 @@ struct HomeView: View {
                     .padding(.bottom, 20)
                 }
 
-                HStack(spacing: 16) {
+                HStack(spacing: 12) {
                     // Play button (leaderboard mode)
                     VStack(spacing: 4) {
                         RetroButton("Play", variant: .primary) {
@@ -157,6 +157,7 @@ struct HomeView: View {
                             .font(.caption)
                             .foregroundStyle(Color("NeonPink").opacity(0.7))
                     }
+                    .frame(maxWidth: .infinity)
 
                     // Practice button (casual mode)
                     VStack(spacing: 4) {
@@ -169,7 +170,9 @@ struct HomeView: View {
                             .font(.caption)
                             .foregroundStyle(Color("ElectricBlue").opacity(0.7))
                     }
+                    .frame(maxWidth: .infinity)
                 }
+                .padding(.horizontal, 4)
 
                 Spacer()
             }
