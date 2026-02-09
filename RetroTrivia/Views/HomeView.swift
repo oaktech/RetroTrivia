@@ -52,16 +52,24 @@ struct HomeView: View {
                     // Leaderboard button (only when authenticated)
                     if gameCenterManager.isAuthenticated {
                         Button(action: {
+                            audioManager.playSoundEffect(named: "button-tap")
+                            // Auto-enable leaderboard mode when viewing leaderboard
+                            if !gameState.gameSettings.leaderboardMode {
+                                gameState.gameSettings.leaderboardMode = true
+                                gameState.gameSettings.save()
+                            }
                             activeSheet = .leaderboard
                         }) {
                             Image(systemName: "trophy.fill")
                                 .font(.system(size: 18))
                                 .foregroundStyle(Color("NeonYellow"))
                                 .frame(width: 42, height: 42)
-                                .background(Color.white.opacity(0.08))
+                                .background(gameState.gameSettings.leaderboardMode
+                                    ? Color("NeonYellow").opacity(0.2)
+                                    : Color.white.opacity(0.08))
                                 .clipShape(Circle())
                         }
-                        .sensoryFeedback(.impact(weight: .light), trigger: activeSheet == .leaderboard)
+                        .sensoryFeedback(.impact(weight: .medium), trigger: activeSheet == .leaderboard)
                     }
 
                     // Settings button

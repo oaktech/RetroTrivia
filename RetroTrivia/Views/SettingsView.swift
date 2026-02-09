@@ -88,51 +88,30 @@ struct SettingsView: View {
                         }
                     }
 
-                    // Game Timer Toggle
+                    // Leaderboard Mode Toggle
                     HStack {
-                        Text("Game Timer")
-                            .retroBody()
-                            .foregroundStyle(.white)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Leaderboard Mode")
+                                .retroBody()
+                                .foregroundStyle(.white)
+                            Text("2-minute timed game")
+                                .font(.caption)
+                                .foregroundStyle(.white.opacity(0.6))
+                        }
 
                         Spacer()
 
                         Toggle("", isOn: Binding(
-                            get: { gameState.gameSettings.gameTimerEnabled },
+                            get: { gameState.gameSettings.leaderboardMode },
                             set: { newValue in
                                 audioManager.playSoundEffect(named: "button-tap")
-                                gameState.gameSettings.gameTimerEnabled = newValue
+                                gameState.gameSettings.leaderboardMode = newValue
                             }
                         ))
-                        .tint(Color("NeonPink"))
-                        .sensoryFeedback(.impact(weight: .light), trigger: gameState.gameSettings.gameTimerEnabled)
+                        .tint(Color("NeonYellow"))
+                        .sensoryFeedback(.impact(weight: .light), trigger: gameState.gameSettings.leaderboardMode)
                     }
                     .padding(.horizontal, 30)
-
-                    // Game Timer Duration Picker (only when game timer is enabled)
-                    if gameState.gameSettings.gameTimerEnabled {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Game Duration")
-                                .retroBody()
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 30)
-
-                            Picker("Game Duration", selection: Binding(
-                                get: { gameState.gameSettings.gameTimerDuration },
-                                set: { newValue in
-                                    audioManager.playSoundEffect(named: "button-tap")
-                                    gameState.gameSettings.gameTimerDuration = newValue
-                                }
-                            )) {
-                                Text("1 min").tag(60)
-                                Text("3 min").tag(180)
-                                Text("5 min").tag(300)
-                                Text("7 min").tag(420)
-                            }
-                            .pickerStyle(.segmented)
-                            .padding(.horizontal, 30)
-                            .sensoryFeedback(.selection, trigger: gameState.gameSettings.gameTimerDuration)
-                        }
-                    }
 
                     // Lives Mode Toggle
                     HStack {

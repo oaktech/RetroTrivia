@@ -65,7 +65,7 @@ struct GameMapView: View {
     // MARK: - Game Timer Helpers
 
     private var gameTimerColor: Color {
-        let fraction = gameTimeRemaining / Double(gameState.gameSettings.gameTimerDuration)
+        let fraction = gameTimeRemaining / Double(GameSettings.leaderboardDuration)
         if fraction > 0.5 { return Color("ElectricBlue") }
         if fraction > 0.25 { return Color("NeonYellow") }
         return Color("NeonPink")
@@ -84,7 +84,7 @@ struct GameMapView: View {
                         .fill(Color.white.opacity(0.1))
                     RoundedRectangle(cornerRadius: 3)
                         .fill(gameTimerColor)
-                        .frame(width: geo.size.width * (gameTimeRemaining / Double(gameState.gameSettings.gameTimerDuration)))
+                        .frame(width: geo.size.width * (gameTimeRemaining / Double(GameSettings.leaderboardDuration)))
                         .animation(.linear(duration: 1), value: gameTimeRemaining)
                 }
             }
@@ -262,8 +262,8 @@ struct GameMapView: View {
         .fullScreenCover(item: $currentQuestion) { question in
             TriviaGameView(
                 question: question,
-                gameTimeRemaining: gameState.gameSettings.gameTimerEnabled ? gameTimeRemaining : nil,
-                gameTimerDuration: Double(gameState.gameSettings.gameTimerDuration),
+                gameTimeRemaining: gameState.gameSettings.leaderboardMode ? gameTimeRemaining : nil,
+                gameTimerDuration: Double(GameSettings.leaderboardDuration),
                 livesRemaining: gameState.gameSettings.livesEnabled ? gameState.livesRemaining : nil,
                 startingLives: gameState.gameSettings.startingLives,
                 onAnswer: { isCorrect in
@@ -286,8 +286,8 @@ struct GameMapView: View {
         }
         .onAppear {
             loadQuestions()
-            if gameState.gameSettings.gameTimerEnabled {
-                gameTimeRemaining = Double(gameState.gameSettings.gameTimerDuration)
+            if gameState.gameSettings.leaderboardMode {
+                gameTimeRemaining = Double(GameSettings.leaderboardDuration)
                 // Don't start timer yet - wait for "Play Trivia" button
             }
         }
@@ -300,8 +300,11 @@ struct GameMapView: View {
         audioManager.playSoundEffect(named: "wrong-buzzer")
         gameOverReason = reason
         showGameOver = true
-        Task {
-            await gameCenterManager.submitScore(gameState.currentPosition)
+        // Only submit score if playing in leaderboard mode
+        if gameState.gameSettings.leaderboardMode {
+            Task {
+                await gameCenterManager.submitScore(gameState.currentPosition)
+            }
         }
     }
 
@@ -421,7 +424,7 @@ struct GameMapView: View {
             }
 
             // Game timer full-width row
-            if gameState.gameSettings.gameTimerEnabled {
+            if gameState.gameSettings.leaderboardMode {
                 gameTimerDisplay
             }
 
@@ -533,7 +536,7 @@ struct GameMapView: View {
         }
 
         // Start game timer on first question
-        if gameState.gameSettings.gameTimerEnabled && !gameTimerActive {
+        if gameState.gameSettings.leaderboardMode && !gameTimerActive {
             gameTimerActive = true
         }
 
