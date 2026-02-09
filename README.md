@@ -2,6 +2,8 @@
 
 An iOS trivia game themed around 80s music, built with SwiftUI.
 
+**Vibe coded in 1 day using [Claude Code](https://claude.ai/code).** Available on the App Store as [Retro Trivia Blast](https://apps.apple.com/app/retro-trivia-blast).
+
 ## Features
 
 - **80s Music Trivia** - Questions about Madonna, Michael Jackson, Prince, Whitney Houston, Duran Duran, and more
