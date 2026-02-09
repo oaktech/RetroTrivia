@@ -6,6 +6,11 @@ struct SettingsView: View {
     @Environment(QuestionManager.self) private var questionManager
     @Environment(AudioManager.self) private var audioManager
 
+    // Developer mode
+    @State private var devTapCount = 0
+    @State private var showDevTools = false
+    @State private var uploader = CloudKitUploader()
+
     var body: some View {
         ZStack {
             // Retro background
@@ -23,26 +28,6 @@ struct SettingsView: View {
                     .padding(.horizontal)
 
                 VStack(spacing: 25) {
-                    // Online Questions Toggle
-                    HStack {
-                        Text("Online Questions")
-                            .retroBody()
-                            .foregroundStyle(.white)
-
-                        Spacer()
-
-                        Toggle("", isOn: Binding(
-                            get: { questionManager.filterConfig.enableOnlineQuestions },
-                            set: { newValue in
-                                audioManager.playSoundEffect(named: "button-tap")
-                                questionManager.filterConfig.enableOnlineQuestions = newValue
-                            }
-                        ))
-                        .tint(Color("NeonPink"))
-                        .sensoryFeedback(.impact(weight: .light), trigger: questionManager.filterConfig.enableOnlineQuestions)
-                    }
-                    .padding(.horizontal, 30)
-
                     // Timer Toggle (fixed at 10 seconds)
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
@@ -138,7 +123,7 @@ struct SettingsView: View {
                         .sensoryFeedback(.selection, trigger: questionManager.filterConfig.difficulty)
                     }
 
-                    // Category Display (locked/informational)
+                    // Category Display (locked/informational) - tap 5x for dev tools
                     HStack {
                         Text("Category")
                             .retroBody()
@@ -157,6 +142,68 @@ struct SettingsView: View {
                         }
                     }
                     .padding(.horizontal, 30)
+                    .onTapGesture {
+                        devTapCount += 1
+                        if devTapCount >= 5 {
+                            showDevTools = true
+                            devTapCount = 0
+                        }
+                    }
+
+                    // Developer Tools (hidden by default)
+                    if showDevTools {
+                        Divider()
+                            .background(Color("NeonYellow").opacity(0.5))
+                            .padding(.horizontal)
+                            .padding(.top, 10)
+
+                        VStack(spacing: 15) {
+                            Text("Developer Tools")
+                                .retroBody()
+                                .foregroundStyle(Color("NeonYellow"))
+
+                            Text(uploader.progress)
+                                .font(.caption)
+                                .foregroundStyle(.white.opacity(0.8))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+
+                            HStack(spacing: 20) {
+                                Button(action: {
+                                    Task { await uploader.uploadAllQuestions() }
+                                }) {
+                                    Text("Upload Questions")
+                                        .font(.caption)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color("NeonPink").opacity(0.3))
+                                        .foregroundStyle(Color("NeonPink"))
+                                        .cornerRadius(8)
+                                }
+                                .disabled(uploader.isUploading)
+
+                                Button(action: {
+                                    Task { await uploader.deleteAllQuestions() }
+                                }) {
+                                    Text("Delete All")
+                                        .font(.caption)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color.red.opacity(0.3))
+                                        .foregroundStyle(.red)
+                                        .cornerRadius(8)
+                                }
+                                .disabled(uploader.isUploading)
+                            }
+
+                            Button(action: { showDevTools = false }) {
+                                Text("Hide Dev Tools")
+                                    .font(.caption2)
+                                    .foregroundStyle(.white.opacity(0.5))
+                            }
+                        }
+                        .padding(.top, 5)
+                    }
                 }
                 .padding(.top, 10)
 
@@ -164,18 +211,9 @@ struct SettingsView: View {
 
                 // Info text
                 VStack(spacing: 8) {
-                    if questionManager.filterConfig.enableOnlineQuestions {
-                        Text("Online questions include all music eras")
-                            .font(.caption)
-                            .foregroundStyle(.white.opacity(0.6))
-                        Text("(not limited to 80s)")
-                            .font(.caption2)
-                            .foregroundStyle(.white.opacity(0.5))
-                    } else {
-                        Text("Using curated 80s music questions")
-                            .font(.caption)
-                            .foregroundStyle(.white.opacity(0.6))
-                    }
+                    Text("80s Music Trivia")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.6))
 
                     Text("Changes apply on next game")
                         .font(.caption2)

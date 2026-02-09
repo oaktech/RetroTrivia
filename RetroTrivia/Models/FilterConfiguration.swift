@@ -28,15 +28,12 @@ enum Difficulty: String, Codable, CaseIterable {
 /// User preferences for trivia questions
 struct FilterConfiguration: Codable {
     var difficulty: Difficulty
-    var enableOnlineQuestions: Bool
 
     // UserDefaults keys
     private static let difficultyKey = "trivia.filter.difficulty"
-    private static let onlineQuestionsKey = "trivia.filter.onlineQuestions"
 
-    init(difficulty: Difficulty = .any, enableOnlineQuestions: Bool = false) {
+    init(difficulty: Difficulty = .any) {
         self.difficulty = difficulty
-        self.enableOnlineQuestions = enableOnlineQuestions
     }
 
     /// Load filter configuration from UserDefaults
@@ -46,18 +43,12 @@ struct FilterConfiguration: Codable {
         let difficultyRawValue = defaults.string(forKey: difficultyKey) ?? Difficulty.any.rawValue
         let difficulty = Difficulty(rawValue: difficultyRawValue) ?? .any
 
-        let enableOnlineQuestions = defaults.object(forKey: onlineQuestionsKey) as? Bool ?? false
-
-        return FilterConfiguration(
-            difficulty: difficulty,
-            enableOnlineQuestions: enableOnlineQuestions
-        )
+        return FilterConfiguration(difficulty: difficulty)
     }
 
     /// Save filter configuration to UserDefaults
     func save() {
         let defaults = UserDefaults.standard
         defaults.set(difficulty.rawValue, forKey: Self.difficultyKey)
-        defaults.set(enableOnlineQuestions, forKey: Self.onlineQuestionsKey)
     }
 }

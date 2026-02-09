@@ -7,7 +7,6 @@ import Foundation
 
 enum QuestionSource: String, Codable {
     case bundle
-    case api
     case cloudKit
 }
 

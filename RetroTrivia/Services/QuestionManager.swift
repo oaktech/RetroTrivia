@@ -14,9 +14,6 @@ class QuestionManager {
     /// CloudKit service for fetching online questions
     private let cloudKitService = CloudKitQuestionService()
 
-    /// Legacy Open Trivia DB API service (fallback)
-    private let openTriviaService = TriviaAPIService()
-
     /// Local cache manager for offline support
     private let cacheManager = QuestionCacheManager()
 
@@ -54,45 +51,26 @@ class QuestionManager {
 
     /// Load initial questions into the pool
     func loadQuestions() async {
-        print("DEBUG: Loading questions (online: \(filterConfig.enableOnlineQuestions), difficulty: \(filterConfig.difficulty.displayName))")
+        print("DEBUG: Loading questions (difficulty: \(filterConfig.difficulty.displayName))")
 
-        if filterConfig.enableOnlineQuestions {
-            // Priority 1: Try CloudKit first (uses random sampling for large datasets)
-            do {
-                let questions = try await cloudKitService.fetchRandomQuestions(
-                    count: targetPoolSize,
-                    difficulty: filterConfig.difficulty.apiValue,
-                    excludeIDs: askedQuestionIDs
-                )
+        // Try CloudKit first (uses random sampling for large datasets)
+        do {
+            let questions = try await cloudKitService.fetchRandomQuestions(
+                count: targetPoolSize,
+                difficulty: filterConfig.difficulty.apiValue,
+                excludeIDs: askedQuestionIDs
+            )
 
-                questionPool = questions
-                currentSource = .cloudKit
-                cacheManager.cacheQuestions(questions, forDifficulty: filterConfig.difficulty.apiValue)
-                print("DEBUG: Loaded \(questionPool.count) questions from CloudKit")
-                return
-            } catch {
-                print("DEBUG: CloudKit fetch failed: \(error.localizedDescription), trying Open Trivia DB")
-            }
-
-            // Priority 2: Try Open Trivia DB API as secondary online source
-            do {
-                let questions = try await openTriviaService.fetchQuestions(
-                    amount: targetPoolSize,
-                    category: 12, // Music
-                    difficulty: filterConfig.difficulty.apiValue
-                )
-
-                questionPool = questions
-                currentSource = .api
-                cacheManager.cacheQuestions(questions, forDifficulty: filterConfig.difficulty.apiValue)
-                print("DEBUG: Loaded \(questionPool.count) questions from Open Trivia DB")
-                return
-            } catch {
-                print("DEBUG: Open Trivia DB fetch failed: \(error.localizedDescription), falling back to cache")
-            }
+            questionPool = questions
+            currentSource = .cloudKit
+            cacheManager.cacheQuestions(questions, forDifficulty: filterConfig.difficulty.apiValue)
+            print("DEBUG: Loaded \(questionPool.count) questions from CloudKit")
+            return
+        } catch {
+            print("DEBUG: CloudKit fetch failed: \(error.localizedDescription), falling back to cache")
         }
 
-        // Priority 3: Try local cache
+        // Fallback: Try local cache
         let cached = cacheManager.getCachedQuestions(
             count: targetPoolSize,
             difficulty: filterConfig.difficulty.apiValue
@@ -104,7 +82,7 @@ class QuestionManager {
             return
         }
 
-        // Priority 4: Fallback to bundled questions
+        // Fallback: Bundled questions
         loadBundledQuestions()
     }
 
@@ -144,40 +122,21 @@ class QuestionManager {
     private func refillQuestionPool() async {
         print("DEBUG: Refilling question pool (current: \(questionPool.count))")
 
-        if filterConfig.enableOnlineQuestions {
-            // Try CloudKit first (uses random sampling for large datasets)
-            do {
-                let newQuestions = try await cloudKitService.fetchRandomQuestions(
-                    count: targetPoolSize,
-                    difficulty: filterConfig.difficulty.apiValue,
-                    excludeIDs: askedQuestionIDs
-                )
+        // Try CloudKit (uses random sampling for large datasets)
+        do {
+            let newQuestions = try await cloudKitService.fetchRandomQuestions(
+                count: targetPoolSize,
+                difficulty: filterConfig.difficulty.apiValue,
+                excludeIDs: askedQuestionIDs
+            )
 
-                addUniqueQuestions(newQuestions)
-                currentSource = .cloudKit
-                cacheManager.cacheQuestions(newQuestions, forDifficulty: filterConfig.difficulty.apiValue)
-                print("DEBUG: Refilled pool from CloudKit (total: \(questionPool.count))")
-                return
-            } catch {
-                print("DEBUG: CloudKit refill failed: \(error.localizedDescription)")
-            }
-
-            // Try Open Trivia DB
-            do {
-                let newQuestions = try await openTriviaService.fetchQuestions(
-                    amount: targetPoolSize,
-                    category: 12,
-                    difficulty: filterConfig.difficulty.apiValue
-                )
-
-                addUniqueQuestions(newQuestions)
-                currentSource = .api
-                cacheManager.cacheQuestions(newQuestions, forDifficulty: filterConfig.difficulty.apiValue)
-                print("DEBUG: Refilled pool from Open Trivia DB (total: \(questionPool.count))")
-                return
-            } catch {
-                print("DEBUG: Open Trivia DB refill failed: \(error.localizedDescription)")
-            }
+            addUniqueQuestions(newQuestions)
+            currentSource = .cloudKit
+            cacheManager.cacheQuestions(newQuestions, forDifficulty: filterConfig.difficulty.apiValue)
+            print("DEBUG: Refilled pool from CloudKit (total: \(questionPool.count))")
+            return
+        } catch {
+            print("DEBUG: CloudKit refill failed: \(error.localizedDescription)")
         }
 
         // Fallback: add bundled questions if pool is depleted
