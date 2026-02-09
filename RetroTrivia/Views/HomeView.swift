@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct HomeView: View {
     @Environment(GameState.self) var gameState
@@ -25,6 +26,20 @@ struct HomeView: View {
     }
 
     @State private var activeSheet: SheetType?
+    @State private var currentPhraseIndex = 0
+
+    private let retroPhrases = [
+        "Totally Tubular!",
+        "Like, Totally Awesome!",
+        "Gag Me With a Spoon!",
+        "Radical!",
+        "Gnarly!",
+        "To the Max!",
+        "Grody to the Max!",
+        "Fer Sure!",
+        "Bodacious!",
+        "Righteous!"
+    ]
 
     var body: some View {
         ZStack {
@@ -99,13 +114,21 @@ struct HomeView: View {
                         .retroSubtitle()
                 }
 
-                VStack(spacing: 8) {
-                    Text("Test your knowledge of")
-                        .retroBody()
-                    Text("the greatest decade in music!")
-                        .retroBody()
-                }
-                .padding(.top, 8)
+                // Scrolling 80s phrases
+                Text(retroPhrases[currentPhraseIndex])
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [Color("NeonPink"), Color("ElectricBlue")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .shadow(color: Color("NeonPink").opacity(0.5), radius: 8)
+                    .contentTransition(.numericText())
+                    .animation(.easeInOut(duration: 0.5), value: currentPhraseIndex)
+                    .padding(.top, 8)
 
                 Spacer()
 
@@ -156,6 +179,11 @@ struct HomeView: View {
         }
         .onAppear {
             activeSheet = nil
+        }
+        .onReceive(Timer.publish(every: 2.5, on: .main, in: .common).autoconnect()) { _ in
+            withAnimation {
+                currentPhraseIndex = (currentPhraseIndex + 1) % retroPhrases.count
+            }
         }
     }
 
