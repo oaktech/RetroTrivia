@@ -1,6 +1,6 @@
 import Foundation
 
-/// Manages the pool of trivia questions with API and bundled fallback
+/// Manages the pool of trivia questions with CloudKit, cache, and bundled fallback
 @Observable
 class QuestionManager {
     // MARK: - Properties
@@ -11,8 +11,14 @@ class QuestionManager {
     /// Set of question IDs that have been asked this session
     private var askedQuestionIDs: Set<String> = []
 
-    /// API service for fetching online questions
-    private let apiService = TriviaAPIService()
+    /// CloudKit service for fetching online questions
+    private let cloudKitService = CloudKitQuestionService()
+
+    /// Legacy Open Trivia DB API service (fallback)
+    private let openTriviaService = TriviaAPIService()
+
+    /// Local cache manager for offline support
+    private let cacheManager = QuestionCacheManager()
 
     /// User filter preferences
     var filterConfig: FilterConfiguration {
@@ -21,7 +27,7 @@ class QuestionManager {
         }
     }
 
-    /// Bundled questions cache
+    /// Bundled questions cache (emergency fallback)
     private var bundledQuestions: [TriviaQuestion] = []
 
     /// Minimum pool size before refilling
@@ -32,6 +38,9 @@ class QuestionManager {
 
     /// Maximum pool size
     private let maxPoolSize = 30
+
+    /// Current question source for debugging
+    private(set) var currentSource: QuestionSource = .bundle
 
     // MARK: - Initialization
 
@@ -48,23 +57,54 @@ class QuestionManager {
         print("DEBUG: Loading questions (online: \(filterConfig.enableOnlineQuestions), difficulty: \(filterConfig.difficulty.displayName))")
 
         if filterConfig.enableOnlineQuestions {
-            // Try to fetch from API first
+            // Priority 1: Try CloudKit first (uses random sampling for large datasets)
             do {
-                let questions = try await apiService.fetchQuestions(
+                let questions = try await cloudKitService.fetchRandomQuestions(
+                    count: targetPoolSize,
+                    difficulty: filterConfig.difficulty.apiValue,
+                    excludeIDs: askedQuestionIDs
+                )
+
+                questionPool = questions
+                currentSource = .cloudKit
+                cacheManager.cacheQuestions(questions, forDifficulty: filterConfig.difficulty.apiValue)
+                print("DEBUG: Loaded \(questionPool.count) questions from CloudKit")
+                return
+            } catch {
+                print("DEBUG: CloudKit fetch failed: \(error.localizedDescription), trying Open Trivia DB")
+            }
+
+            // Priority 2: Try Open Trivia DB API as secondary online source
+            do {
+                let questions = try await openTriviaService.fetchQuestions(
                     amount: targetPoolSize,
                     category: 12, // Music
                     difficulty: filterConfig.difficulty.apiValue
                 )
 
                 questionPool = questions
-                print("DEBUG: Loaded \(questionPool.count) questions from API")
+                currentSource = .api
+                cacheManager.cacheQuestions(questions, forDifficulty: filterConfig.difficulty.apiValue)
+                print("DEBUG: Loaded \(questionPool.count) questions from Open Trivia DB")
                 return
             } catch {
-                print("DEBUG: API fetch failed: \(error.localizedDescription), falling back to bundled questions")
+                print("DEBUG: Open Trivia DB fetch failed: \(error.localizedDescription), falling back to cache")
             }
         }
 
-        // Fallback to bundled questions
+        // Priority 3: Try local cache
+        let cached = cacheManager.getCachedQuestions(
+            count: targetPoolSize,
+            difficulty: filterConfig.difficulty.apiValue
+        )
+        if !cached.isEmpty {
+            questionPool = cached
+            currentSource = cached.first?.source ?? .bundle
+            print("DEBUG: Loaded \(questionPool.count) questions from cache")
+            return
+        }
+
+        // Priority 4: Fallback to bundled questions
         loadBundledQuestions()
     }
 
@@ -105,35 +145,57 @@ class QuestionManager {
         print("DEBUG: Refilling question pool (current: \(questionPool.count))")
 
         if filterConfig.enableOnlineQuestions {
-            // Try to fetch more from API
+            // Try CloudKit first (uses random sampling for large datasets)
             do {
-                let newQuestions = try await apiService.fetchQuestions(
+                let newQuestions = try await cloudKitService.fetchRandomQuestions(
+                    count: targetPoolSize,
+                    difficulty: filterConfig.difficulty.apiValue,
+                    excludeIDs: askedQuestionIDs
+                )
+
+                addUniqueQuestions(newQuestions)
+                currentSource = .cloudKit
+                cacheManager.cacheQuestions(newQuestions, forDifficulty: filterConfig.difficulty.apiValue)
+                print("DEBUG: Refilled pool from CloudKit (total: \(questionPool.count))")
+                return
+            } catch {
+                print("DEBUG: CloudKit refill failed: \(error.localizedDescription)")
+            }
+
+            // Try Open Trivia DB
+            do {
+                let newQuestions = try await openTriviaService.fetchQuestions(
                     amount: targetPoolSize,
                     category: 12,
                     difficulty: filterConfig.difficulty.apiValue
                 )
 
-                // Add new questions that aren't already in the pool
-                let existingIDs = Set(questionPool.map { $0.id })
-                let uniqueNewQuestions = newQuestions.filter { !existingIDs.contains($0.id) }
-
-                questionPool.append(contentsOf: uniqueNewQuestions)
-
-                // Trim to max size if needed
-                if questionPool.count > maxPoolSize {
-                    questionPool = Array(questionPool.prefix(maxPoolSize))
-                }
-
-                print("DEBUG: Refilled pool with \(uniqueNewQuestions.count) new questions (total: \(questionPool.count))")
+                addUniqueQuestions(newQuestions)
+                currentSource = .api
+                cacheManager.cacheQuestions(newQuestions, forDifficulty: filterConfig.difficulty.apiValue)
+                print("DEBUG: Refilled pool from Open Trivia DB (total: \(questionPool.count))")
                 return
             } catch {
-                print("DEBUG: Refill from API failed: \(error.localizedDescription)")
+                print("DEBUG: Open Trivia DB refill failed: \(error.localizedDescription)")
             }
         }
 
         // Fallback: add bundled questions if pool is depleted
         if questionPool.isEmpty {
             loadBundledQuestions()
+        }
+    }
+
+    /// Add unique questions to the pool
+    private func addUniqueQuestions(_ newQuestions: [TriviaQuestion]) {
+        let existingIDs = Set(questionPool.map { $0.id })
+        let uniqueNewQuestions = newQuestions.filter { !existingIDs.contains($0.id) }
+
+        questionPool.append(contentsOf: uniqueNewQuestions)
+
+        // Trim to max size if needed
+        if questionPool.count > maxPoolSize {
+            questionPool = Array(questionPool.prefix(maxPoolSize))
         }
     }
 
@@ -156,12 +218,18 @@ class QuestionManager {
 
         // Shuffle for variety
         questionPool = questions.shuffled()
+        currentSource = .bundle
         print("DEBUG: Loaded \(questionPool.count) bundled questions")
     }
 
     /// Get pool status for debugging
     func getPoolStatus() -> String {
         let unanswered = questionPool.filter { !askedQuestionIDs.contains($0.id) }.count
-        return "Pool: \(questionPool.count) total, \(unanswered) unanswered, \(askedQuestionIDs.count) asked"
+        return "Pool: \(questionPool.count) total, \(unanswered) unanswered, \(askedQuestionIDs.count) asked, source: \(currentSource.rawValue)"
+    }
+
+    /// Clear the question cache
+    func clearCache() {
+        cacheManager.clearCache()
     }
 }
