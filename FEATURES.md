@@ -10,6 +10,7 @@
 - [x] Feature: Standardize leaderboard to 2-minute timed games
 - [x] Feature: Add Play vs Practice mode selection
 - [x] Feature: Implement Lives System + Game Center Leaderboard
+- [x] Feature: Add app icon to home screen
 
 ### Pending
 - [ ] Feature: Display leaderboard in-app
@@ -17,7 +18,6 @@
 - [ ] Feature: Fix question timer at 10 seconds
 - [ ] Refactor: Implement MVVM architecture
 - [ ] Feature: Build question API service and database
-- [ ] Feature: Add app icon to home screen
 - [ ] Feature: Add scrolling 80s phrases to home screen
 
 ---

@@ -81,6 +81,16 @@ struct HomeView: View {
 
                 Spacer()
 
+                // App icon with retro glow
+                Image("AppIconImage")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 120, height: 120)
+                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                    .shadow(color: Color("NeonPink").opacity(0.6), radius: 20)
+                    .shadow(color: Color("ElectricBlue").opacity(0.4), radius: 30)
+                    .padding(.bottom, 8)
+
                 VStack(spacing: 12) {
                     Text("RETROTRIVIA")
                         .retroTitle()
