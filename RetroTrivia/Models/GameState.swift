@@ -15,7 +15,7 @@ class GameState {
     var currentPosition: Int {
         didSet {
             UserDefaults.standard.set(currentPosition, forKey: Self.currentPositionKey)
-            if currentPosition > highScorePosition {
+            if gameSettings.leaderboardMode && currentPosition > highScorePosition {
                 highScorePosition = currentPosition
             }
         }
