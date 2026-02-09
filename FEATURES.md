@@ -1,5 +1,27 @@
 # RetroTrivia — Feature Ideas
 
+---
+
+## 📋 Active Task List
+
+### Completed
+- [x] Fix: Game timer starts only after Play Trivia click
+- [x] Fix: Settings button unresponsive after quitting game
+- [x] Feature: Standardize leaderboard to 2-minute timed games
+- [x] Feature: Add Play vs Practice mode selection
+- [x] Feature: Implement Lives System + Game Center Leaderboard
+
+### Pending
+- [ ] Feature: Display leaderboard in-app
+- [ ] Feature: Expand offline question database
+- [ ] Feature: Fix question timer at 10 seconds
+- [ ] Refactor: Implement MVVM architecture
+- [ ] Feature: Build question API service and database
+- [ ] Feature: Add app icon to home screen
+- [ ] Feature: Add scrolling 80s phrases to home screen
+
+---
+
 ## 🔥 High Impact / Retention
 
 **Daily Challenge**
@@ -56,6 +78,12 @@ Alternate map skins (cassette tape theme, vinyl record theme) — no pay-to-win.
 ---
 
 ## ✨ Polish
+
+**App Icon on Home Screen**
+Display the app icon prominently on the HomeView to add visual polish and brand recognition.
+
+**Scrolling 80s Phrases**
+Animated marquee or rotating display of 80s catchphrases ("Totally Tubular!", "Radical!", "Gnarly!") on the home screen to enhance the retro aesthetic.
 
 **Animated Map Characters**
 A small retro avatar that walks up/down the map instead of just highlighting a circle.
