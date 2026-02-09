@@ -48,30 +48,6 @@ struct SettingsView: View {
                     }
                     .padding(.horizontal, 30)
 
-                    // Difficulty Picker
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Difficulty")
-                            .retroBody()
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 30)
-
-                        Picker("Difficulty", selection: Binding(
-                            get: { questionManager.filterConfig.difficulty },
-                            set: { newValue in
-                                audioManager.playSoundEffect(named: "button-tap")
-                                questionManager.filterConfig.difficulty = newValue
-                            }
-                        )) {
-                            ForEach(Difficulty.allCases, id: \.self) { difficulty in
-                                Text(difficulty.displayName)
-                                    .tag(difficulty)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .padding(.horizontal, 30)
-                        .sensoryFeedback(.selection, trigger: questionManager.filterConfig.difficulty)
-                    }
-
                     // Category Display (locked/informational) - tap 5x for dev tools
                     HStack {
                         Text("Category")

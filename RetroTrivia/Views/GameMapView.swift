@@ -190,6 +190,14 @@ struct GameMapView: View {
         ZStack {
             RetroGradientBackground()
 
+            if !hasPlayedOnce {
+                // Show minimal loading state before first question appears
+                if isLoadingQuestions {
+                    ProgressView()
+                        .tint(Color("NeonPink"))
+                }
+            }
+
             VStack(spacing: 0) {
                 // Header with Back button and score
                 header
@@ -286,6 +294,7 @@ struct GameMapView: View {
                 // Play button at bottom
                 playButton
             }
+            .opacity(hasPlayedOnce ? 1 : 0)
 
             // Level up overlay
             if showLevelUp {
@@ -382,7 +391,6 @@ struct GameMapView: View {
             loadQuestions()
             if gameState.gameSettings.leaderboardMode {
                 gameTimeRemaining = Double(GameSettings.leaderboardDuration)
-                // Don't start timer yet - wait for "Play Trivia" button
             }
         }
     }
@@ -579,14 +587,6 @@ struct GameMapView: View {
                 .padding(.horizontal, 40)
                 .padding(.vertical, 16)
                 .transition(.opacity)
-            } else if !hasPlayedOnce {
-                // Initial play button
-                RetroButton("Play Trivia", variant: .primary) {
-                    startTrivia()
-                }
-                .disabled(isLoadingQuestions || questionManager.questionPool.isEmpty)
-                .padding(.horizontal)
-                .padding(.vertical, 20)
             }
 
             if isLoadingQuestions {
@@ -620,6 +620,11 @@ struct GameMapView: View {
             await questionManager.loadQuestions()
             isLoadingQuestions = false
             print("DEBUG: \(questionManager.getPoolStatus())")
+
+            // Auto-start first question once loaded
+            if !questionManager.questionPool.isEmpty {
+                startTrivia()
+            }
         }
     }
 
