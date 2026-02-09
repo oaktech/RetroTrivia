@@ -35,6 +35,7 @@ struct GameMapView: View {
     @State private var gameTimerActive = false
     @State private var showGameOver = false
     @State private var gameOverReason: GameOverOverlay.Reason = .timerExpired
+    @State private var urgencyPulse: Bool = false
 
     private let gameTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -73,9 +74,11 @@ struct GameMapView: View {
 
     private var gameTimerDisplay: some View {
         HStack(spacing: 12) {
-            Image(systemName: "clock")
-                .font(.system(size: 14, weight: .semibold))
+            Image(systemName: urgencyLevel == .critical ? "exclamationmark.circle.fill" : "clock")
+                .font(.system(size: urgencyLevel == .none ? 14 : 16, weight: .semibold))
                 .foregroundStyle(gameTimerColor)
+                .scaleEffect(urgencyScale)
+                .animation(.easeInOut(duration: urgencyLevel == .critical ? 0.3 : 0.5), value: urgencyPulse)
 
             // Progress bar
             GeometryReader { geo in
@@ -88,15 +91,23 @@ struct GameMapView: View {
                         .animation(.linear(duration: 1), value: gameTimeRemaining)
                 }
             }
-            .frame(height: 6)
+            .frame(height: urgencyLevel == .critical ? 8 : 6)
 
             Text(formattedTime(gameTimeRemaining))
-                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                .font(.system(size: urgencyLevel == .none ? 14 : 18, weight: .bold, design: .monospaced))
                 .monospacedDigit()
                 .foregroundStyle(gameTimerColor)
-                .frame(width: 40, alignment: .trailing)
+                .scaleEffect(urgencyScale)
+                .animation(.easeInOut(duration: urgencyLevel == .critical ? 0.3 : 0.5), value: urgencyPulse)
+                .frame(width: 50, alignment: .trailing)
         }
         .padding(.horizontal, 4)
+        .padding(.vertical, urgencyLevel != .none ? 4 : 0)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(urgencyVignetteColor.opacity(urgencyLevel != .none ? 0.1 : 0))
+                .animation(.easeInOut(duration: 0.5), value: urgencyLevel != .none)
+        )
     }
 
     private func formattedTime(_ seconds: Double) -> String {
@@ -104,6 +115,46 @@ struct GameMapView: View {
         let m = total / 60
         let s = total % 60
         return String(format: "%d:%02d", m, s)
+    }
+
+    // Urgency level based on time remaining
+    private enum UrgencyLevel {
+        case none, moderate, high, critical
+    }
+
+    private var urgencyLevel: UrgencyLevel {
+        guard gameState.gameSettings.leaderboardMode && gameTimerActive else { return .none }
+        if gameTimeRemaining <= 10 { return .critical }
+        if gameTimeRemaining <= 20 { return .high }
+        if gameTimeRemaining <= 30 { return .moderate }
+        return .none
+    }
+
+    private var urgencyVignetteOpacity: Double {
+        switch urgencyLevel {
+        case .none: return 0
+        case .moderate: return 0.15
+        case .high: return 0.25
+        case .critical: return 0.4
+        }
+    }
+
+    private var urgencyVignetteColor: Color {
+        switch urgencyLevel {
+        case .none, .moderate: return Color("NeonPink")
+        case .high: return Color.orange
+        case .critical: return Color.red
+        }
+    }
+
+    private var urgencyScale: CGFloat {
+        guard urgencyPulse else { return 1.0 }
+        switch urgencyLevel {
+        case .none: return 1.0
+        case .moderate: return 1.05
+        case .high: return 1.1
+        case .critical: return 1.15
+        }
     }
 
     // MARK: - Progressive Intensity Helpers
@@ -250,11 +301,54 @@ struct GameMapView: View {
                     onBackTapped()
                 }
             }
+
+            // Urgency vignette overlay (screen edge glow when time is running out)
+            if urgencyLevel != .none {
+                Rectangle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color.clear,
+                                Color.clear,
+                                urgencyVignetteColor.opacity(urgencyVignetteOpacity * (urgencyPulse ? 1.2 : 0.8))
+                            ],
+                            center: .center,
+                            startRadius: UIScreen.main.bounds.width * 0.3,
+                            endRadius: UIScreen.main.bounds.width * 0.8
+                        )
+                    )
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+                    .animation(.easeInOut(duration: urgencyLevel == .critical ? 0.3 : 0.5), value: urgencyPulse)
+            }
         }
         .onReceive(gameTimer) { _ in
             guard gameTimerActive else { return }
             if gameTimeRemaining > 0 {
                 gameTimeRemaining -= 1
+
+                // Trigger urgency pulse animation at thresholds
+                if urgencyLevel != .none {
+                    // Pulse frequency increases with urgency
+                    let shouldPulse: Bool
+                    switch urgencyLevel {
+                    case .critical:
+                        shouldPulse = true // every second
+                    case .high:
+                        shouldPulse = Int(gameTimeRemaining) % 2 == 0 // every 2 seconds
+                    case .moderate:
+                        shouldPulse = Int(gameTimeRemaining) % 3 == 0 // every 3 seconds
+                    case .none:
+                        shouldPulse = false
+                    }
+
+                    if shouldPulse {
+                        urgencyPulse = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            urgencyPulse = false
+                        }
+                    }
+                }
             } else {
                 handleGameOver(reason: .timerExpired)
             }

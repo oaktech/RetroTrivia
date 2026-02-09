@@ -28,8 +28,49 @@ struct TriviaGameView: View {
     @State private var showTimeout = false
     @State private var timeRemaining: Double = 15.0
     @State private var timerIsActive = false
+    @State private var urgencyPulse = false
 
     private let countdownTimer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
+
+    // Urgency level based on game time remaining
+    private enum UrgencyLevel {
+        case none, moderate, high, critical
+    }
+
+    private var urgencyLevel: UrgencyLevel {
+        guard let remaining = gameTimeRemaining else { return .none }
+        if remaining <= 10 { return .critical }
+        if remaining <= 20 { return .high }
+        if remaining <= 30 { return .moderate }
+        return .none
+    }
+
+    private var urgencyVignetteOpacity: Double {
+        switch urgencyLevel {
+        case .none: return 0
+        case .moderate: return 0.15
+        case .high: return 0.25
+        case .critical: return 0.4
+        }
+    }
+
+    private var urgencyVignetteColor: Color {
+        switch urgencyLevel {
+        case .none, .moderate: return Color("NeonPink")
+        case .high: return Color.orange
+        case .critical: return Color.red
+        }
+    }
+
+    private var urgencyScale: CGFloat {
+        guard urgencyPulse else { return 1.0 }
+        switch urgencyLevel {
+        case .none: return 1.0
+        case .moderate: return 1.05
+        case .high: return 1.1
+        case .critical: return 1.15
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -144,6 +185,26 @@ struct TriviaGameView: View {
                     handleOverlayComplete(isCorrect: false)
                 }
             }
+
+            // Urgency vignette overlay (screen edge glow when time is running out)
+            if urgencyLevel != .none {
+                Rectangle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color.clear,
+                                Color.clear,
+                                urgencyVignetteColor.opacity(urgencyVignetteOpacity * (urgencyPulse ? 1.2 : 0.8))
+                            ],
+                            center: .center,
+                            startRadius: UIScreen.main.bounds.width * 0.3,
+                            endRadius: UIScreen.main.bounds.width * 0.8
+                        )
+                    )
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+                    .animation(.easeInOut(duration: urgencyLevel == .critical ? 0.3 : 0.5), value: urgencyPulse)
+            }
         }
         .sensoryFeedback(.impact(weight: .light), trigger: buttonTapTrigger)
         .sensoryFeedback(.success, trigger: correctAnswerTrigger)
@@ -168,6 +229,29 @@ struct TriviaGameView: View {
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             if !hasAnswered && gameState.gameSettings.timerEnabled {
                 timerIsActive = true
+            }
+        }
+        .onChange(of: gameTimeRemaining) { oldValue, newValue in
+            guard let remaining = newValue else { return }
+
+            // Trigger urgency pulse at thresholds
+            let shouldPulse: Bool
+            switch urgencyLevel {
+            case .critical:
+                shouldPulse = true // every second
+            case .high:
+                shouldPulse = Int(remaining) % 2 == 0 // every 2 seconds
+            case .moderate:
+                shouldPulse = Int(remaining) % 3 == 0 // every 3 seconds
+            case .none:
+                shouldPulse = false
+            }
+
+            if shouldPulse {
+                urgencyPulse = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    urgencyPulse = false
+                }
             }
         }
     }
@@ -200,9 +284,11 @@ struct TriviaGameView: View {
         let color: Color = fraction > 0.5 ? Color("ElectricBlue") : fraction > 0.25 ? Color("NeonYellow") : Color("NeonPink")
 
         HStack(spacing: 10) {
-            Image(systemName: "clock")
-                .font(.system(size: 13, weight: .semibold))
+            Image(systemName: urgencyLevel == .critical ? "exclamationmark.circle.fill" : "clock")
+                .font(.system(size: urgencyLevel == .none ? 13 : 15, weight: .semibold))
                 .foregroundStyle(color)
+                .scaleEffect(urgencyScale)
+                .animation(.easeInOut(duration: urgencyLevel == .critical ? 0.3 : 0.5), value: urgencyPulse)
 
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
@@ -214,16 +300,24 @@ struct TriviaGameView: View {
                         .animation(.linear(duration: 1), value: fraction)
                 }
             }
-            .frame(height: 6)
+            .frame(height: urgencyLevel == .critical ? 8 : 6)
 
             Text(formattedGameTime(remaining))
-                .font(.system(size: 13, weight: .bold, design: .monospaced))
+                .font(.system(size: urgencyLevel == .none ? 13 : 16, weight: .bold, design: .monospaced))
                 .monospacedDigit()
                 .foregroundStyle(color)
-                .frame(width: 38, alignment: .trailing)
+                .scaleEffect(urgencyScale)
+                .animation(.easeInOut(duration: urgencyLevel == .critical ? 0.3 : 0.5), value: urgencyPulse)
+                .frame(width: 45, alignment: .trailing)
         }
         .padding(.horizontal, 24)
-        .padding(.top, 8)
+        .padding(.vertical, urgencyLevel != .none ? 8 : 0)
+        .padding(.top, urgencyLevel == .none ? 8 : 0)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(urgencyVignetteColor.opacity(urgencyLevel != .none ? 0.1 : 0))
+                .animation(.easeInOut(duration: 0.5), value: urgencyLevel != .none)
+        )
     }
 
     private func formattedGameTime(_ seconds: Double) -> String {
