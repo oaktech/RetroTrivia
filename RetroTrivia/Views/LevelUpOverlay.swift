@@ -13,6 +13,7 @@ struct LevelUpOverlay: View {
     @State private var isAnimating = false
     @State private var pulseScale: CGFloat = 1.0
     @State private var rotationDegrees: Double = 0
+    @State private var hasCompleted = false
 
     private var tierName: String {
         switch newTier {
@@ -48,6 +49,11 @@ struct LevelUpOverlay: View {
         ZStack {
             Color.black.opacity(0.4)
                 .ignoresSafeArea()
+                .onTapGesture {
+                    guard !hasCompleted else { return }
+                    hasCompleted = true
+                    onComplete()
+                }
 
             // Particle burst
             ForEach(0..<40, id: \.self) { index in
@@ -137,6 +143,8 @@ struct LevelUpOverlay: View {
 
             // Auto-dismiss after 2 seconds
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                guard !hasCompleted else { return }
+                hasCompleted = true
                 onComplete()
             }
         }

@@ -16,8 +16,8 @@ extension View {
                     endPoint: .trailing
                 )
             )
-            .shadow(color: Color("NeonPink").opacity(0.8), radius: 10)
-            .shadow(color: Color("NeonPink").opacity(0.5), radius: 20)
+            .shadow(color: Color("NeonPink").opacity(0.8), radius: 8)
+            .shadow(color: Color("NeonPink").opacity(0.4), radius: 12)
     }
 
     func retroSubtitle() -> some View {

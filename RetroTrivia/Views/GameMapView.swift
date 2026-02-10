@@ -168,7 +168,7 @@ struct GameMapView: View {
 
     private func lineWidth(for level: Int) -> CGFloat {
         let baseWidth: CGFloat = 2
-        let maxWidth: CGFloat = 10
+        let maxWidth: CGFloat = 6
         let intensity = intensityMultiplier(for: level)
         return baseWidth + (maxWidth - baseWidth) * intensity
     }
@@ -244,8 +244,12 @@ struct GameMapView: View {
                                                     .frame(width: lineWidth(for: level), height: 30)
                                             )
                                             .shadow(
-                                                color: isAnimatingLine ? Color("NeonYellow") : .clear,
-                                                radius: isAnimatingLine ? 10 * lineFlashIntensity : 0
+                                                color: isAnimatingLine
+                                                    ? Color("NeonYellow")
+                                                    : (level <= gameState.currentPosition ? lineColor(for: level).opacity(0.5) : .clear),
+                                                radius: isAnimatingLine
+                                                    ? 10 * lineFlashIntensity
+                                                    : (level <= gameState.currentPosition ? lineWidth(for: level) * 1.5 : 0)
                                             )
                                             .drawingGroup()
                                     }
