@@ -28,26 +28,6 @@ struct SettingsView: View {
                     .padding(.horizontal)
 
                 VStack(spacing: 25) {
-                    // Lives Mode Toggle
-                    HStack {
-                        Text("Lives Mode")
-                            .retroBody()
-                            .foregroundStyle(.white)
-
-                        Spacer()
-
-                        Toggle("", isOn: Binding(
-                            get: { gameState.gameSettings.livesEnabled },
-                            set: { newValue in
-                                audioManager.playSoundEffect(named: "button-tap")
-                                gameState.gameSettings.livesEnabled = newValue
-                            }
-                        ))
-                        .tint(Color("NeonPink"))
-                        .sensoryFeedback(.impact(weight: .light), trigger: gameState.gameSettings.livesEnabled)
-                    }
-                    .padding(.horizontal, 30)
-
                     // Category Display (locked/informational) - tap 5x for dev tools
                     HStack {
                         Text("Category")
