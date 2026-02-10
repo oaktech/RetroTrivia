@@ -13,6 +13,7 @@ struct GameOverOverlay: View {
 
     let score: Int
     var reason: Reason = .timerExpired
+    let onPlayAgain: (() -> Void)?
     let onComplete: () -> Void
 
     @Environment(GameCenterManager.self) private var gameCenterManager
@@ -73,13 +74,19 @@ struct GameOverOverlay: View {
                 .opacity(isAnimating ? 1 : 0)
 
                 VStack(spacing: 12) {
+                    if let onPlayAgain {
+                        RetroButton("Play Again", variant: .primary) {
+                            onPlayAgain()
+                        }
+                    }
+
                     if gameCenterManager.isAuthenticated {
                         RetroButton("Leaderboard", variant: .secondary) {
                             showLeaderboard = true
                         }
                     }
 
-                    RetroButton("Back to Menu", variant: .primary) {
+                    RetroButton("Back to Menu", variant: .secondary) {
                         onComplete()
                     }
                 }
@@ -100,7 +107,7 @@ struct GameOverOverlay: View {
 }
 
 #Preview {
-    GameOverOverlay(score: 12) {
+    GameOverOverlay(score: 12, onPlayAgain: { print("play again") }) {
         print("dismissed")
     }
     .environment(GameCenterManager.shared)

@@ -305,7 +305,9 @@ struct GameMapView: View {
 
             // Game over overlay
             if showGameOver {
-                GameOverOverlay(score: gameState.currentPosition, reason: gameOverReason) {
+                GameOverOverlay(score: gameState.currentPosition, reason: gameOverReason, onPlayAgain: {
+                    playAgain()
+                }) {
                     audioManager.playMenuMusic()
                     onBackTapped()
                 }
@@ -393,6 +395,17 @@ struct GameMapView: View {
                 gameTimeRemaining = Double(GameSettings.leaderboardDuration)
             }
         }
+    }
+
+    private func playAgain() {
+        showGameOver = false
+        gameState.resetGame()
+        questionManager.resetSession()
+        if gameState.gameSettings.leaderboardMode {
+            gameTimeRemaining = Double(GameSettings.leaderboardDuration)
+            gameTimerActive = false
+        }
+        loadQuestions()
     }
 
     private func handleGameOver(reason: GameOverOverlay.Reason = .timerExpired) {
