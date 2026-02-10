@@ -314,6 +314,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/RetroTrivia/Scripts/.venv/lib/python3.13/site-packages/jiter",
+					"$(PROJECT_DIR)/RetroTrivia/Scripts/.venv/lib/python3.13/site-packages/pydantic_core",
+				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.oak-tech.RetroTrivia";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -349,6 +354,11 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/RetroTrivia/Scripts/.venv/lib/python3.13/site-packages/jiter",
+					"$(PROJECT_DIR)/RetroTrivia/Scripts/.venv/lib/python3.13/site-packages/pydantic_core",
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.oak-tech.RetroTrivia";

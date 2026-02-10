@@ -1,4 +1,5 @@
 build/
+Scripts/.venv/
 *.xcodeproj/xcuserdata/
 *.xcworkspace/xcuserdata/
 DerivedData/
