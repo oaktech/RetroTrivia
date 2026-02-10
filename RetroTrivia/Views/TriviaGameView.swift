@@ -18,6 +18,8 @@ struct TriviaGameView: View {
     let onAnswer: (Bool) -> Void
     var onQuit: (() -> Void)? = nil
 
+    @State private var shuffledOptions: [String] = []
+    @State private var shuffledCorrectIndex: Int = 0
     @State private var selectedIndex: Int? = nil
     @State private var hasAnswered = false
     @State private var buttonTapTrigger = 0
@@ -187,7 +189,7 @@ struct TriviaGameView: View {
             }
 
             if showWrong {
-                WrongAnswerOverlay(correctAnswer: question.options[question.correctIndex]) {
+                WrongAnswerOverlay(correctAnswer: shuffledOptions.indices.contains(shuffledCorrectIndex) ? shuffledOptions[shuffledCorrectIndex] : question.options[question.correctIndex]) {
                     handleOverlayComplete(isCorrect: false)
                 }
             }
@@ -222,6 +224,11 @@ struct TriviaGameView: View {
         .sensoryFeedback(.success, trigger: correctAnswerTrigger)
         .sensoryFeedback(.error, trigger: wrongAnswerTrigger)
         .onAppear {
+            // Shuffle answer positions so the correct answer isn't always in the same slot
+            let indices = (0..<question.options.count).shuffled()
+            shuffledOptions = indices.map { question.options[$0] }
+            shuffledCorrectIndex = indices.firstIndex(of: question.correctIndex) ?? 0
+
             if gameState.gameSettings.timerEnabled {
                 timeRemaining = Double(gameState.gameSettings.timerDuration)
                 timerIsActive = true
@@ -273,7 +280,7 @@ struct TriviaGameView: View {
         Button(action: {
             handleAnswer(index)
         }) {
-            Text(question.options[index])
+            Text(shuffledOptions.indices.contains(index) ? shuffledOptions[index] : "")
                 .font(.system(size: 16, weight: .semibold, design: .rounded))
                 .foregroundStyle(textColor(for: index))
                 .multilineTextAlignment(.center)
@@ -358,7 +365,7 @@ struct TriviaGameView: View {
         selectedIndex = index
         hasAnswered = true
 
-        let isCorrect = index == question.correctIndex
+        let isCorrect = index == shuffledCorrectIndex
 
         // Show appropriate overlay with haptic (overlay handles the sound)
         if isCorrect {
@@ -387,7 +394,7 @@ struct TriviaGameView: View {
             return .white
         }
 
-        if index == question.correctIndex {
+        if index == shuffledCorrectIndex {
             return .white
         } else if index == selectedIndex {
             return .white
@@ -401,7 +408,7 @@ struct TriviaGameView: View {
             return Color("RetroPurple").opacity(0.6)
         }
 
-        if index == question.correctIndex {
+        if index == shuffledCorrectIndex {
             return .green.opacity(0.7)
         } else if index == selectedIndex {
             return .red.opacity(0.7)
@@ -415,7 +422,7 @@ struct TriviaGameView: View {
             return Color("ElectricBlue")
         }
 
-        if index == question.correctIndex {
+        if index == shuffledCorrectIndex {
             return .green
         } else if index == selectedIndex {
             return .red
