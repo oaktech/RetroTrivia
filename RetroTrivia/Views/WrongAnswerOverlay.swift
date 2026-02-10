@@ -8,6 +8,7 @@ import SwiftUI
 struct WrongAnswerOverlay: View {
     @Environment(AudioManager.self) var audioManager
 
+    let correctAnswer: String
     let onComplete: () -> Void
 
     @State private var isAnimating = false
@@ -40,6 +41,21 @@ struct WrongAnswerOverlay: View {
                     .scaleEffect(isAnimating ? 1.0 : 0.5)
                     .opacity(isAnimating ? 1 : 0)
                     .offset(x: shakeOffset)
+
+                VStack(spacing: 6) {
+                    Text("The answer was:")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.7))
+
+                    Text(correctAnswer)
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundStyle(.green)
+                        .shadow(color: .green.opacity(0.6), radius: 6)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                }
+                .scaleEffect(isAnimating ? 1.0 : 0.5)
+                .opacity(isAnimating ? 1 : 0)
             }
         }
         .onAppear {
@@ -67,7 +83,7 @@ struct WrongAnswerOverlay: View {
 }
 
 #Preview {
-    WrongAnswerOverlay {
+    WrongAnswerOverlay(correctAnswer: "Thriller") {
         print("Wrong answer overlay complete")
     }
     .environment(AudioManager.shared)

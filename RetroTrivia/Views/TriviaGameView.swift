@@ -187,7 +187,7 @@ struct TriviaGameView: View {
             }
 
             if showWrong {
-                WrongAnswerOverlay {
+                WrongAnswerOverlay(correctAnswer: question.options[question.correctIndex]) {
                     handleOverlayComplete(isCorrect: false)
                 }
             }
