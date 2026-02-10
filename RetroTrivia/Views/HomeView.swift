@@ -147,28 +147,35 @@ struct HomeView: View {
 
                 HStack(spacing: 12) {
                     // Play button (leaderboard mode)
-                    VStack(spacing: 4) {
+                    VStack(spacing: 6) {
                         RetroButton("Play", variant: .primary) {
                             audioManager.playSoundEffect(named: "button-tap")
                             pendingLeaderboardMode = true
                             showDifficultyPicker = true
                         }
-                        Text("2-minute challenge")
-                            .font(.caption)
-                            .foregroundStyle(Color("NeonPink").opacity(0.7))
+                        HStack(spacing: 8) {
+                            Label("2 min", systemImage: "clock")
+                            Label("5 lives", systemImage: "heart.fill")
+                            Label("Ranked", systemImage: "trophy")
+                        }
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Color("NeonPink").opacity(0.75))
                     }
                     .frame(maxWidth: .infinity)
 
                     // Practice button (casual mode)
-                    VStack(spacing: 4) {
+                    VStack(spacing: 6) {
                         RetroButton("Practice", variant: .secondary) {
                             audioManager.playSoundEffect(named: "button-tap")
                             pendingLeaderboardMode = false
                             showDifficultyPicker = true
                         }
-                        Text("No time limit")
-                            .font(.caption)
-                            .foregroundStyle(Color("ElectricBlue").opacity(0.7))
+                        HStack(spacing: 8) {
+                            Label("Unlimited", systemImage: "infinity")
+                            Label("No lives", systemImage: "heart.slash")
+                        }
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Color("ElectricBlue").opacity(0.75))
                     }
                     .frame(maxWidth: .infinity)
                 }
