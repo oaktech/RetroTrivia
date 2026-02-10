@@ -40,6 +40,9 @@ struct GameMapView: View {
 
     // Badge system
     @State private var currentStreak: Int = 0
+    #if DEBUG
+    @State private var showDebugBadgePanel = false
+    #endif
     @State private var sessionBadges: [Badge] = []
     @State private var badgeToastQueue: [Badge] = []
     @State private var showBadgeToast: Bool = false
@@ -423,6 +426,12 @@ struct GameMapView: View {
                 gameTimeRemaining = Double(GameSettings.leaderboardDuration)
             }
         }
+        #if DEBUG
+        .sheet(isPresented: $showDebugBadgePanel) {
+            DebugBadgePanelView(onUnlock: enqueueBadgeToasts)
+                .environment(badgeManager)
+        }
+        #endif
     }
 
     private func playAgain() {
@@ -454,7 +463,8 @@ struct GameMapView: View {
             streak: currentStreak,
             livesRemaining: gameState.livesRemaining,
             isLeaderboardMode: gameState.gameSettings.leaderboardMode,
-            isGameOver: true
+            isGameOver: true,
+            difficulty: questionManager.filterConfig.difficulty
         )
         enqueueBadgeToasts(newBadges)
 
@@ -515,6 +525,9 @@ struct GameMapView: View {
                             .fill(tierColor.opacity(0.15))
                             .stroke(tierColor.opacity(0.4), lineWidth: 1)
                     )
+                    #if DEBUG
+                    .onLongPressGesture { showDebugBadgePanel = true }
+                    #endif
 
                     // Correct answers indicator
                     if gameState.currentPosition > 0 {
@@ -701,7 +714,8 @@ struct GameMapView: View {
                 streak: currentStreak,
                 livesRemaining: gameState.livesRemaining,
                 isLeaderboardMode: true,
-                isGameOver: false
+                isGameOver: false,
+                difficulty: questionManager.filterConfig.difficulty
             )
             enqueueBadgeToasts(newBadges)
         } else if !gameState.gameSettings.leaderboardMode && !hasPlayedOnce {
@@ -712,7 +726,8 @@ struct GameMapView: View {
                 streak: currentStreak,
                 livesRemaining: gameState.livesRemaining,
                 isLeaderboardMode: false,
-                isGameOver: false
+                isGameOver: false,
+                difficulty: questionManager.filterConfig.difficulty
             )
             enqueueBadgeToasts(newBadges)
         }
@@ -781,7 +796,8 @@ struct GameMapView: View {
                 streak: currentStreak,
                 livesRemaining: gameState.livesRemaining,
                 isLeaderboardMode: gameState.gameSettings.leaderboardMode,
-                isGameOver: false
+                isGameOver: false,
+                difficulty: questionManager.filterConfig.difficulty
             )
             enqueueBadgeToasts(newBadges)
 

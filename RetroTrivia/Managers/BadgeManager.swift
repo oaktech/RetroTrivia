@@ -52,7 +52,8 @@ class BadgeManager {
         streak: Int,
         livesRemaining: Int,
         isLeaderboardMode: Bool,
-        isGameOver: Bool
+        isGameOver: Bool,
+        difficulty: Difficulty = .any
     ) -> [Badge] {
         var newly: [Badge] = []
 
@@ -85,6 +86,7 @@ class BadgeManager {
                 tryUnlock("first_gauntlet")
                 if livesRemaining >= 3 { tryUnlock("gauntlet_flawless") }
                 if livesRemaining == 1 { tryUnlock("gauntlet_survivor") }
+                if difficulty == .hard  { tryUnlock("gauntlet_hard") }
             }
         }
 
@@ -97,4 +99,20 @@ class BadgeManager {
         UserDefaults.standard.set(Array(unlockedIDs), forKey: Self.unlockedIDsKey)
         UserDefaults.standard.set(totalGamesPlayed, forKey: Self.totalGamesKey)
     }
+
+    // MARK: - Debug Helpers
+
+    #if DEBUG
+    @discardableResult
+    func forceUnlock(_ id: String) -> [Badge] {
+        guard !unlockedIDs.contains(id), let badge = Badge.find(id: id) else { return [] }
+        unlockedIDs.insert(id)
+        return [badge]
+    }
+
+    func resetAll() {
+        unlockedIDs = []
+        totalGamesPlayed = 0
+    }
+    #endif
 }

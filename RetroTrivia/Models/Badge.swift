@@ -30,6 +30,8 @@ struct Badge: Identifiable {
         // Dedication
         Badge(id: "games_10", title: "Can't Stop Won't Stop", description: "Play 10 games", iconName: "repeat.circle.fill", iconColor: "ElectricBlue"),
         Badge(id: "games_25", title: "Dedicated",             description: "Play 25 games", iconName: "medal.fill",         iconColor: "NeonYellow"),
+        // Hard mode
+        Badge(id: "gauntlet_hard", title: "Hardcore", description: "Complete Gauntlet on Hard difficulty", iconName: "exclamationmark.triangle.fill", iconColor: "HotMagenta"),
     ]
 
     static func find(id: String) -> Badge? {
