@@ -155,7 +155,6 @@ struct HomeView: View {
                         }
                         HStack(spacing: 8) {
                             Label("2 min", systemImage: "clock")
-                            Label("5 lives", systemImage: "heart.fill")
                             Label("Ranked", systemImage: "trophy")
                         }
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
@@ -163,16 +162,16 @@ struct HomeView: View {
                     }
                     .frame(maxWidth: .infinity)
 
-                    // Practice button (casual mode)
+                    // Gauntlet button (survival mode)
                     VStack(spacing: 6) {
-                        RetroButton("Practice", variant: .secondary) {
+                        RetroButton("Gauntlet", variant: .secondary) {
                             audioManager.playSoundEffect(named: "button-tap")
                             pendingLeaderboardMode = false
                             showDifficultyPicker = true
                         }
                         HStack(spacing: 8) {
-                            Label("Unlimited", systemImage: "infinity")
-                            Label("No lives", systemImage: "heart.slash")
+                            Label("3 lives", systemImage: "heart.fill")
+                            Label("No clock", systemImage: "infinity")
                         }
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color("ElectricBlue").opacity(0.75))
@@ -220,13 +219,16 @@ struct HomeView: View {
         audioManager.playSoundEffect(named: "button-tap")
         gameState.gameSettings.leaderboardMode = leaderboardMode
 
-        // Timer is always enabled (10 seconds per question)
+        // Per-question timer always enabled (10 seconds per question)
         gameState.gameSettings.timerEnabled = true
 
-        // Leaderboard mode uses 5 lives + 2 minute game timer
         if leaderboardMode {
+            // Play: 2-minute game timer, no lives
+            gameState.gameSettings.livesEnabled = false
+        } else {
+            // Gauntlet: no game timer, 3 lives
             gameState.gameSettings.livesEnabled = true
-            gameState.gameSettings.startingLives = GameSettings.leaderboardLives
+            gameState.gameSettings.startingLives = GameSettings.gauntletLives
         }
 
         gameState.gameSettings.save()

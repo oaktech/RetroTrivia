@@ -12,9 +12,11 @@ struct GameSettings {
     var livesEnabled: Bool
     var startingLives: Int
 
-    // Leaderboard games are always 2 minutes with 5 lives
+    // Play mode: 2-minute timed challenge, no lives
     static let leaderboardDuration: Int = 120
-    static let leaderboardLives: Int = 5
+
+    // Gauntlet mode: 3 lives, no game timer
+    static let gauntletLives: Int = 3
 
     private static let timerEnabledKey = "game.settings.timerEnabled"
     private static let timerDurationKey = "game.settings.timerDuration"
