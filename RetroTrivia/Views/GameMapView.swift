@@ -11,6 +11,7 @@ struct GameMapView: View {
     @Environment(AudioManager.self) var audioManager
     @Environment(QuestionManager.self) var questionManager
     @Environment(GameCenterManager.self) var gameCenterManager
+    @Environment(BadgeManager.self) var badgeManager
     let onBackTapped: () -> Void
 
     @State private var currentQuestion: TriviaQuestion?
@@ -36,6 +37,13 @@ struct GameMapView: View {
     @State private var showGameOver = false
     @State private var gameOverReason: GameOverOverlay.Reason = .timerExpired
     @State private var urgencyPulse: Bool = false
+
+    // Badge system
+    @State private var currentStreak: Int = 0
+    @State private var sessionBadges: [Badge] = []
+    @State private var badgeToastQueue: [Badge] = []
+    @State private var showBadgeToast: Bool = false
+    @State private var activeBadgeToast: Badge? = nil
 
     private let gameTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -309,12 +317,28 @@ struct GameMapView: View {
 
             // Game over overlay
             if showGameOver {
-                GameOverOverlay(score: gameState.currentPosition, reason: gameOverReason, onPlayAgain: {
-                    playAgain()
-                }) {
+                GameOverOverlay(
+                    score: gameState.currentPosition,
+                    reason: gameOverReason,
+                    newBadges: sessionBadges,
+                    onPlayAgain: {
+                        playAgain()
+                    }
+                ) {
                     audioManager.playMenuMusic()
                     onBackTapped()
                 }
+            }
+
+            // Badge toast (top of screen, below Dynamic Island / status bar)
+            if let toastBadge = activeBadgeToast {
+                VStack {
+                    BadgeToastView(badge: toastBadge, isVisible: showBadgeToast)
+                        .padding(.top, 8)
+                    Spacer()
+                }
+                .allowsHitTesting(false)
+                .zIndex(100)
             }
 
             // Urgency vignette overlay (screen edge glow when time is running out)
@@ -403,6 +427,11 @@ struct GameMapView: View {
 
     private func playAgain() {
         showGameOver = false
+        currentStreak = 0
+        sessionBadges = []
+        badgeToastQueue = []
+        showBadgeToast = false
+        activeBadgeToast = nil
         gameState.resetGame()
         questionManager.resetSession()
         if gameState.gameSettings.leaderboardMode {
@@ -418,6 +447,17 @@ struct GameMapView: View {
         currentQuestion = nil
         audioManager.playSoundEffect(named: "wrong-buzzer")
         gameOverReason = reason
+
+        // Check game-over badges (first_play, first_gauntlet, flawless, survivor)
+        let newBadges = badgeManager.checkBadges(
+            position: gameState.currentPosition,
+            streak: currentStreak,
+            livesRemaining: gameState.livesRemaining,
+            isLeaderboardMode: gameState.gameSettings.leaderboardMode,
+            isGameOver: true
+        )
+        enqueueBadgeToasts(newBadges)
+
         showGameOver = true
         // Only submit score if playing in leaderboard mode
         if gameState.gameSettings.leaderboardMode {
@@ -651,9 +691,30 @@ struct GameMapView: View {
             return
         }
 
-        // Start game timer on first question
+        // Start game timer on first question (and record game start for badge tracking)
         if gameState.gameSettings.leaderboardMode && !gameTimerActive {
             gameTimerActive = true
+            badgeManager.recordGameStarted()
+            // Check dedication badges right after incrementing count
+            let newBadges = badgeManager.checkBadges(
+                position: gameState.currentPosition,
+                streak: currentStreak,
+                livesRemaining: gameState.livesRemaining,
+                isLeaderboardMode: true,
+                isGameOver: false
+            )
+            enqueueBadgeToasts(newBadges)
+        } else if !gameState.gameSettings.leaderboardMode && !hasPlayedOnce {
+            // Gauntlet: record game start on the very first question
+            badgeManager.recordGameStarted()
+            let newBadges = badgeManager.checkBadges(
+                position: gameState.currentPosition,
+                streak: currentStreak,
+                livesRemaining: gameState.livesRemaining,
+                isLeaderboardMode: false,
+                isGameOver: false
+            )
+            enqueueBadgeToasts(newBadges)
         }
 
         // Play button tap sound
@@ -662,6 +723,37 @@ struct GameMapView: View {
         print("DEBUG: Selected question: \(question.question)")
         questionManager.markQuestionAsked(question.id)
         currentQuestion = question
+    }
+
+    // MARK: - Badge Toast Queue
+
+    private func enqueueBadgeToasts(_ badges: [Badge]) {
+        guard !badges.isEmpty else { return }
+        sessionBadges.append(contentsOf: badges)
+        badgeToastQueue.append(contentsOf: badges)
+        if !showBadgeToast {
+            showNextToast()
+        }
+    }
+
+    private func showNextToast() {
+        guard !badgeToastQueue.isEmpty else {
+            activeBadgeToast = nil
+            return
+        }
+        let next = badgeToastQueue.removeFirst()
+        activeBadgeToast = next
+        // Small delay then animate in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            withAnimation { self.showBadgeToast = true }
+        }
+        // Hold for 2 seconds, then slide out and show next
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
+            withAnimation { self.showBadgeToast = false }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.7) {
+            self.showNextToast()
+        }
     }
 
     private func handleAnswer(isCorrect: Bool) {
@@ -673,6 +765,7 @@ struct GameMapView: View {
         let oldPosition = gameState.currentPosition
 
         if isCorrect {
+            currentStreak += 1
             let oldTier = gameState.currentPosition / 3
             gameState.incrementPosition()
             let newTier = gameState.currentPosition / 3
@@ -681,6 +774,16 @@ struct GameMapView: View {
             animateClimbing(from: oldPosition, to: gameState.currentPosition)
 
             print("DEBUG: Position \(oldPosition) -> \(gameState.currentPosition), Tier \(oldTier) -> \(newTier)")
+
+            // Check badges after position update
+            let newBadges = badgeManager.checkBadges(
+                position: gameState.currentPosition,
+                streak: currentStreak,
+                livesRemaining: gameState.livesRemaining,
+                isLeaderboardMode: gameState.gameSettings.leaderboardMode,
+                isGameOver: false
+            )
+            enqueueBadgeToasts(newBadges)
 
             // Show level-up overlay when reaching a new tier (every 3 levels)
             if newTier > oldTier {
@@ -692,6 +795,7 @@ struct GameMapView: View {
                 }
             }
         } else {
+            currentStreak = 0
             gameState.decrementPosition()
 
             // Trigger falling animation (line below and target node below)
@@ -789,4 +893,5 @@ struct GameMapView: View {
         .environment(AudioManager.shared)
         .environment(QuestionManager())
         .environment(GameCenterManager.shared)
+        .environment(BadgeManager.shared)
 }

@@ -13,6 +13,7 @@ struct GameOverOverlay: View {
 
     let score: Int
     var reason: Reason = .timerExpired
+    var newBadges: [Badge] = []
     let onPlayAgain: (() -> Void)?
     let onComplete: () -> Void
 
@@ -72,6 +73,41 @@ struct GameOverOverlay: View {
                 }
                 .scaleEffect(isAnimating ? 1.0 : 0.5)
                 .opacity(isAnimating ? 1 : 0)
+
+                // New badges earned this session
+                if !newBadges.isEmpty {
+                    VStack(spacing: 8) {
+                        Text("NEW BADGES")
+                            .font(.system(size: 13, weight: .black, design: .rounded))
+                            .foregroundStyle(Color("NeonYellow"))
+                            .tracking(2)
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 10) {
+                                ForEach(newBadges) { badge in
+                                    HStack(spacing: 6) {
+                                        Image(systemName: badge.iconName)
+                                            .font(.system(size: 16, weight: .bold))
+                                            .foregroundStyle(Color(badge.iconColor))
+                                        Text(badge.title)
+                                            .font(.system(size: 13, weight: .bold, design: .rounded))
+                                            .foregroundStyle(Color("NeonYellow"))
+                                    }
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .fill(Color.white.opacity(0.08))
+                                            .stroke(Color("NeonYellow").opacity(0.35), lineWidth: 1)
+                                    )
+                                }
+                            }
+                            .padding(.horizontal, 4)
+                        }
+                    }
+                    .scaleEffect(isAnimating ? 1.0 : 0.5)
+                    .opacity(isAnimating ? 1 : 0)
+                }
 
                 VStack(spacing: 12) {
                     if let onPlayAgain {

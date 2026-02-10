@@ -13,6 +13,7 @@ struct RetroTriviaApp: App {
     @State private var audioManager = AudioManager.shared
     @State private var questionManager = QuestionManager()
     @State private var gameCenterManager = GameCenterManager.shared
+    @State private var badgeManager = BadgeManager.shared
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
@@ -22,6 +23,7 @@ struct RetroTriviaApp: App {
                 .environment(audioManager)
                 .environment(questionManager)
                 .environment(gameCenterManager)
+                .environment(badgeManager)
                 .onAppear {
                     gameCenterManager.authenticate()
                 }

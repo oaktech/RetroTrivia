@@ -11,16 +11,19 @@ struct HomeView: View {
     @Environment(AudioManager.self) var audioManager
     @Environment(QuestionManager.self) var questionManager
     @Environment(GameCenterManager.self) var gameCenterManager
+    @Environment(BadgeManager.self) var badgeManager
     let onPlayTapped: () -> Void
 
     enum SheetType: Identifiable {
         case settings
         case leaderboard
+        case badges
 
         var id: Int {
             switch self {
             case .settings: return 0
             case .leaderboard: return 1
+            case .badges: return 2
             }
         }
     }
@@ -80,6 +83,32 @@ struct HomeView: View {
                         }
                         .sensoryFeedback(.impact(weight: .medium), trigger: activeSheet == .leaderboard)
                     }
+
+                    // Badge gallery button
+                    Button(action: {
+                        audioManager.playSoundEffect(named: "button-tap")
+                        activeSheet = .badges
+                    }) {
+                        ZStack(alignment: .topTrailing) {
+                            Image(systemName: "medal.fill")
+                                .font(.system(size: 18))
+                                .foregroundStyle(Color("NeonYellow"))
+                                .frame(width: 42, height: 42)
+                                .background(Color.white.opacity(0.08))
+                                .clipShape(Circle())
+                            // Badge count pip
+                            if badgeManager.unlockedIDs.count > 0 {
+                                Text("\(badgeManager.unlockedIDs.count)")
+                                    .font(.system(size: 9, weight: .black, design: .rounded))
+                                    .foregroundStyle(.black)
+                                    .padding(3)
+                                    .background(Color("NeonYellow"))
+                                    .clipShape(Circle())
+                                    .offset(x: 4, y: -4)
+                            }
+                        }
+                    }
+                    .sensoryFeedback(.impact(weight: .light), trigger: activeSheet == .badges)
 
                     // Settings button
                     Button(action: {
@@ -189,6 +218,11 @@ struct HomeView: View {
                 SettingsView()
             case .leaderboard:
                 GameCenterLeaderboardView()
+            case .badges:
+                BadgeGalleryView {
+                    activeSheet = nil
+                }
+                .environment(badgeManager)
             }
         }
         .onAppear {
