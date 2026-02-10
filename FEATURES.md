@@ -53,6 +53,55 @@ Filter by genre (Rock, Pop, Hip-Hop, R&B) or artist. Niche audiences are passion
 **Multiplayer Pass-and-Play**
 Two players, same device, taking turns. Zero infrastructure needed, huge party appeal.
 
+### Pass & Play — Design Spec
+
+**Core concept**: 2–4 players take turns on one device. Each player has their own marker on the shared map. Winner is whoever reaches the highest position when the round ends (or first to the summit).
+
+**Setup screen** (before the game)
+- Player count: 2, 3, or 4
+- Optional per-player name entry (defaults to "Player 1" etc.)
+- Difficulty picker (same as Gauntlet)
+- Round limit: 5 / 10 / 15 questions per player, or "Race to 25"
+
+**Turn flow**
+1. Full-screen handoff prompt — "Pass to [Player Name]" — so previous player looks away
+2. Player answers question (same 10-second per-question timer)
+3. Correct → advance marker; Wrong → fall back (no lives — map position is the penalty)
+4. Celebration / wrong-answer overlay fires as normal
+5. "Pass to [Next Player]" — repeat
+
+**End conditions**
+- Fixed rounds: after each player completes their N questions, show final standings
+- Race to 25: first player to reach the summit wins instantly
+
+**Map display**: each player gets a distinct colored dot (NeonPink / ElectricBlue / NeonYellow / HotMagenta). If tied at same node, dots stack. Map scrolls to the active player's position at the start of their turn.
+
+**Data model**
+- New `PassAndPlaySession` struct — player array, current player index, per-player position
+- Purely in-memory (never persists to UserDefaults)
+- No leaderboard submission, no badge progress
+
+**Navigation**
+```
+HomeView → Pass & Play setup sheet
+         → PassAndPlayMapView (new)
+         → TriviaGameView (reused unchanged)
+         → Handoff screen (between turns, tap-to-continue)
+         → FinalStandingsView (end of game)
+```
+
+**What's reused vs new**
+| Component | Status |
+|---|---|
+| TriviaGameView | Reused unchanged |
+| MapNodeView | Reused, extended to show multiple player dots |
+| GameState | Not used — replaced by PassAndPlaySession |
+| QuestionManager | Reused |
+| GameMapView | New PassAndPlayMapView (same map, different header/logic) |
+| Handoff screen | New (un-skippable full-screen prompt) |
+| Setup screen | New |
+| Final standings | New |
+
 **Hint System**
 "50/50" or "Skip" consumables — classic trivia mechanic players expect.
 
