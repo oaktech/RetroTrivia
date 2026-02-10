@@ -28,7 +28,6 @@ struct HomeView: View {
     @State private var activeSheet: SheetType?
     @State private var currentPhraseIndex = 0
     @State private var showDifficultyPicker = false
-    @State private var pendingLeaderboardMode = true
 
     private let retroPhrases = [
         "Totally Tubular!",
@@ -146,12 +145,13 @@ struct HomeView: View {
                 }
 
                 HStack(spacing: 12) {
-                    // Play button (leaderboard mode)
+                    // Play button (leaderboard mode — fixed to Any difficulty for fair competition)
                     VStack(spacing: 6) {
                         RetroButton("Play", variant: .primary) {
                             audioManager.playSoundEffect(named: "button-tap")
-                            pendingLeaderboardMode = true
-                            showDifficultyPicker = true
+                            questionManager.filterConfig.difficulty = .any
+                            questionManager.filterConfig.save()
+                            startGame(leaderboardMode: true)
                         }
                         HStack(spacing: 8) {
                             Label("2 min", systemImage: "clock")
@@ -166,7 +166,6 @@ struct HomeView: View {
                     VStack(spacing: 6) {
                         RetroButton("Gauntlet", variant: .secondary) {
                             audioManager.playSoundEffect(named: "button-tap")
-                            pendingLeaderboardMode = false
                             showDifficultyPicker = true
                         }
                         HStack(spacing: 8) {
@@ -206,7 +205,7 @@ struct HomeView: View {
                     questionManager.filterConfig.difficulty = difficulty
                     questionManager.filterConfig.save()
                     showDifficultyPicker = false
-                    startGame(leaderboardMode: pendingLeaderboardMode)
+                    startGame(leaderboardMode: false)
                 },
                 onCancel: {
                     showDifficultyPicker = false
