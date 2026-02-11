@@ -39,8 +39,7 @@ Answer 80s music trivia questions to climb the vertical progress map. Each corre
 
 **Game Modes:**
 - **Leaderboard Mode** - 2-minute timed speed game. Tap the trophy icon to enable and compete globally on Game Center.
-- **Practice Mode** - Play at your own pace without time pressure or scoring.
-- **Lives Mode** - Start with 3 lives. Each wrong answer costs a life. Game ends when lives run out (adds urgency and challenge).
+- **Gauntlet Mode** - Start with 3 lives. Each wrong answer costs a life. Game ends when lives run out (adds urgency and challenge).
 - **Pass & Play** - 2-4 players on one device. Take turns answering questions, see final standings with medal rankings.
 
 As you progress, map visuals evolve with thickening lines and shifting colors from Electric Blue → Neon Pink → Hot Magenta, creating escalating visual excitement.
