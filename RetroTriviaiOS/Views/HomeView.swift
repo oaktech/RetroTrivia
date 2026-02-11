@@ -47,177 +47,178 @@ struct HomeView: View {
     ]
 
     var body: some View {
-        ZStack {
-            RetroGradientBackground()
+        GeometryReader { geo in
+            ZStack {
+                RetroGradientBackground()
 
-            VStack(spacing: 32) {
-                // Header buttons
-                HStack(spacing: 12) {
-                    Spacer()
+                VStack(spacing: 32) {
+                    // Header buttons
+                    HStack(spacing: 12) {
+                        Spacer()
 
-                    // Music toggle button
-                    Button(action: {
-                        audioManager.playSoundEffect(named: "music-toggle")
-                        audioManager.isMusicEnabled.toggle()
-                    }) {
-                        Image(systemName: audioManager.isMusicEnabled ? "speaker.wave.3.fill" : "speaker.slash.fill")
-                            .font(.system(size: 18))
-                            .foregroundStyle(audioManager.isMusicEnabled ? Color("NeonPink") : Color.white.opacity(0.4))
-                            .frame(width: 42, height: 42)
-                            .background(Color.white.opacity(0.08))
-                            .clipShape(Circle())
-                    }
-                    .sensoryFeedback(.impact(weight: .light), trigger: audioManager.isMusicEnabled)
-
-                    // Leaderboard button (only when authenticated)
-                    if gameCenterManager.isAuthenticated {
+                        // Music toggle button
                         Button(action: {
-                            audioManager.playSoundEffect(named: "button-tap")
-                            GameCenterLeaderboard.show()
+                            audioManager.playSoundEffect(named: "music-toggle")
+                            audioManager.isMusicEnabled.toggle()
                         }) {
-                            Image(systemName: "trophy.fill")
+                            Image(systemName: audioManager.isMusicEnabled ? "speaker.wave.3.fill" : "speaker.slash.fill")
                                 .font(.system(size: 18))
-                                .foregroundStyle(Color("NeonYellow"))
+                                .foregroundStyle(audioManager.isMusicEnabled ? Color("NeonPink") : Color.white.opacity(0.4))
                                 .frame(width: 42, height: 42)
                                 .background(Color.white.opacity(0.08))
                                 .clipShape(Circle())
                         }
+                        .sensoryFeedback(.impact(weight: .light), trigger: audioManager.isMusicEnabled)
 
-                    }
-
-                    // Badge gallery button
-                    Button(action: {
-                        audioManager.playSoundEffect(named: "button-tap")
-                        activeSheet = .badges
-                    }) {
-                        ZStack(alignment: .topTrailing) {
-                            Image(systemName: "medal.fill")
-                                .font(.system(size: 18))
-                                .foregroundStyle(Color("NeonYellow"))
-                                .frame(width: 42, height: 42)
-                                .background(Color.white.opacity(0.08))
-                                .clipShape(Circle())
-                            // Badge count pip
-                            if badgeManager.unlockedIDs.count > 0 {
-                                Text("\(badgeManager.unlockedIDs.count)")
-                                    .font(.system(size: 9, weight: .black, design: .rounded))
-                                    .foregroundStyle(.black)
-                                    .padding(3)
-                                    .background(Color("NeonYellow"))
+                        // Leaderboard button (only when authenticated)
+                        if gameCenterManager.isAuthenticated {
+                            Button(action: {
+                                audioManager.playSoundEffect(named: "button-tap")
+                                GameCenterLeaderboard.show()
+                            }) {
+                                Image(systemName: "trophy.fill")
+                                    .font(.system(size: 18))
+                                    .foregroundStyle(Color("NeonYellow"))
+                                    .frame(width: 42, height: 42)
+                                    .background(Color.white.opacity(0.08))
                                     .clipShape(Circle())
-                                    .offset(x: 4, y: -4)
                             }
                         }
+
+                        // Badge gallery button
+                        Button(action: {
+                            audioManager.playSoundEffect(named: "button-tap")
+                            activeSheet = .badges
+                        }) {
+                            ZStack(alignment: .topTrailing) {
+                                Image(systemName: "medal.fill")
+                                    .font(.system(size: 18))
+                                    .foregroundStyle(Color("NeonYellow"))
+                                    .frame(width: 42, height: 42)
+                                    .background(Color.white.opacity(0.08))
+                                    .clipShape(Circle())
+                                // Badge count pip
+                                if badgeManager.unlockedIDs.count > 0 {
+                                    Text("\(badgeManager.unlockedIDs.count)")
+                                        .font(.system(size: 9, weight: .black, design: .rounded))
+                                        .foregroundStyle(.black)
+                                        .padding(3)
+                                        .background(Color("NeonYellow"))
+                                        .clipShape(Circle())
+                                        .offset(x: 4, y: -4)
+                                }
+                            }
+                        }
+                        .sensoryFeedback(.impact(weight: .light), trigger: activeSheet == .badges)
+
+                        // Settings button
+                        Button(action: {
+                            activeSheet = .settings
+                        }) {
+                            Image(systemName: "gearshape.fill")
+                                .font(.system(size: 18))
+                                .foregroundStyle(Color("NeonPink"))
+                                .frame(width: 42, height: 42)
+                                .background(Color.white.opacity(0.08))
+                                .clipShape(Circle())
+                        }
+                        .sensoryFeedback(.impact(weight: .light), trigger: activeSheet == .settings)
                     }
-                    .sensoryFeedback(.impact(weight: .light), trigger: activeSheet == .badges)
 
-                    // Settings button
-                    Button(action: {
-                        activeSheet = .settings
-                    }) {
-                        Image(systemName: "gearshape.fill")
-                            .font(.system(size: 18))
-                            .foregroundStyle(Color("NeonPink"))
-                            .frame(width: 42, height: 42)
-                            .background(Color.white.opacity(0.08))
-                            .clipShape(Circle())
+                    Spacer()
+
+                    // App icon with retro glow
+                    Image("AppIconImage")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 120, height: 120)
+                        .clipShape(RoundedRectangle(cornerRadius: 24))
+                        .shadow(color: Color("NeonPink").opacity(0.6), radius: 20)
+                        .shadow(color: Color("ElectricBlue").opacity(0.4), radius: 30)
+                        .padding(.bottom, 8)
+
+                    VStack(spacing: 12) {
+                        Text("RETROTRIVIA")
+                            .retroTitle()
+
+                        Text("80s Music Challenge")
+                            .retroSubtitle()
                     }
-                    .sensoryFeedback(.impact(weight: .light), trigger: activeSheet == .settings)
-                }
 
-                Spacer()
-
-                // App icon with retro glow
-                Image("AppIconImage")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 120, height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 24))
-                    .shadow(color: Color("NeonPink").opacity(0.6), radius: 20)
-                    .shadow(color: Color("ElectricBlue").opacity(0.4), radius: 30)
-                    .padding(.bottom, 8)
-
-                VStack(spacing: 12) {
-                    Text("RETROTRIVIA")
-                        .retroTitle()
-
-                    Text("80s Music Challenge")
-                        .retroSubtitle()
-                }
-
-                // Scrolling 80s phrases
-                Text(retroPhrases[currentPhraseIndex])
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [Color("NeonPink"), Color("ElectricBlue")],
-                            startPoint: .leading,
-                            endPoint: .trailing
+                    // Scrolling 80s phrases
+                    Text(retroPhrases[currentPhraseIndex])
+                        .font(.title3)
+                        .fontWeight(.bold)
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Color("NeonPink"), Color("ElectricBlue")],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
                         )
-                    )
-                    .shadow(color: Color("NeonPink").opacity(0.5), radius: 8)
-                    .contentTransition(.numericText())
-                    .animation(.easeInOut(duration: 0.5), value: currentPhraseIndex)
-                    .padding(.top, 8)
+                        .shadow(color: Color("NeonPink").opacity(0.5), radius: 8)
+                        .contentTransition(.numericText())
+                        .animation(.easeInOut(duration: 0.5), value: currentPhraseIndex)
+                        .padding(.top, 8)
 
-                Spacer()
+                    Spacer()
 
-                if gameState.highScorePosition > 0 {
-                    VStack(spacing: 8) {
-                        Text("High Score")
-                            .retroBody()
-                            .opacity(0.8)
-                        Text("\(gameState.highScorePosition)")
-                            .retroHeading()
+                    if gameState.highScorePosition > 0 {
+                        VStack(spacing: 8) {
+                            Text("High Score")
+                                .retroBody()
+                                .opacity(0.8)
+                            Text("\(gameState.highScorePosition)")
+                                .retroHeading()
+                        }
+                        .padding(.bottom, 20)
                     }
-                    .padding(.bottom, 20)
-                }
 
-                VStack(spacing: 18) {
-                    // Play button (leaderboard mode — fixed to Any difficulty for fair competition)
-                    VStack(spacing: 10) {
-                        RetroButton("Play", variant: .primary) {
+                    VStack(spacing: 12) {
+                        // Play — ranked leaderboard mode
+                        GameModeCard(
+                            "Play",
+                            details: [("clock", "2 min"), ("trophy", "Ranked")],
+                            accent: Color("NeonPink"),
+                            isHero: true
+                        ) {
                             audioManager.playSoundEffect(named: "button-tap")
                             questionManager.filterConfig.difficulty = .any
                             questionManager.filterConfig.save()
                             startGame(leaderboardMode: true)
                         }
-                        HStack(spacing: 8) {
-                            GameModeTag("2 min", icon: "clock", color: Color("NeonPink"))
-                            GameModeTag("Ranked", icon: "trophy", color: Color("NeonPink"))
-                        }
-                    }
 
-                    // Gauntlet button (survival mode)
-                    VStack(spacing: 10) {
-                        RetroButton("Gauntlet", variant: .secondary) {
+                        // Gauntlet — survival mode
+                        GameModeCard(
+                            "Gauntlet",
+                            details: [("heart.fill", "3 lives"), ("infinity", "No clock")],
+                            accent: Color("ElectricBlue")
+                        ) {
                             audioManager.playSoundEffect(named: "button-tap")
                             showDifficultyPicker = true
                         }
-                        HStack(spacing: 8) {
-                            GameModeTag("3 lives", icon: "heart.fill", color: Color("ElectricBlue"))
-                            GameModeTag("No clock", icon: "infinity", color: Color("ElectricBlue"))
-                        }
-                    }
 
-                    // Pass & Play button
-                    VStack(spacing: 10) {
-                        RetroButton("Pass & Play", variant: .primary) {
+                        // Pass & Play — local multiplayer
+                        GameModeCard(
+                            "Pass & Play",
+                            details: [("person.2.fill", "2-4 players"), ("wifi.slash", "Local only")],
+                            accent: Color("NeonYellow")
+                        ) {
                             audioManager.playSoundEffect(named: "button-tap")
                             activeSheet = .passAndPlaySetup
                         }
-                        HStack(spacing: 8) {
-                            GameModeTag("2-4 players", icon: "person.2.fill", color: Color("NeonYellow"))
-                            GameModeTag("Local only", icon: "wifi.slash", color: Color("NeonYellow"))
-                        }
                     }
-                }
+                    .padding(.horizontal, 20)
 
-                Spacer()
+                    Spacer()
+                }
+                .padding(.top, max(geo.safeAreaInsets.top, 50) + 8)
+                .padding(.bottom, max(geo.safeAreaInsets.bottom, 20))
+                .padding(.horizontal)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
-            .padding()
         }
+        .ignoresSafeArea()
         .fullScreenCover(item: $activeSheet) { sheetType in
             switch sheetType {
             case .settings:
@@ -292,28 +293,63 @@ struct HomeView: View {
     }
 }
 
-// MARK: - Game Mode Tag
+// MARK: - Game Mode Card
 
-private struct GameModeTag: View {
-    let label: String
-    let icon: String
-    let color: Color
+private struct GameModeCard: View {
+    let title: String
+    let details: [(icon: String, text: String)]
+    let accent: Color
+    var isHero: Bool = false
+    let action: () -> Void
 
-    init(_ label: String, icon: String, color: Color) {
-        self.label = label
-        self.icon = icon
-        self.color = color
+    init(_ title: String, details: [(icon: String, text: String)], accent: Color, isHero: Bool = false, action: @escaping () -> Void) {
+        self.title = title
+        self.details = details
+        self.accent = accent
+        self.isHero = isHero
+        self.action = action
     }
 
     var body: some View {
-        Label(label, systemImage: icon)
-            .font(.system(size: 12, weight: .semibold, design: .rounded))
-            .foregroundStyle(color)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(color.opacity(0.12))
-            .clipShape(Capsule())
-            .overlay(Capsule().strokeBorder(color.opacity(0.35), lineWidth: 1))
+        Button(action: action) {
+            HStack(spacing: 0) {
+                // Neon accent strip
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(accent)
+                    .frame(width: 4)
+                    .shadow(color: accent.opacity(0.9), radius: 6)
+                    .padding(.vertical, 6)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(title)
+                        .font(.title2)
+                        .fontWeight(.black)
+                        .fontDesign(.rounded)
+                        .foregroundStyle(.white)
+
+                    HStack(spacing: 14) {
+                        ForEach(0..<details.count, id: \.self) { i in
+                            Label(details[i].text, systemImage: details[i].icon)
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundStyle(accent.opacity(isHero ? 1.0 : 0.8))
+                        }
+                    }
+                }
+                .padding(.leading, 16)
+
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 18)
+            .background(isHero ? accent.opacity(0.1) : Color.white.opacity(0.04))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(accent.opacity(isHero ? 0.5 : 0.25), lineWidth: isHero ? 1.5 : 1)
+            )
+            .shadow(color: accent.opacity(isHero ? 0.3 : 0.12), radius: isHero ? 10 : 5)
+        }
+        .buttonStyle(ScaleButtonStyle())
     }
 }
 
