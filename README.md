@@ -1,4 +1,4 @@
-# RetroTrivia
+# Retro Trivia Blast
 
 An iOS trivia game themed around 80s music, built with SwiftUI.
 
