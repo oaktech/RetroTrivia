@@ -8,13 +8,13 @@ DerivedData/
 .DS_Store
 
 # CloudKit migration (contains questions)
-RetroTrivia/Data/questions_full_backup.json
+RetroTriviaiOS/Data/questions_full_backup.json
 Scripts/migrate_to_cloudkit.sh
 CloudKitMigration/
 
 # Question data - managed via CloudKit, not version controlled
-RetroTrivia/Data/questions.json
-RetroTrivia/Data/questions_full_backup.json
-RetroTrivia/Data/regenerated_broken.json
-RetroTrivia/Data/audit_report.json
-RetroTrivia/Scripts/
+RetroTriviaiOS/Data/questions.json
+RetroTriviaiOS/Data/questions_full_backup.json
+RetroTriviaiOS/Data/regenerated_broken.json
+RetroTriviaiOS/Data/audit_report.json
+RetroTriviaiOS/Scripts/

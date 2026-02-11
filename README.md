@@ -86,7 +86,7 @@ xcodebuild test -scheme RetroTrivia -destination 'platform=iOS Simulator,name=iP
 ## 📁 Project Structure
 
 ```
-RetroTrivia/
+RetroTriviaiOS/
 ├── Models/               # GameState, PassAndPlaySession, TriviaQuestion, GameSettings, Badge
 ├── Views/                # HomeView, GameMapView, PassAndPlayMapView, TriviaGameView
 │                         # Overlays: CelebrationOverlay, WrongAnswerOverlay, LevelUpOverlay
