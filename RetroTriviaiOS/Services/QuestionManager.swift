@@ -39,6 +39,11 @@ class QuestionManager {
     /// Current question source for debugging
     private(set) var currentSource: QuestionSource = .bundle
 
+    #if DEBUG
+    /// Skip CloudKit and cache; use bundled questions only. For testing.
+    var forceBundleMode: Bool = false
+    #endif
+
     // MARK: - Initialization
 
     init() {
@@ -52,6 +57,14 @@ class QuestionManager {
     /// Load initial questions into the pool
     func loadQuestions() async {
         print("DEBUG: Loading questions (difficulty: \(filterConfig.difficulty.displayName))")
+
+        #if DEBUG
+        if forceBundleMode {
+            print("DEBUG: forceBundleMode enabled — skipping CloudKit and cache")
+            loadBundledQuestions()
+            return
+        }
+        #endif
 
         // Try CloudKit first (uses random sampling for large datasets)
         do {

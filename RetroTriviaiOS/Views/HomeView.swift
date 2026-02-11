@@ -265,7 +265,12 @@ struct HomeView: View {
 
     private func startGame(leaderboardMode: Bool) {
         audioManager.playSoundEffect(named: "button-tap")
+        #if DEBUG
+        // Bundled question mode is never leaderboard-eligible
+        gameState.gameSettings.leaderboardMode = leaderboardMode && !questionManager.forceBundleMode
+        #else
         gameState.gameSettings.leaderboardMode = leaderboardMode
+        #endif
 
         // Per-question timer always enabled (10 seconds per question)
         gameState.gameSettings.timerEnabled = true

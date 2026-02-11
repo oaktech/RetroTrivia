@@ -73,7 +73,26 @@ struct SettingsView: View {
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal)
 
-                            HStack(spacing: 12) {
+                            // Bundle-only mode toggle
+                        #if DEBUG
+                        Toggle(isOn: Binding(
+                            get: { questionManager.forceBundleMode },
+                            set: { questionManager.forceBundleMode = $0 }
+                        )) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Bundle Questions Only")
+                                    .font(.caption)
+                                    .foregroundStyle(Color("NeonYellow"))
+                                Text("Skips CloudKit — uses 200 bundled questions")
+                                    .font(.caption2)
+                                    .foregroundStyle(.white.opacity(0.5))
+                            }
+                        }
+                        .tint(Color("NeonYellow"))
+                        .padding(.horizontal)
+                        #endif
+
+                        HStack(spacing: 12) {
                                 Button(action: {
                                     Task { await uploader.uploadAllQuestions() }
                                 }) {
