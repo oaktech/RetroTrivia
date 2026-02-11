@@ -17,14 +17,12 @@ struct HomeView: View {
 
     enum SheetType: Identifiable {
         case settings
-        case leaderboard
         case badges
         case passAndPlaySetup
 
         var id: Int {
             switch self {
             case .settings: return 0
-            case .leaderboard: return 1
             case .badges: return 2
             case .passAndPlaySetup: return 3
             }
@@ -75,7 +73,7 @@ struct HomeView: View {
                     if gameCenterManager.isAuthenticated {
                         Button(action: {
                             audioManager.playSoundEffect(named: "button-tap")
-                            activeSheet = .leaderboard
+                            GameCenterLeaderboard.show()
                         }) {
                             Image(systemName: "trophy.fill")
                                 .font(.system(size: 18))
@@ -84,7 +82,7 @@ struct HomeView: View {
                                 .background(Color.white.opacity(0.08))
                                 .clipShape(Circle())
                         }
-                        .sensoryFeedback(.impact(weight: .medium), trigger: activeSheet == .leaderboard)
+
                     }
 
                     // Badge gallery button
@@ -235,8 +233,6 @@ struct HomeView: View {
             switch sheetType {
             case .settings:
                 SettingsView()
-            case .leaderboard:
-                GameCenterLeaderboardView()
             case .badges:
                 BadgeGalleryView {
                     activeSheet = nil

@@ -19,7 +19,6 @@ struct GameOverOverlay: View {
 
     @Environment(GameCenterManager.self) private var gameCenterManager
     @State private var isAnimating = false
-    @State private var showLeaderboard = false
 
     private var titleText: String {
         switch reason {
@@ -118,7 +117,7 @@ struct GameOverOverlay: View {
 
                     if gameCenterManager.isAuthenticated {
                         RetroButton("Leaderboard", variant: .secondary) {
-                            showLeaderboard = true
+                            GameCenterLeaderboard.show()
                         }
                     }
 
@@ -136,9 +135,7 @@ struct GameOverOverlay: View {
                 isAnimating = true
             }
         }
-        .sheet(isPresented: $showLeaderboard) {
-            GameCenterLeaderboardView()
-        }
+
     }
 }
 
