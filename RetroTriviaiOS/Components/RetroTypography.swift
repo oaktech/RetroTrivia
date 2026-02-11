@@ -8,7 +8,7 @@ import SwiftUI
 extension View {
     func retroTitle() -> some View {
         self
-            .font(.system(size: 42, weight: .black, design: .rounded))
+            .font(.custom("PressStart2P-Regular", size: 24))
             .foregroundStyle(
                 LinearGradient(
                     colors: [Color("NeonPink"), Color("HotMagenta")],
@@ -35,7 +35,7 @@ extension View {
 
     func retroHeading() -> some View {
         self
-            .font(.system(size: 28, weight: .bold, design: .rounded))
+            .font(.custom("PressStart2P-Regular", size: 16))
             .foregroundStyle(Color("NeonYellow"))
             .shadow(color: Color("NeonYellow").opacity(0.6), radius: 6)
     }

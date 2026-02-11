@@ -48,7 +48,7 @@ struct GameOverOverlay: View {
                     .opacity(isAnimating ? 1 : 0)
 
                 Text(titleText)
-                    .font(.system(size: 48, weight: .black, design: .rounded))
+                    .font(.custom("PressStart2P-Regular", size: 28))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Color("NeonPink"), Color("HotMagenta")],
@@ -66,7 +66,8 @@ struct GameOverOverlay: View {
                         .foregroundStyle(.white.opacity(0.8))
 
                     Text("\(score)")
-                        .font(.system(size: 64, weight: .black, design: .rounded))
+                        .font(.custom("Orbitron-Bold", size: 52))
+                        .monospacedDigit()
                         .foregroundStyle(Color("NeonYellow"))
                         .shadow(color: Color("NeonYellow"), radius: 10)
                 }

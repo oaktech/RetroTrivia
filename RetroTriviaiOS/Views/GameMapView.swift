@@ -105,12 +105,12 @@ struct GameMapView: View {
             .frame(height: urgencyLevel == .critical ? 8 : 6)
 
             Text(formattedTime(gameTimeRemaining))
-                .font(.system(size: urgencyLevel == .none ? 14 : 18, weight: .bold, design: .monospaced))
+                .font(.custom("Orbitron-Bold", size: urgencyLevel == .none ? 13 : 16))
                 .monospacedDigit()
                 .foregroundStyle(gameTimerColor)
                 .scaleEffect(urgencyScale)
                 .animation(.easeInOut(duration: urgencyLevel == .critical ? 0.3 : 0.5), value: urgencyPulse)
-                .frame(width: 50, alignment: .trailing)
+                .frame(width: 56, alignment: .trailing)
         }
         .padding(.horizontal, 4)
         .padding(.vertical, urgencyLevel != .none ? 4 : 0)
@@ -537,8 +537,8 @@ struct GameMapView: View {
                                     .font(.caption)
                                     .foregroundStyle(.white.opacity(0.7))
                                 Text("\(gameState.currentPosition)")
-                                    .font(.title2)
-                                    .fontWeight(.bold)
+                                    .font(.custom("Orbitron-Bold", size: 20))
+                                    .monospacedDigit()
                                     .foregroundStyle(Color("NeonYellow"))
                                     .contentTransition(.numericText())
                             }

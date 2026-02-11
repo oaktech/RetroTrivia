@@ -37,7 +37,7 @@ struct CountdownTimerView: View {
                 .animation(.linear(duration: 0.1), value: fraction)
 
             Text("\(Int(ceil(max(0, timeRemaining))))")
-                .font(.system(size: 22, weight: .black, design: .rounded))
+                .font(.custom("Orbitron-Bold", size: 18))
                 .monospacedDigit()
                 .foregroundStyle(timerColor)
                 .neonGlow(color: timerColor, radius: 4)

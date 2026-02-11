@@ -40,7 +40,7 @@ struct FinalStandingsView: View {
 
                 // Game Over title
                 Text("GAME OVER")
-                    .font(.system(size: 44, weight: .black, design: .rounded))
+                    .font(.custom("PressStart2P-Regular", size: 26))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Color("NeonPink"), Color("ElectricBlue")],
@@ -89,7 +89,8 @@ struct FinalStandingsView: View {
                                     Image(systemName: "location.fill")
                                         .font(.system(size: 12))
                                     Text("\(player.position)")
-                                        .font(.system(size: 18, weight: .black, design: .rounded))
+                                        .font(.custom("Orbitron-Bold", size: 16))
+                                        .monospacedDigit()
                                 }
                                 .foregroundStyle(player.color)
                             }
@@ -125,7 +126,8 @@ struct FinalStandingsView: View {
                                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white.opacity(0.7))
                             Text("\(session.players.map(\.questionsAnswered).reduce(0, +))")
-                                .font(.system(size: 24, weight: .black, design: .rounded))
+                                .font(.custom("Orbitron-Bold", size: 20))
+                                .monospacedDigit()
                                 .foregroundStyle(Color("ElectricBlue"))
                         }
 
@@ -136,7 +138,8 @@ struct FinalStandingsView: View {
                                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white.opacity(0.7))
                             Text("\(session.players.map(\.correctAnswers).reduce(0, +))")
-                                .font(.system(size: 24, weight: .black, design: .rounded))
+                                .font(.custom("Orbitron-Bold", size: 20))
+                                .monospacedDigit()
                                 .foregroundStyle(Color("NeonPink"))
                         }
 
@@ -147,7 +150,8 @@ struct FinalStandingsView: View {
                                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white.opacity(0.7))
                             Text("\(session.players.count)")
-                                .font(.system(size: 24, weight: .black, design: .rounded))
+                                .font(.custom("Orbitron-Bold", size: 20))
+                                .monospacedDigit()
                                 .foregroundStyle(Color("NeonYellow"))
                         }
                     }

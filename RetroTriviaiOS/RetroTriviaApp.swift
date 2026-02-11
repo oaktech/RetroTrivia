@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreText
 
 @main
 struct RetroTriviaApp: App {
@@ -46,7 +47,14 @@ struct RetroTriviaApp: App {
     }
 
     init() {
-        // Start menu music when app launches
+        registerFonts()
         AudioManager.shared.playMenuMusic()
+    }
+
+    private func registerFonts() {
+        ["PressStart2P-Regular", "Orbitron-Regular", "Orbitron-Bold"].forEach { name in
+            guard let url = Bundle.main.url(forResource: name, withExtension: "ttf") else { return }
+            CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
+        }
     }
 }
