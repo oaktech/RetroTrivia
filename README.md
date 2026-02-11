@@ -7,14 +7,14 @@
 ## ✨ Features
 
 ### Content
-- **6,008 Curated Trivia Questions** - Carefully calibrated difficulty levels (Easy 30%, Medium 24%, Hard 46%)
+- **6,000+ Curated Trivia Questions** - Carefully calibrated difficulty levels (Easy 30%, Medium 24%, Hard 46%)
 - **Iconic 80s Artists & Hits** - Madonna, Prince, Michael Jackson, Whitney Houston, U2, Duran Duran, The Police, and 30+ more
 - **Smart Question Selection** - Difficulty filtering, automatic deduplication, never repeat questions in a session
 
 ### Gameplay Modes
 - **Single-Player Mode** - Climb the vertical progress map at your own pace
 - **Leaderboard Mode** - 2-minute timed competitive mode with Game Center integration
-- **Lives Mode** - Optional difficulty modifier (1/2/3/5 lives) - game ends when lives run out
+- **Lives Mode** - Play with 3 lives - answer incorrectly and lose a life, game ends when you run out
 - **Pass & Play Multiplayer** - Local 2-4 player same-device mode with turn-based gameplay and final standings
 
 ### Visual & Audio
@@ -27,16 +27,15 @@
 
 ### Gameplay Features
 - **Candy Crush-style Progress Map** - Vertical map where correct answers move you up, wrong answers move you down (floor is level 0)
-- **Countdown Timer** - Optional per-question timer with urgency effects (pulsing at 30s/20s/10s)
+- **Countdown Timer** - Built-in per-question timer with urgency effects (pulsing at 30s/20s/10s)
 - **Game Center Leaderboard** - Global competitive rankings
 - **Badge Achievement System** - Unlock badges for various milestones and challenges
 - **Persistent Progress** - High score tracking across sessions
-- **Offline Support** - Bundled question fallback when CloudKit unavailable
-- **Settings Customization** - Timer duration, difficulty selection, lives mode, game preferences
+- **Difficulty Selection** - Filter questions by Easy, Medium, or Hard in any game mode
 
 ### Technical Highlights
-- **CloudKit Question Delivery** - 6,008 questions from cloud with intelligent random sampling
-- **3-Tier Fallback Strategy** - CloudKit → Local Cache → Bundled Fallback (app always playable)
+- **CloudKit Question Delivery** - 6,000+ questions from cloud with intelligent random sampling
+- **Smart Fallback Strategy** - CloudKit → Local Cache (app always playable)
 - **Modern Swift Concurrency** - Async/await, MainActor safety, observation pattern
 - **Zero Dependencies** - Pure SwiftUI, no third-party libraries
 
@@ -47,7 +46,7 @@ Answer 80s music trivia questions to climb the vertical progress map. Each corre
 **Game Modes:**
 - **Leaderboard Mode** - 2-minute timed speed game. Tap the trophy icon to enable and compete globally on Game Center.
 - **Practice Mode** - Play at your own pace without time pressure or scoring.
-- **Lives Mode** - Choose 1/2/3/5 lives in Settings. Game ends when you lose all lives (adds urgency and challenge).
+- **Lives Mode** - Start with 3 lives. Each wrong answer costs a life. Game ends when lives run out (adds urgency and challenge).
 - **Pass & Play** - 2-4 players on one device. Take turns answering questions, see final standings with medal rankings.
 
 **Tier Progression:**
