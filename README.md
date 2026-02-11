@@ -31,7 +31,7 @@
 - **Game Center Leaderboard** - Global competitive rankings
 - **Badge Achievement System** - Unlock badges for various milestones and challenges
 - **Persistent Progress** - High score tracking across sessions
-- **Difficulty Selection** - Filter questions by Easy, Medium, or Hard in any game mode
+- **Difficulty Selection** - Filter questions by Easy, Medium, or Hard
 
 ### Technical Highlights
 - **CloudKit Question Delivery** - 6,000+ questions from cloud with intelligent random sampling
