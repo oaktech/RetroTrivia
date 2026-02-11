@@ -14,3 +14,4 @@ CloudKitMigration/
 # Question data - managed via CloudKit, not version controlled
 RetroTrivia/Data/questions.json
 RetroTrivia/Data/questions_full_backup.json
+RetroTrivia/Data/regenerated_broken.json
