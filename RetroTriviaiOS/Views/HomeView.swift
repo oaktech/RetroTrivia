@@ -174,54 +174,43 @@ struct HomeView: View {
                     .padding(.bottom, 20)
                 }
 
-                VStack(spacing: 12) {
-                    HStack(spacing: 12) {
-                        // Play button (leaderboard mode — fixed to Any difficulty for fair competition)
-                        VStack(spacing: 6) {
-                            RetroButton("Play", variant: .primary) {
-                                audioManager.playSoundEffect(named: "button-tap")
-                                questionManager.filterConfig.difficulty = .any
-                                questionManager.filterConfig.save()
-                                startGame(leaderboardMode: true)
-                            }
-                            HStack(spacing: 8) {
-                                Label("2 min", systemImage: "clock")
-                                Label("Ranked", systemImage: "trophy")
-                            }
-                            .font(.system(size: 11, weight: .semibold, design: .rounded))
-                            .foregroundStyle(Color("NeonPink").opacity(0.75))
+                VStack(spacing: 18) {
+                    // Play button (leaderboard mode — fixed to Any difficulty for fair competition)
+                    VStack(spacing: 10) {
+                        RetroButton("Play", variant: .primary) {
+                            audioManager.playSoundEffect(named: "button-tap")
+                            questionManager.filterConfig.difficulty = .any
+                            questionManager.filterConfig.save()
+                            startGame(leaderboardMode: true)
                         }
-                        .frame(maxWidth: .infinity)
-
-                        // Gauntlet button (survival mode)
-                        VStack(spacing: 6) {
-                            RetroButton("Gauntlet", variant: .secondary) {
-                                audioManager.playSoundEffect(named: "button-tap")
-                                showDifficultyPicker = true
-                            }
-                            HStack(spacing: 8) {
-                                Label("3 lives", systemImage: "heart.fill")
-                                Label("No clock", systemImage: "infinity")
-                            }
-                            .font(.system(size: 11, weight: .semibold, design: .rounded))
-                            .foregroundStyle(Color("ElectricBlue").opacity(0.75))
+                        HStack(spacing: 8) {
+                            GameModeTag("2 min", icon: "clock", color: Color("NeonPink"))
+                            GameModeTag("Ranked", icon: "trophy", color: Color("NeonPink"))
                         }
-                        .frame(maxWidth: .infinity)
                     }
-                    .padding(.horizontal, 4)
+
+                    // Gauntlet button (survival mode)
+                    VStack(spacing: 10) {
+                        RetroButton("Gauntlet", variant: .secondary) {
+                            audioManager.playSoundEffect(named: "button-tap")
+                            showDifficultyPicker = true
+                        }
+                        HStack(spacing: 8) {
+                            GameModeTag("3 lives", icon: "heart.fill", color: Color("ElectricBlue"))
+                            GameModeTag("No clock", icon: "infinity", color: Color("ElectricBlue"))
+                        }
+                    }
 
                     // Pass & Play button
-                    VStack(spacing: 6) {
+                    VStack(spacing: 10) {
                         RetroButton("Pass & Play", variant: .primary) {
                             audioManager.playSoundEffect(named: "button-tap")
                             activeSheet = .passAndPlaySetup
                         }
                         HStack(spacing: 8) {
-                            Label("2-4 players", systemImage: "person.2.fill")
-                            Label("Local only", systemImage: "wifi.slash")
+                            GameModeTag("2-4 players", icon: "person.2.fill", color: Color("NeonYellow"))
+                            GameModeTag("Local only", icon: "wifi.slash", color: Color("NeonYellow"))
                         }
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundStyle(Color("NeonYellow").opacity(0.75))
                     }
                 }
 
@@ -295,6 +284,31 @@ struct HomeView: View {
         questionManager.resetSession()
         audioManager.playGameplayMusic()
         onPlayTapped()
+    }
+}
+
+// MARK: - Game Mode Tag
+
+private struct GameModeTag: View {
+    let label: String
+    let icon: String
+    let color: Color
+
+    init(_ label: String, icon: String, color: Color) {
+        self.label = label
+        self.icon = icon
+        self.color = color
+    }
+
+    var body: some View {
+        Label(label, systemImage: icon)
+            .font(.system(size: 12, weight: .semibold, design: .rounded))
+            .foregroundStyle(color)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(color.opacity(0.12))
+            .clipShape(Capsule())
+            .overlay(Capsule().strokeBorder(color.opacity(0.35), lineWidth: 1))
     }
 }
 

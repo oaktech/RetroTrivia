@@ -35,7 +35,7 @@ extension View {
 
     func retroHeading() -> some View {
         self
-            .font(.custom("PressStart2P-Regular", size: 16))
+            .font(.system(size: 22, weight: .bold, design: .rounded))
             .foregroundStyle(Color("NeonYellow"))
             .shadow(color: Color("NeonYellow").opacity(0.6), radius: 6)
     }
