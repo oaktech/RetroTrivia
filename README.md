@@ -11,12 +11,6 @@
 - **Iconic 80s Artists & Hits** - Madonna, Prince, Michael Jackson, Whitney Houston, U2, Duran Duran, The Police, and 30+ more
 - **Smart Question Selection** - Difficulty filtering, automatic deduplication, never repeat questions in a session
 
-### Gameplay Modes
-- **Single-Player Mode** - Climb the vertical progress map at your own pace
-- **Leaderboard Mode** - 2-minute timed competitive mode with Game Center integration
-- **Lives Mode** - Play with 3 lives - answer incorrectly and lose a life, game ends when you run out
-- **Pass & Play Multiplayer** - Local 2-4 player same-device mode with turn-based gameplay and final standings
-
 ### Visual & Audio
 - **Retro 80s Aesthetic** - Neon pink, electric blue, hot magenta colors with bold typography
 - **Progressive Tier System** - 9 distinct achievement tiers with escalating visual intensity
