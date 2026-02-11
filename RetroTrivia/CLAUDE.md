@@ -1,87 +1,171 @@
-# CLAUDE.md
+# CLAUDE.md - Retro Trivia Blast Development Guide
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with this repository.
 
 ## Project Overview
 
-RetroTrivia is an iOS trivia game built with SwiftUI, themed around 80s music. It features a Candy Crush-style vertical progress map where correct answers move the player up and wrong answers move them down.
+**Retro Trivia Blast** is a production iOS trivia game built with SwiftUI, themed around 80s music. It features a Candy Crush-style vertical progress map where correct answers move the player up and wrong answers move them down.
 
-**Tech stack**: SwiftUI, iOS 17+, UserDefaults for progress, bundled JSON for questions. No third-party dependencies.
+**Tech Stack:**
+- SwiftUI (iOS 17+)
+- CloudKit for 6,008 questions (public database)
+- UserDefaults for player progress
+- Bundled question fallback for offline play
+- Game Center leaderboard integration
+- No third-party dependencies
+
+**Status:** Complete and App Store published - focus on bug fixes and feature polish.
 
 ## Git Workflow
 
 **IMPORTANT: Commit frequently!**
 
 Create a git commit after:
-- Each completed stage (Stage 1, Stage 2, etc.)
-- Each major feature implementation
-- Each bug fix that resolves an issue
-- Before starting a new phase of work
+- Each completed feature or bug fix
+- Significant refactoring
+- Architecture improvements
+- Before starting new work
 
-When a stage or feature is complete, **always ask the user if they want to create a commit**. Don't proceed to the next stage without committing first.
-
-Use descriptive commit messages following the existing pattern:
+Use descriptive commit messages:
 - First line: Brief summary (50 chars or less)
 - Body: Bullet points describing changes
-- Footer: `Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>`
+- Footer: `Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>`
 
 ## Build & Run Commands
 
 ```bash
-# Build the project
+# Build for iOS
 xcodebuild -scheme RetroTrivia -destination 'generic/platform=iOS'
 
-# Run tests
+# Run unit tests
 xcodebuild test -scheme RetroTrivia -destination 'platform=iOS Simulator,name=iPhone 16'
 
-# Or in Xcode: Cmd+R to run, Cmd+U to test
+# Or in Xcode
+Cmd+R     # Build and run
+Cmd+U     # Run tests
+Cmd+B     # Build only
 ```
 
-## Architecture
+## Current Architecture
 
-The project follows a staged build approach documented in `BUILD_PROMPTS.md`. Key architectural decisions:
+### Core Models
+- **GameState** (@Observable, @MainActor) - Single-player game progress, persisted to UserDefaults
+- **PassAndPlaySession** - Multiplayer (2-4 players) local game state, positions, turn tracking
+- **TriviaQuestion** - Trivia data structure with difficulty, category
+- **GameSettings** - User preferences (lives mode, difficulty, timer settings)
+- **Badge** - Achievement system
 
-**Directory structure** (as implementation progresses):
-- `Models/` - TriviaQuestion (Codable struct), GameState (@Observable with UserDefaults persistence)
-- `Views/` - HomeView, GameMapView, TriviaGameView, overlay views
-- `Components/` - RetroButton, RetroGradientBackground
-- `Data/` - questions.json (bundled trivia questions)
+### Services Layer
+- **QuestionManager** (@Observable) - Question pool management with CloudKit primary, cache fallback, bundled emergency fallback
+- **CloudKitQuestionService** - CloudKit public database queries with random sampling
+- **AudioManager** (singleton) - Menu/gameplay music, sound effects, haptics
+- **GameCenterManager** (singleton) - Leaderboard submission, authentication
+- **BadgeManager** (singleton) - Achievement tracking and unlocking
 
-**Data flow**:
-- GameState is injected via environment from ContentView
-- Questions loaded from bundled JSON via `TriviaQuestion.loadFromBundle()`
-- Position persists to UserDefaults on change
+### View Architecture
+- **ContentView** - Root navigation orchestrator
+- **HomeView** - Main menu with game mode selection
+- **GameMapView** - Single-player progress map with node interactions
+- **PassAndPlayMapView** - Multiplayer map with turn orchestration
+- **TriviaGameView** - Question display and answer selection (full-screen overlay)
+- **Overlay Views** - CelebrationOverlay, WrongAnswerOverlay, LevelUpOverlay, etc.
+- **Components** - RetroButton, RetroGradientBackground, CountdownTimerView
 
-**Navigation**:
+### Data Flow
 ```
-HomeView → GameMapView → TriviaGameView (sheet) → Overlay → dismiss back to map
+RetroTriviaApp (@State managers)
+    ↓
+ContentView (environment injection)
+    ↓
+Views & Services (@Environment access)
+    ↓
+State mutations via @Observable didSet
+    ↓
+UserDefaults/CloudKit persistence
 ```
+
+### Question Loading Strategy
+1. **Primary**: CloudKit random sampling (1-6008 range)
+2. **Fallback**: QuestionCacheManager (offline support)
+3. **Emergency**: Bundled questions.json (app always playable)
+
+Session tracks `askedQuestionIDs` per game (Set<String>) to prevent repeats within a session.
 
 ## Design System
 
-80s retro aesthetic with these color constants:
-- NeonPink: #FF10F0
-- ElectricBlue: #00D4FF
-- HotMagenta: #FF00AA
+**80s Retro Aesthetic** - Neon colors, bold typography, particle effects
+
+Color Constants:
+- NeonPink: #FF10F0 (winner highlight, accents)
+- ElectricBlue: #00D4FF (primary, lower tiers)
+- HotMagenta: #FF00AA (upper tier intensity)
 - RetroPurple: #2D1B4E (dark background)
-- NeonYellow: #FFFF00
+- NeonYellow: #FFFF00 (accent, tier badges)
 
-## Development Stages
-
-Follow `BUILD_PROMPTS.md` for staged implementation:
-1. Models & data foundation (TriviaQuestion, GameState, questions.json)
-2. Retro theme & design system (colors, RetroButton, typography)
-3. Home screen
-4. Trivia gameplay view
-5. Haptic feedback
-6. Celebration/wrong-answer overlays
-7. Candy Crush-style progress map
-8. Integration & polish
+**Typography:**
+- System font with rounded design
+- .black weight for titles
+- .semibold for headers
+- .system for body text
 
 ## Key Implementation Notes
 
-- Use SwiftUI's `.sensoryFeedback()` for haptics (iOS 17+)
-- GameState floor is 0 (wrong answers can't go negative)
+### Performance & Best Practices
+- Use SwiftUI's `.sensoryFeedback()` for haptics (iOS 17+ native)
+- @MainActor ensures all state mutations on main thread
+- GameState floor is 0 (position never goes negative)
 - Overlay animations auto-dismiss after ~1.5 seconds
-- ScrollViewReader keeps current map position in view
+- ScrollViewReader maintains map scroll position during gameplay
 - High score updates when currentPosition exceeds highScorePosition
+
+### CloudKit Integration
+- Random sampling via sortOrder field (1-6008)
+- Rate limiting: 200 questions per batch with 500ms delay
+- Graceful fallback: CloudKit → Cache → Bundled
+- Network errors are recoverable (user continues with cached/bundled)
+
+### Multiplayer (Pass & Play)
+- 2-4 players, same device only
+- Turn-based orchestration via PassAndPlayMapView
+- No networking or persistence between sessions
+- Final standings sorted by: position → correctAnswers → player order
+- HandoffView full-screen interstitial between turns
+
+### State Management
+- Avoid @State in most views (use @Environment for @Observable objects)
+- Only use @State for local UI state (sheet visibility, picker selection)
+- Never pass non-Observable data through environment
+- didSet observers handle persistence automatically
+
+## Important Files to Know
+
+- `RetroTriviaApp.swift` - App entry, environment setup, scene phase handling
+- `Models/GameState.swift` - Core single-player state machine
+- `Models/PassAndPlaySession.swift` - Multiplayer state model
+- `Services/QuestionManager.swift` - Question pool orchestration
+- `Services/CloudKitQuestionService.swift` - CloudKit queries
+- `Audio/AudioManager.swift` - Sound effects and music
+- `Views/GameMapView.swift` - Single-player UI
+- `Views/PassAndPlayMapView.swift` - Multiplayer UI
+- `.gitignore` - Protected: questions.json, Scripts/, xcuserdata/, .DS_Store
+
+## Known Limitations & Considerations
+
+- No undo/replay system (future: could implement action reducer pattern)
+- Tests minimal (recommend unit tests for GameState logic)
+- View components could be smaller (some exceed 150 lines)
+- Consider MVVM-C for future architectural refactoring
+- CloudKit random sampling scales well to 6,008 questions
+
+## Useful Commands for Debugging
+
+```bash
+# Check what's in git (for accidental commits)
+git ls-files | grep -E "json|Scripts"
+
+# View commit history for a file
+git log --oneline -- path/to/file
+
+# Show environment variables in app
+lldb> po ProcessInfo.processInfo.environment
+```
