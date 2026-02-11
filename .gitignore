@@ -10,3 +10,7 @@ DerivedData/
 RetroTrivia/Data/questions_full_backup.json
 Scripts/migrate_to_cloudkit.sh
 CloudKitMigration/
+
+# Question data - managed via CloudKit, not version controlled
+RetroTrivia/Data/questions.json
+RetroTrivia/Data/questions_full_backup.json
