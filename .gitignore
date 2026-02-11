@@ -1,6 +1,7 @@
 build/
 Scripts/.venv/
 *.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/
 *.xcworkspace/xcuserdata/
 DerivedData/
 *.pbxproj.backup
