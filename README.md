@@ -1,89 +1,133 @@
 # Retro Trivia Blast
 
-An iOS trivia game themed around 80s music, built with SwiftUI.
+🎮 An iOS trivia game themed around 80s music, built with SwiftUI. Climb a vertical progress map by answering questions about Madonna, Prince, Michael Jackson, and more iconic 80s artists.
 
-**Vibe coded in 1 day using [Claude Code](https://claude.ai/code).** Available on the App Store as [Retro Trivia Blast](https://apps.apple.com/app/retro-trivia-blast).
+**Available on the App Store:** [Retro Trivia Blast](https://apps.apple.com/app/retro-trivia-blast) | **Built with:** [Claude Code](https://claude.ai/code)
 
-## Features
+## ✨ Features
 
-- **80s Music Trivia** - Questions about Madonna, Michael Jackson, Prince, Whitney Houston, Duran Duran, and more
-- **Candy Crush-style Progress Map** - Vertical map where correct answers move you up, wrong answers move you down
-- **Game Center Leaderboard** - Compete globally with 2-minute timed leaderboard mode
-- **Lives System** - Optional lives mode (1/2/3/5 lives) for added challenge
-- **Progressive Intensity System** - Visual effects and colors intensify as you climb higher, with 9 distinct tier levels
-- **Urgency Effects** - Escalating visual tension at 30s, 20s, and 10s remaining with pulsing timer and screen vignette
+### Content
+- **6,008 Curated Trivia Questions** - Carefully calibrated difficulty levels (Easy 30%, Medium 24%, Hard 46%)
+- **Iconic 80s Artists & Hits** - Madonna, Prince, Michael Jackson, Whitney Houston, U2, Duran Duran, The Police, and 30+ more
+- **Smart Question Selection** - Difficulty filtering, automatic deduplication, never repeat questions in a session
+
+### Gameplay Modes
+- **Single-Player Mode** - Climb the vertical progress map at your own pace
+- **Leaderboard Mode** - 2-minute timed competitive mode with Game Center integration
+- **Lives Mode** - Optional difficulty modifier (1/2/3/5 lives) - game ends when lives run out
+- **Pass & Play Multiplayer** - Local 2-4 player same-device mode with turn-based gameplay and final standings
+
+### Visual & Audio
+- **Retro 80s Aesthetic** - Neon pink, electric blue, hot magenta colors with bold typography
+- **Progressive Tier System** - 9 distinct achievement tiers with escalating visual intensity
 - **Level-Up Celebrations** - Spectacular particle burst animations when reaching new tiers
-- **Countdown Timer** - Optional per-question timer to keep the pace up
-- **Retro Aesthetic** - Neon colors, bold typography, and authentic 80s vibes
 - **Dynamic Music System** - Separate synthwave tracks for menu and gameplay
-- **Comprehensive Sound Effects** - Audio feedback for answers, buttons, and level-ups
-- **Haptic Feedback** - Satisfying tactile feedback throughout
-- **Celebration Animations** - Confetti explosions for correct answers, shake effect for wrong ones
+- **Comprehensive Sound Effects** - Audio feedback for correct/wrong answers, button taps, level-ups
+- **Haptic Feedback** - Satisfying tactile feedback throughout gameplay
 
-## Gameplay
+### Gameplay Features
+- **Candy Crush-style Progress Map** - Vertical map where correct answers move you up, wrong answers move you down (floor is level 0)
+- **Countdown Timer** - Optional per-question timer with urgency effects (pulsing at 30s/20s/10s)
+- **Game Center Leaderboard** - Global competitive rankings
+- **Badge Achievement System** - Unlock badges for various milestones and challenges
+- **Persistent Progress** - High score tracking across sessions
+- **Offline Support** - Bundled question fallback when CloudKit unavailable
+- **Settings Customization** - Timer duration, difficulty selection, lives mode, game preferences
 
-Answer 80s music trivia questions to climb the vertical progress map. Correct answers move you up, wrong answers move you down (but never below level 0).
+### Technical Highlights
+- **CloudKit Question Delivery** - 6,008 questions from cloud with intelligent random sampling
+- **3-Tier Fallback Strategy** - CloudKit → Local Cache → Bundled Fallback (app always playable)
+- **Modern Swift Concurrency** - Async/await, MainActor safety, observation pattern
+- **Zero Dependencies** - Pure SwiftUI, no third-party libraries
+
+## 🎯 Gameplay
+
+Answer 80s music trivia questions to climb the vertical progress map. Each correct answer advances you one level, each wrong answer moves you back one level.
 
 **Game Modes:**
-- **Leaderboard Mode** - 2-minute timed game with scores submitted to Game Center. Tap the trophy icon to enable and compete globally.
-- **Practice Mode** - Play at your own pace without time pressure.
-- **Lives Mode** - Enable lives (1/2/3/5) in Settings for an extra challenge. Game ends when you run out!
+- **Leaderboard Mode** - 2-minute timed speed game. Tap the trophy icon to enable and compete globally on Game Center.
+- **Practice Mode** - Play at your own pace without time pressure or scoring.
+- **Lives Mode** - Choose 1/2/3/5 lives in Settings. Game ends when you lose all lives (adds urgency and challenge).
+- **Pass & Play** - 2-4 players on one device. Take turns answering questions, see final standings with medal rankings.
 
-**Tier System:**
-Every 3 levels, you advance to a new tier with increasing visual intensity:
-- **Level 1-2**: Beginner (Electric Blue)
-- **Level 3-5**: Rising Star
-- **Level 6-8**: On Fire
-- **Level 9-11**: Hot Streak (Neon Pink)
-- **Level 12-14**: Supercharged
-- **Level 15-17**: Elite
-- **Level 18-20**: Champion (Hot Magenta)
-- **Level 21-23**: Legendary
-- **Level 24-25**: Ultimate Master
+**Tier Progression:**
+Every 3 levels you advance to a new tier with increasing visual intensity:
+- **Levels 1-2**: Beginner (Electric Blue)
+- **Levels 3-5**: Rising Star (colors intensify)
+- **Levels 6-8**: On Fire (more intense effects)
+- **Levels 9-11**: Hot Streak (Neon Pink)
+- **Levels 12-14**: Supercharged
+- **Levels 15-17**: Elite
+- **Levels 18-20**: Champion (Hot Magenta)
+- **Levels 21-23**: Legendary
+- **Levels 24-25**: Ultimate Master (maximum intensity)
 
-As you progress, the map's connecting lines grow thicker and colors shift from Electric Blue → Neon Pink → Hot Magenta, creating a sense of escalating excitement.
+Map visuals evolve continuously: connecting lines thicken, colors shift from Electric Blue → Neon Pink → Hot Magenta, creating escalating visual excitement.
 
-## Requirements
+## 📱 Requirements
 
 - iOS 17.0+
 - Xcode 15.0+
+- iCloud account (optional, for CloudKit questions and Game Center leaderboard)
 
-## Getting Started
+## 🚀 Getting Started
 
 1. Clone the repository
 2. Open `RetroTrivia.xcodeproj` in Xcode
 3. Select a simulator or device
-4. Build and run (Cmd+R)
+4. Build and run: `Cmd+R`
 
-## Project Structure
+### Running Tests
+```bash
+xcodebuild test -scheme RetroTrivia -destination 'platform=iOS Simulator,name=iPhone 16'
+# Or press Cmd+U in Xcode
+```
+
+## 📁 Project Structure
 
 ```
 RetroTrivia/
-├── Models/          # TriviaQuestion, GameState, GameSettings
-├── Views/           # HomeView, GameMapView, TriviaGameView, GameCenterLeaderboardView
-│                    # MapNodeView, CelebrationOverlay, WrongAnswerOverlay, LevelUpOverlay
-├── Components/      # RetroButton, RetroGradientBackground, RetroTypography
-├── Managers/        # AudioManager, GameCenterManager, QuestionManager
-├── Audio/           # Background music and sound effects
-├── Data/            # questions.json
-└── Assets.xcassets/ # Colors, images, and app icon
+├── Models/               # GameState, PassAndPlaySession, TriviaQuestion, GameSettings, Badge
+├── Views/                # HomeView, GameMapView, PassAndPlayMapView, TriviaGameView
+│                         # Overlays: CelebrationOverlay, WrongAnswerOverlay, LevelUpOverlay
+│                         # FinalStandingsView, SettingsView, GameCenterLeaderboardView
+├── Components/           # RetroButton, RetroGradientBackground, CountdownTimerView
+├── Services/             # QuestionManager, CloudKitQuestionService, QuestionCacheManager
+├── Managers/             # AudioManager, GameCenterManager, BadgeManager
+├── Extensions/           # TriviaQuestion+CloudKit
+├── Audio/                # Background music (menu, gameplay) and sound effects
+├── Data/                 # questions.json (6,008 questions, bundled)
+└── Assets.xcassets/      # Colors, images, app icon
 ```
 
-## Development
+## 🏗️ Architecture
 
-See `BUILD_PROMPTS.md` for staged build instructions. The project is designed to be built incrementally across 8 stages, from data models through final polish.
+**State Management:**
+- `@Observable` pattern for reactive state (iOS 17+)
+- `@MainActor` for thread safety
+- Environment injection for dependency access
+- UserDefaults for persistence
 
-## Credits
+**Question Delivery:**
+1. **Primary**: CloudKit random sampling (efficient for 6K+ questions)
+2. **Fallback**: Local cache for offline play
+3. **Emergency**: Bundled questions.json (app always playable)
+
+**Data Flow:** RetroTriviaApp → ContentView → Views & Services → State mutations → Persistence
+
+See `CLAUDE.md` for detailed architecture documentation.
+
+## 🎵 Credits
 
 **Menu Music:** "Electric Lullaby" by Electronic Senses
 **Gameplay Music:** "Retro" by jiglr
 
-See `CREDITS.md` for full music, sound effects, and asset attribution.
+See `CREDITS.md` for complete music, sound effects, and asset attribution.
 
-## Privacy Policy
+## 📋 Privacy & Legal
 
-[Privacy Policy](https://gist.github.com/oaktech/dc4d99c3a4115ba743df84e3834dc03e)
+[Privacy Policy](https://gist.github.com/oaktech/dc4d99c3a4115ba743df84e3834dc03e) | [MIT License](LICENSE)
 
-## License
+---
 
-MIT
+Built with ❤️ and 80s nostalgia. 🎸🎹
