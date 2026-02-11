@@ -10,6 +10,7 @@ struct MapNodeView: View {
     let isCurrentPosition: Bool
     let currentPosition: Int
     var isAnimatingTarget: Bool = false
+    var playerDots: [Color] = []  // NEW: Pass & Play player dots
 
     @State private var pulseScale: CGFloat = 1.0
     @State private var animationRotation: Double = 0
@@ -45,27 +46,43 @@ struct MapNodeView: View {
 
     var body: some View {
         ZStack {
-            // Node circle
-            Circle()
-                .fill(backgroundColor)
-                .frame(width: nodeSize, height: nodeSize)
-                .overlay(borderOverlay)
-                .compositingGroup()
-                .shadow(color: shadowColor, radius: shadowRadius(for: levelIndex, state: nodeState))
-                .shadow(
-                    color: isLegendaryTier ? Color("NeonYellow").opacity(0.4) : .clear,
-                    radius: isLegendaryTier ? shadowRadius(for: levelIndex, state: nodeState) * 1.5 : 0
-                )
-
-            // Icon or number
-            if nodeState == .completed {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 32))
-                    .foregroundStyle(Color("NeonPink"))
+            // Pass & Play: Show player dots if provided
+            if !playerDots.isEmpty {
+                HStack(spacing: playerDots.count > 1 ? -8 : 0) {
+                    ForEach(playerDots.indices, id: \.self) { index in
+                        Circle()
+                            .fill(playerDots[index])
+                            .frame(width: 24, height: 24)
+                            .overlay(Circle().stroke(Color.white, lineWidth: 1.5))
+                            .shadow(color: playerDots[index].opacity(0.6), radius: 8)
+                    }
+                }
             } else {
-                Image(systemName: "music.note")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(iconColor)
+                // Standard single-player mode
+                ZStack {
+                    // Node circle
+                    Circle()
+                        .fill(backgroundColor)
+                        .frame(width: nodeSize, height: nodeSize)
+                        .overlay(borderOverlay)
+                        .compositingGroup()
+                        .shadow(color: shadowColor, radius: shadowRadius(for: levelIndex, state: nodeState))
+                        .shadow(
+                            color: isLegendaryTier ? Color("NeonYellow").opacity(0.4) : .clear,
+                            radius: isLegendaryTier ? shadowRadius(for: levelIndex, state: nodeState) * 1.5 : 0
+                        )
+
+                    // Icon or number
+                    if nodeState == .completed {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 32))
+                            .foregroundStyle(Color("NeonPink"))
+                    } else {
+                        Image(systemName: "music.note")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundStyle(iconColor)
+                    }
+                }
             }
         }
         .scaleEffect(scaleEffect * targetPulseScale)

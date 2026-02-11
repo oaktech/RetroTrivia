@@ -13,17 +13,20 @@ struct HomeView: View {
     @Environment(GameCenterManager.self) var gameCenterManager
     @Environment(BadgeManager.self) var badgeManager
     let onPlayTapped: () -> Void
+    let onPassAndPlayTapped: (PassAndPlaySession) -> Void
 
     enum SheetType: Identifiable {
         case settings
         case leaderboard
         case badges
+        case passAndPlaySetup
 
         var id: Int {
             switch self {
             case .settings: return 0
             case .leaderboard: return 1
             case .badges: return 2
+            case .passAndPlaySetup: return 3
             }
         }
     }
@@ -173,40 +176,56 @@ struct HomeView: View {
                     .padding(.bottom, 20)
                 }
 
-                HStack(spacing: 12) {
-                    // Play button (leaderboard mode — fixed to Any difficulty for fair competition)
-                    VStack(spacing: 6) {
-                        RetroButton("Play", variant: .primary) {
-                            audioManager.playSoundEffect(named: "button-tap")
-                            questionManager.filterConfig.difficulty = .any
-                            questionManager.filterConfig.save()
-                            startGame(leaderboardMode: true)
+                VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        // Play button (leaderboard mode — fixed to Any difficulty for fair competition)
+                        VStack(spacing: 6) {
+                            RetroButton("Play", variant: .primary) {
+                                audioManager.playSoundEffect(named: "button-tap")
+                                questionManager.filterConfig.difficulty = .any
+                                questionManager.filterConfig.save()
+                                startGame(leaderboardMode: true)
+                            }
+                            HStack(spacing: 8) {
+                                Label("2 min", systemImage: "clock")
+                                Label("Ranked", systemImage: "trophy")
+                            }
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .foregroundStyle(Color("NeonPink").opacity(0.75))
                         }
-                        HStack(spacing: 8) {
-                            Label("2 min", systemImage: "clock")
-                            Label("Ranked", systemImage: "trophy")
-                        }
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundStyle(Color("NeonPink").opacity(0.75))
-                    }
-                    .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity)
 
-                    // Gauntlet button (survival mode)
+                        // Gauntlet button (survival mode)
+                        VStack(spacing: 6) {
+                            RetroButton("Gauntlet", variant: .secondary) {
+                                audioManager.playSoundEffect(named: "button-tap")
+                                showDifficultyPicker = true
+                            }
+                            HStack(spacing: 8) {
+                                Label("3 lives", systemImage: "heart.fill")
+                                Label("No clock", systemImage: "infinity")
+                            }
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .foregroundStyle(Color("ElectricBlue").opacity(0.75))
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(.horizontal, 4)
+
+                    // Pass & Play button
                     VStack(spacing: 6) {
-                        RetroButton("Gauntlet", variant: .secondary) {
+                        RetroButton("Pass & Play", variant: .primary) {
                             audioManager.playSoundEffect(named: "button-tap")
-                            showDifficultyPicker = true
+                            activeSheet = .passAndPlaySetup
                         }
                         HStack(spacing: 8) {
-                            Label("3 lives", systemImage: "heart.fill")
-                            Label("No clock", systemImage: "infinity")
+                            Label("2-4 players", systemImage: "person.2.fill")
+                            Label("Local only", systemImage: "wifi.slash")
                         }
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundStyle(Color("ElectricBlue").opacity(0.75))
+                        .foregroundStyle(Color("NeonYellow").opacity(0.75))
                     }
-                    .frame(maxWidth: .infinity)
                 }
-                .padding(.horizontal, 4)
 
                 Spacer()
             }
@@ -223,6 +242,17 @@ struct HomeView: View {
                     activeSheet = nil
                 }
                 .environment(badgeManager)
+            case .passAndPlaySetup:
+                PassAndPlaySetupView(
+                    onStart: { session in
+                        audioManager.playSoundEffect(named: "button-tap")
+                        activeSheet = nil
+                        onPassAndPlayTapped(session)
+                    },
+                    onCancel: {
+                        activeSheet = nil
+                    }
+                )
             }
         }
         .onAppear {
@@ -364,7 +394,7 @@ private struct DifficultyPickerOverlay: View {
 }
 
 #Preview {
-    HomeView(onPlayTapped: {})
+    HomeView(onPlayTapped: {}, onPassAndPlayTapped: { _ in })
         .environment(GameState())
         .environment(AudioManager.shared)
         .environment(QuestionManager())
