@@ -30,22 +30,9 @@
 		2ADB32F12F33FBF600EFA7E9 /* RetroTriviaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RetroTriviaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		2ADB33062F33FBF600EFA7E9 /* ExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 2ADB32D12F33FBF600EFA7E9 /* Resources */;
-			membershipExceptions = (
-				Info.plist,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2ADB32D52F33FBF600EFA7E9 /* RetroTriviaiOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				2ADB33062F33FBF600EFA7E9 /* ExceptionSet */,
-			);
 			path = RetroTriviaiOS;
 			sourceTree = "<group>";
 		};
