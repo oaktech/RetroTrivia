@@ -49,19 +49,7 @@ Answer 80s music trivia questions to climb the vertical progress map. Each corre
 - **Lives Mode** - Start with 3 lives. Each wrong answer costs a life. Game ends when lives run out (adds urgency and challenge).
 - **Pass & Play** - 2-4 players on one device. Take turns answering questions, see final standings with medal rankings.
 
-**Tier Progression:**
-Every 3 levels you advance to a new tier with increasing visual intensity:
-- **Levels 1-2**: Beginner (Electric Blue)
-- **Levels 3-5**: Rising Star (colors intensify)
-- **Levels 6-8**: On Fire (more intense effects)
-- **Levels 9-11**: Hot Streak (Neon Pink)
-- **Levels 12-14**: Supercharged
-- **Levels 15-17**: Elite
-- **Levels 18-20**: Champion (Hot Magenta)
-- **Levels 21-23**: Legendary
-- **Levels 24-25**: Ultimate Master (maximum intensity)
-
-Map visuals evolve continuously: connecting lines thicken, colors shift from Electric Blue → Neon Pink → Hot Magenta, creating escalating visual excitement.
+As you progress, map visuals evolve with thickening lines and shifting colors from Electric Blue → Neon Pink → Hot Magenta, creating escalating visual excitement.
 
 ## 📱 Requirements
 
