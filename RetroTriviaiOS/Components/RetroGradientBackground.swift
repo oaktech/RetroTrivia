@@ -22,7 +22,7 @@ struct RetroGradientBackground: View {
 
             if showGrid {
                 GridOverlay()
-                    .opacity(0.15)
+                    .opacity(0.25)
             }
         }
         .ignoresSafeArea()

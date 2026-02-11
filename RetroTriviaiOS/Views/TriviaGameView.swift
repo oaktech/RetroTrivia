@@ -31,6 +31,7 @@ struct TriviaGameView: View {
     @State private var timeRemaining: Double = 15.0
     @State private var timerIsActive = false
     @State private var urgencyPulse = false
+    @State private var lastTickSecond: Int = -1
 
     private var isShowingOverlay: Bool {
         showCelebration || showWrong || showTimeout
@@ -229,6 +230,7 @@ struct TriviaGameView: View {
             shuffledOptions = indices.map { question.options[$0] }
             shuffledCorrectIndex = indices.firstIndex(of: question.correctIndex) ?? 0
 
+            lastTickSecond = -1
             if gameState.gameSettings.timerEnabled {
                 timeRemaining = Double(gameState.gameSettings.timerDuration)
                 timerIsActive = true
@@ -238,6 +240,13 @@ struct TriviaGameView: View {
             guard timerIsActive, !hasAnswered else { return }
             if timeRemaining > 0.1 {
                 timeRemaining -= 0.1
+
+                // Tick sound in last 5 seconds
+                let currentSecond = Int(ceil(timeRemaining))
+                if currentSecond >= 1, currentSecond <= 5, currentSecond != lastTickSecond {
+                    lastTickSecond = currentSecond
+                    audioManager.playTickSound()
+                }
             } else {
                 handleTimeout()
             }
@@ -275,24 +284,38 @@ struct TriviaGameView: View {
         }
     }
 
+    private static let letterLabels = ["A", "B", "C", "D"]
+
     @ViewBuilder
     private func answerButton(index: Int) -> some View {
         Button(action: {
             handleAnswer(index)
         }) {
-            Text(shuffledOptions.indices.contains(index) ? shuffledOptions[index] : "")
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                .foregroundStyle(textColor(for: index))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 20)
-                .frame(maxWidth: .infinity, minHeight: 80)
-                .background(backgroundColor(for: index))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(borderColor(for: index), lineWidth: 2)
-                )
+            HStack(spacing: 12) {
+                // Letter chip
+                Text(Self.letterLabels[index])
+                    .font(.system(size: 15, weight: .bold, design: .monospaced))
+                    .foregroundStyle(.white)
+                    .frame(width: 32, height: 32)
+                    .background(letterChipColor(for: index))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                // Answer text
+                Text(shuffledOptions.indices.contains(index) ? shuffledOptions[index] : "")
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundStyle(textColor(for: index))
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 20)
+            .frame(maxWidth: .infinity, minHeight: 80)
+            .background(backgroundColor(for: index))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(borderColor(for: index), lineWidth: 2)
+            )
         }
         .disabled(hasAnswered)
     }
@@ -415,6 +438,22 @@ struct TriviaGameView: View {
         }
 
         return Color("RetroPurple").opacity(0.3)
+    }
+
+    private static let defaultChipColors: [Color] = [
+        Color("ElectricBlue"), Color("NeonPink"), Color("NeonYellow"), Color("HotMagenta")
+    ]
+
+    private func letterChipColor(for index: Int) -> Color {
+        if !hasAnswered {
+            return Self.defaultChipColors[index]
+        }
+        if index == shuffledCorrectIndex {
+            return .green
+        } else if index == selectedIndex {
+            return .red
+        }
+        return Self.defaultChipColors[index].opacity(0.4)
     }
 
     private func borderColor(for index: Int) -> Color {

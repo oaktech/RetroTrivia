@@ -19,6 +19,8 @@ struct GameOverOverlay: View {
 
     @Environment(GameCenterManager.self) private var gameCenterManager
     @State private var isAnimating = false
+    @State private var displayedScore = 0
+    @State private var countUpTimer: Timer?
 
     private var titleText: String {
         switch reason {
@@ -65,11 +67,12 @@ struct GameOverOverlay: View {
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.8))
 
-                    Text("\(score)")
+                    Text("\(displayedScore)")
                         .font(.custom("Orbitron-Bold", size: 52))
                         .monospacedDigit()
                         .foregroundStyle(Color("NeonYellow"))
                         .shadow(color: Color("NeonYellow"), radius: 10)
+                        .contentTransition(.numericText())
                 }
                 .scaleEffect(isAnimating ? 1.0 : 0.5)
                 .opacity(isAnimating ? 1 : 0)
@@ -135,6 +138,31 @@ struct GameOverOverlay: View {
             withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
                 isAnimating = true
             }
+
+            // Start score count-up after spring animation settles
+            guard score > 0 else {
+                displayedScore = 0
+                return
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                let steps = min(score, 60) // cap at 60 increments for smooth ~1s animation
+                let increment = max(1, score / steps)
+                let interval = 1.0 / Double(steps)
+
+                countUpTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { timer in
+                    let next = displayedScore + increment
+                    if next >= score {
+                        withAnimation(.default) { displayedScore = score }
+                        timer.invalidate()
+                    } else {
+                        withAnimation(.default) { displayedScore = next }
+                    }
+                }
+            }
+        }
+        .onDisappear {
+            countUpTimer?.invalidate()
+            countUpTimer = nil
         }
 
     }

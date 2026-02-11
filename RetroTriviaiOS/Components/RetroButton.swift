@@ -82,9 +82,28 @@ struct RetroButton: View {
 
 struct ScaleButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
+        ScaleButtonContent(configuration: configuration)
+    }
+}
+
+private struct ScaleButtonContent: View {
+    let configuration: ButtonStyleConfiguration
+    @State private var glowBrightness: Double = 0
+
+    var body: some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .brightness(glowBrightness)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+            .onChange(of: configuration.isPressed) { wasPressed, isPressed in
+                if wasPressed && !isPressed {
+                    // Button released — flash brightness
+                    glowBrightness = 0.3
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        glowBrightness = 0
+                    }
+                }
+            }
     }
 }
 

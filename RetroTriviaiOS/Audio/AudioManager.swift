@@ -3,6 +3,7 @@
 //  RetroTrivia
 //
 
+import AudioToolbox
 import AVFoundation
 import SwiftUI
 
@@ -111,6 +112,11 @@ class AudioManager {
     func resumeBackgroundMusic() {
         guard isMusicEnabled else { return }
         backgroundMusicPlayer?.play()
+    }
+
+    func playTickSound() {
+        guard isSoundEffectsEnabled else { return }
+        AudioServicesPlaySystemSound(1057) // System "Tock" sound
     }
 
     func playSoundEffect(named name: String, withExtension ext: String = "mp3", volume: Float? = nil) {
