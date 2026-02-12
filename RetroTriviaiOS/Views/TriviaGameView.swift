@@ -157,16 +157,9 @@ struct TriviaGameView: View {
                 Spacer()
 
                 // Answer buttons in 2x2 grid
-                VStack(spacing: 16) {
-                    ForEach(0..<2) { row in
-                        HStack(spacing: 16) {
-                            ForEach(0..<2) { col in
-                                let index = row * 2 + col
-                                if index < question.options.count {
-                                    answerButton(index: index)
-                                }
-                            }
-                        }
+                EqualHeightGrid(columns: 2, spacing: 20) {
+                    ForEach(0..<question.options.count, id: \.self) { index in
+                        answerButton(index: index)
                     }
                 }
                 .padding(.horizontal, 20)
@@ -284,38 +277,24 @@ struct TriviaGameView: View {
         }
     }
 
-    private static let letterLabels = ["A", "B", "C", "D"]
-
     @ViewBuilder
     private func answerButton(index: Int) -> some View {
         Button(action: {
             handleAnswer(index)
         }) {
-            HStack(spacing: 12) {
-                // Letter chip
-                Text(Self.letterLabels[index])
-                    .font(.system(size: 15, weight: .bold, design: .monospaced))
-                    .foregroundStyle(.white)
-                    .frame(width: 32, height: 32)
-                    .background(letterChipColor(for: index))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-
-                // Answer text
-                Text(shuffledOptions.indices.contains(index) ? shuffledOptions[index] : "")
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(textColor(for: index))
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 20)
-            .frame(maxWidth: .infinity, minHeight: 80)
-            .background(backgroundColor(for: index))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(borderColor(for: index), lineWidth: 2)
-            )
+            Text(shuffledOptions.indices.contains(index) ? shuffledOptions[index] : "")
+                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .foregroundStyle(textColor(for: index))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 18)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(backgroundColor(for: index))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(borderColor(for: index), lineWidth: 2)
+                )
         }
         .disabled(hasAnswered)
     }
@@ -440,21 +419,6 @@ struct TriviaGameView: View {
         return Color("RetroPurple").opacity(0.3)
     }
 
-    private static let defaultChipColors: [Color] = [
-        Color("ElectricBlue"), Color("NeonPink"), Color("NeonYellow"), Color("HotMagenta")
-    ]
-
-    private func letterChipColor(for index: Int) -> Color {
-        if !hasAnswered {
-            return Self.defaultChipColors[index]
-        }
-        if index == shuffledCorrectIndex {
-            return .green
-        } else if index == selectedIndex {
-            return .red
-        }
-        return Self.defaultChipColors[index].opacity(0.4)
-    }
 
     private func borderColor(for index: Int) -> Color {
         if !hasAnswered {
@@ -486,4 +450,41 @@ struct TriviaGameView: View {
     }
     .environment(AudioManager.shared)
     .environment(GameState())
+}
+
+/// A 2D grid layout that makes every cell the same height (the tallest cell's intrinsic height).
+private struct EqualHeightGrid: Layout {
+    let columns: Int
+    let spacing: CGFloat
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        guard !subviews.isEmpty else { return .zero }
+        let width = proposal.width ?? 0
+        let cellWidth = (width - CGFloat(columns - 1) * spacing) / CGFloat(columns)
+        let maxCellHeight = subviews
+            .map { $0.sizeThatFits(.init(width: cellWidth, height: nil)).height }
+            .max() ?? 0
+        let rows = (subviews.count + columns - 1) / columns
+        let totalHeight = CGFloat(rows) * maxCellHeight + CGFloat(rows - 1) * spacing
+        return CGSize(width: width, height: totalHeight)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        guard !subviews.isEmpty else { return }
+        let cellWidth = (bounds.width - CGFloat(columns - 1) * spacing) / CGFloat(columns)
+        let maxCellHeight = subviews
+            .map { $0.sizeThatFits(.init(width: cellWidth, height: nil)).height }
+            .max() ?? 0
+
+        for (index, subview) in subviews.enumerated() {
+            let col = index % columns
+            let row = index / columns
+            let x = bounds.minX + CGFloat(col) * (cellWidth + spacing)
+            let y = bounds.minY + CGFloat(row) * (maxCellHeight + spacing)
+            subview.place(
+                at: CGPoint(x: x, y: y),
+                proposal: .init(width: cellWidth, height: maxCellHeight)
+            )
+        }
+    }
 }

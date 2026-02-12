@@ -51,7 +51,7 @@ struct HomeView: View {
             ZStack {
                 RetroGradientBackground()
 
-                VStack(spacing: 32) {
+                VStack(spacing: 0) {
                     // Header buttons
                     HStack(spacing: 12) {
                         Spacer()
@@ -124,93 +124,93 @@ struct HomeView: View {
                         }
                         .sensoryFeedback(.impact(weight: .light), trigger: activeSheet == .settings)
                     }
+                    .padding(.bottom, 16)
 
-                    Spacer()
+                    ScrollView {
+                        VStack(spacing: 24) {
+                            // App icon with retro glow
+                            Image("AppIconImage")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 120, height: 120)
+                                .clipShape(RoundedRectangle(cornerRadius: 24))
+                                .shadow(color: Color("NeonPink").opacity(0.6), radius: 20)
+                                .shadow(color: Color("ElectricBlue").opacity(0.4), radius: 30)
+                                .padding(.bottom, 8)
 
-                    // App icon with retro glow
-                    Image("AppIconImage")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 120, height: 120)
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                        .shadow(color: Color("NeonPink").opacity(0.6), radius: 20)
-                        .shadow(color: Color("ElectricBlue").opacity(0.4), radius: 30)
-                        .padding(.bottom, 8)
+                            VStack(spacing: 12) {
+                                Text("RETROTRIVIA")
+                                    .retroTitle()
 
-                    VStack(spacing: 12) {
-                        Text("RETROTRIVIA")
-                            .retroTitle()
+                                Text("80s Music Challenge")
+                                    .retroSubtitle()
+                            }
 
-                        Text("80s Music Challenge")
-                            .retroSubtitle()
+                            // Scrolling 80s phrases
+                            Text(retroPhrases[currentPhraseIndex])
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [Color("NeonPink"), Color("ElectricBlue")],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .shadow(color: Color("NeonPink").opacity(0.5), radius: 8)
+                                .contentTransition(.numericText())
+                                .animation(.easeInOut(duration: 0.5), value: currentPhraseIndex)
+
+                            if gameState.highScorePosition > 0 {
+                                VStack(spacing: 8) {
+                                    Text("High Score")
+                                        .retroBody()
+                                        .opacity(0.8)
+                                    Text("\(gameState.highScorePosition)")
+                                        .retroHeading()
+                                }
+                                .padding(.top, 8)
+                            }
+
+                            VStack(spacing: 12) {
+                                // Play — ranked leaderboard mode
+                                GameModeCard(
+                                    "Play",
+                                    details: [("clock", "2 min"), ("trophy", "Ranked")],
+                                    accent: Color("NeonPink"),
+                                    isHero: true
+                                ) {
+                                    audioManager.playSoundEffect(named: "button-tap")
+                                    questionManager.filterConfig.difficulty = .any
+                                    questionManager.filterConfig.save()
+                                    startGame(leaderboardMode: true)
+                                }
+
+                                // Gauntlet — survival mode
+                                GameModeCard(
+                                    "Gauntlet",
+                                    details: [("heart.fill", "3 lives"), ("infinity", "No clock")],
+                                    accent: Color("ElectricBlue")
+                                ) {
+                                    audioManager.playSoundEffect(named: "button-tap")
+                                    showDifficultyPicker = true
+                                }
+
+                                // Pass & Play — local multiplayer
+                                GameModeCard(
+                                    "Pass & Play",
+                                    details: [("person.2.fill", "2-4 players"), ("wifi.slash", "Local only")],
+                                    accent: Color("NeonYellow")
+                                ) {
+                                    audioManager.playSoundEffect(named: "button-tap")
+                                    activeSheet = .passAndPlaySetup
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                        }
+                        .padding(.bottom, 16)
                     }
-
-                    // Scrolling 80s phrases
-                    Text(retroPhrases[currentPhraseIndex])
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [Color("NeonPink"), Color("ElectricBlue")],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .shadow(color: Color("NeonPink").opacity(0.5), radius: 8)
-                        .contentTransition(.numericText())
-                        .animation(.easeInOut(duration: 0.5), value: currentPhraseIndex)
-                        .padding(.top, 8)
-
-                    Spacer()
-
-                    if gameState.highScorePosition > 0 {
-                        VStack(spacing: 8) {
-                            Text("High Score")
-                                .retroBody()
-                                .opacity(0.8)
-                            Text("\(gameState.highScorePosition)")
-                                .retroHeading()
-                        }
-                        .padding(.bottom, 20)
-                    }
-
-                    VStack(spacing: 12) {
-                        // Play — ranked leaderboard mode
-                        GameModeCard(
-                            "Play",
-                            details: [("clock", "2 min"), ("trophy", "Ranked")],
-                            accent: Color("NeonPink"),
-                            isHero: true
-                        ) {
-                            audioManager.playSoundEffect(named: "button-tap")
-                            questionManager.filterConfig.difficulty = .any
-                            questionManager.filterConfig.save()
-                            startGame(leaderboardMode: true)
-                        }
-
-                        // Gauntlet — survival mode
-                        GameModeCard(
-                            "Gauntlet",
-                            details: [("heart.fill", "3 lives"), ("infinity", "No clock")],
-                            accent: Color("ElectricBlue")
-                        ) {
-                            audioManager.playSoundEffect(named: "button-tap")
-                            showDifficultyPicker = true
-                        }
-
-                        // Pass & Play — local multiplayer
-                        GameModeCard(
-                            "Pass & Play",
-                            details: [("person.2.fill", "2-4 players"), ("wifi.slash", "Local only")],
-                            accent: Color("NeonYellow")
-                        ) {
-                            audioManager.playSoundEffect(named: "button-tap")
-                            activeSheet = .passAndPlaySetup
-                        }
-                    }
-                    .padding(.horizontal, 20)
-
-                    Spacer()
+                    .scrollIndicators(.hidden)
                 }
                 .padding(.top, max(geo.safeAreaInsets.top, 50) + 8)
                 .padding(.bottom, max(geo.safeAreaInsets.bottom, 20))
