@@ -12,8 +12,9 @@ RetroTriviaiOS/Data/questions_full_backup.json
 Scripts/migrate_to_cloudkit.sh
 CloudKitMigration/
 
-# Large question exports - not version controlled
+# Full question dataset - local only
 RetroTriviaiOS/Data/questions_full_backup.json
+# questions.json (200 bundled questions) IS tracked for offline fallback
 RetroTriviaiOS/Data/regenerated_broken.json
 RetroTriviaiOS/Data/audit_report.json
 RetroTriviaiOS/Scripts/
