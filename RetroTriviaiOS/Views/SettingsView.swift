@@ -9,6 +9,7 @@ struct SettingsView: View {
     // Developer mode
     @State private var devTapCount = 0
     @State private var showDevTools = false
+    @State private var showCredits = false
     @State private var uploader = CloudKitUploader()
 
     var body: some View {
@@ -37,7 +38,7 @@ struct SettingsView: View {
                         Spacer()
 
                         HStack(spacing: 6) {
-                            Text("Music")
+                            Text("80s Trivia")
                                 .retroBody()
                                 .foregroundStyle(Color("ElectricBlue"))
 
@@ -145,9 +146,22 @@ struct SettingsView: View {
 
                 Spacer()
 
+                // Credits button
+                Button {
+                    showCredits = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "music.note")
+                            .font(.caption)
+                        Text("Credits & Licenses")
+                            .font(.caption)
+                    }
+                    .foregroundStyle(Color("ElectricBlue").opacity(0.8))
+                }
+
                 // Info text
                 VStack(spacing: 8) {
-                    Text("80s Music Trivia")
+                    Text("80s Trivia Game")
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.6))
 
@@ -167,6 +181,152 @@ struct SettingsView: View {
                 .padding(.bottom, 40)
             }
         }
+        .sheet(isPresented: $showCredits) {
+            CreditsView()
+        }
+    }
+}
+
+struct CreditsView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        ZStack {
+            RetroGradientBackground()
+
+            ScrollView {
+                VStack(spacing: 24) {
+                    Text("Credits")
+                        .retroHeading()
+                        .foregroundStyle(Color("NeonPink"))
+                        .padding(.top, 40)
+
+                    Divider()
+                        .background(Color("NeonPink").opacity(0.3))
+                        .padding(.horizontal)
+
+                    // Music Credits
+                    VStack(alignment: .leading, spacing: 20) {
+                        Text("Music")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundStyle(Color("ElectricBlue"))
+
+                        MusicCreditRow(
+                            title: "Afterglow Love",
+                            artist: "e s c p",
+                            usage: "Menu Music",
+                            url: "https://www.escp.space",
+                            license: "CC BY 4.0"
+                        )
+
+                        MusicCreditRow(
+                            title: "Retro",
+                            artist: "jiglr",
+                            usage: "Gameplay Music",
+                            url: "https://soundcloud.com/jiglrmusic",
+                            license: "CC BY 3.0",
+                            promotedBy: "free-stock-music.com"
+                        )
+                    }
+                    .padding(.horizontal, 24)
+
+                    Divider()
+                        .background(.white.opacity(0.1))
+                        .padding(.horizontal, 24)
+
+                    // License info
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Licenses")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundStyle(Color("ElectricBlue"))
+
+                        Text("CC BY 4.0 — Creative Commons Attribution 4.0 International")
+                            .font(.caption2)
+                            .foregroundStyle(.white.opacity(0.6))
+
+                        Text("CC BY 3.0 — Creative Commons Attribution 3.0 Unported")
+                            .font(.caption2)
+                            .foregroundStyle(.white.opacity(0.6))
+
+                        Text("These licenses allow free use, including commercial, with attribution to the original artist.")
+                            .font(.caption2)
+                            .foregroundStyle(.white.opacity(0.4))
+                            .padding(.top, 4)
+                    }
+                    .padding(.horizontal, 24)
+
+                    Spacer(minLength: 30)
+
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text("Close")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .foregroundStyle(Color("NeonPink"))
+                            .padding(.horizontal, 40)
+                            .padding(.vertical, 12)
+                            .background(Color("NeonPink").opacity(0.15))
+                            .cornerRadius(12)
+                    }
+                    .padding(.bottom, 40)
+                }
+            }
+        }
+        .presentationDetents([.large])
+    }
+}
+
+struct MusicCreditRow: View {
+    let title: String
+    let artist: String
+    let usage: String
+    let url: String
+    let license: String
+    var promotedBy: String? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text("\"\(title)\"")
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+
+                Spacer()
+
+                Text(usage)
+                    .font(.caption2)
+                    .foregroundStyle(Color("NeonYellow").opacity(0.8))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(Color("NeonYellow").opacity(0.1))
+                    .cornerRadius(4)
+            }
+
+            Text("by \(artist)")
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.7))
+
+            if let urlObj = URL(string: url) {
+                Link(url, destination: urlObj)
+                    .font(.caption2)
+                    .foregroundStyle(Color("ElectricBlue").opacity(0.7))
+            }
+
+            HStack(spacing: 8) {
+                Text("License: \(license)")
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.4))
+
+                if let promoted = promotedBy {
+                    Text("Promoted by \(promoted)")
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.4))
+                }
+            }
+        }
+        .padding(12)
+        .background(.white.opacity(0.05))
+        .cornerRadius(8)
     }
 }
 

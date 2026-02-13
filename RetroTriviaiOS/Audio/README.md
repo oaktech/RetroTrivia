@@ -21,7 +21,9 @@ All audio is managed by `AudioManager.swift`, an @Observable singleton that hand
 - Plays on: Home screen
 - Website: https://www.escp.space
 - Bandcamp: https://escp-music.bandcamp.com
-- License: Check with artist for commercial use
+- License: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Commercial use: Allowed with attribution
+- Attribution: "Afterglow Love by | e s c p | https://www.escp.space"
 
 **Gameplay Music:** "Retro" by jiglr
 - File: `gameplay-music.mp3` (8.3 MB)
@@ -297,24 +299,19 @@ Same process as music:
 **Current Audio Assets:**
 
 ✅ **menu-music.mp3** - "Afterglow Love" by e s c p
-- License: Check with artist for distribution
-- Credit required: Yes
+- License: CC BY 4.0
+- Credit required: Yes — provided in-app Credits screen
+- Commercial use: Allowed with attribution
 
 ✅ **gameplay-music.mp3** - "Retro" by jiglr
 - License: CC BY 3.0
-- Credit required: Yes (provided)
+- Credit required: Yes — provided in-app Credits screen
 - Commercial use: Allowed with attribution
 
 ⚠️ **Sound Effects**
-- Verify licensing for each effect
+- Sources not documented — verify licensing for each effect
 - Keep attribution if required
-- Replace with original/licensed effects for commercial release
-
-**For Commercial Release:**
-- Verify all audio licenses allow commercial use
-- Provide required attribution
-- Consider commissioning original music/effects
-- Consult with legal advisor for license compliance
+- Replace with original/licensed effects if provenance cannot be confirmed
 
 ---
 

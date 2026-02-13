@@ -48,7 +48,7 @@ extension TriviaQuestion {
         record["questionText"] = question
         record["options"] = options
         record["correctIndex"] = Int64(correctIndex)
-        record["category"] = category ?? "Music"
+        record["category"] = category ?? "Song Trivia"
         record["difficulty"] = difficulty ?? "medium"
         record["isActive"] = Int64(1)
         // sortOrder enables efficient random sampling for large datasets (6K+)

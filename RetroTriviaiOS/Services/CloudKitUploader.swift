@@ -91,7 +91,7 @@ class CloudKitUploader {
             record["questionText"] = question.question
             record["options"] = question.options
             record["correctIndex"] = Int64(question.correctIndex)
-            record["category"] = question.category ?? "Music"
+            record["category"] = question.category ?? "Song Trivia"
             record["difficulty"] = question.difficulty ?? "medium"
             record["isActive"] = Int64(1)
             record["sortOrder"] = Int64((startingSortOrder + index) % 6008 + 1)

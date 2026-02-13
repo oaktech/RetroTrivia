@@ -9,7 +9,7 @@
       "Cinderella"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "medium"
   },
   {
@@ -22,7 +22,7 @@
       "Coming to America"
     ],
     "correctIndex": 0,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "medium"
   },
   {
@@ -35,7 +35,7 @@
       "Van Halen"
     ],
     "correctIndex": 2,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -48,7 +48,7 @@
       "Peter Gabriel"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -61,7 +61,7 @@
       "Billy Idol"
     ],
     "correctIndex": 2,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "easy"
   },
   {
@@ -74,7 +74,7 @@
       "Bonnie Tyler"
     ],
     "correctIndex": 2,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -87,7 +87,7 @@
       "David Bowie"
     ],
     "correctIndex": 2,
-    "category": "Collaborations",
+    "category": "Duets & Collabs",
     "difficulty": "easy"
   },
   {
@@ -100,7 +100,7 @@
       "Born in the USA"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -113,7 +113,7 @@
       "Gene Vincent"
     ],
     "correctIndex": 0,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "medium"
   },
   {
@@ -126,7 +126,7 @@
       "New Order"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "medium"
   },
   {
@@ -139,7 +139,7 @@
       "1986"
     ],
     "correctIndex": 0,
-    "category": "Awards",
+    "category": "Awards & Honors",
     "difficulty": "hard"
   },
   {
@@ -152,7 +152,7 @@
       "Culture Club"
     ],
     "correctIndex": 3,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "easy"
   },
   {
@@ -165,7 +165,7 @@
       "Blondie"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -178,7 +178,7 @@
       "1983"
     ],
     "correctIndex": 0,
-    "category": "Events",
+    "category": "Concerts & Events",
     "difficulty": "easy"
   },
   {
@@ -191,7 +191,7 @@
       "Digital Display"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -204,7 +204,7 @@
       "Jeanny"
     ],
     "correctIndex": 1,
-    "category": "Charts",
+    "category": "Chart Trivia",
     "difficulty": "easy"
   },
   {
@@ -217,7 +217,7 @@
       "The Alarm"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -230,7 +230,7 @@
       "Cancer"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -243,7 +243,7 @@
       "Tears for Fears"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "easy"
   },
   {
@@ -256,7 +256,7 @@
       "Eurythmics"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -269,7 +269,7 @@
       "Both talk box and vocoder"
     ],
     "correctIndex": 1,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "medium"
   },
   {
@@ -282,7 +282,7 @@
       "New Order"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -295,7 +295,7 @@
       "REO Speedwagon"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "medium"
   },
   {
@@ -308,7 +308,7 @@
       "New Order"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -321,7 +321,7 @@
       "1981"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -334,7 +334,7 @@
       "Pink Floyd"
     ],
     "correctIndex": 3,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "easy"
   },
   {
@@ -347,7 +347,7 @@
       "Pink Floyd"
     ],
     "correctIndex": 1,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "easy"
   },
   {
@@ -360,7 +360,7 @@
       "All I Wanna Do"
     ],
     "correctIndex": 0,
-    "category": "Charts",
+    "category": "Chart Trivia",
     "difficulty": "medium"
   },
   {
@@ -373,7 +373,7 @@
       "Stacey Q"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -386,7 +386,7 @@
       "Barenaked Ladies"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -399,7 +399,7 @@
       "Peter Gabriel"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "medium"
   },
   {
@@ -412,7 +412,7 @@
       "Elton John"
     ],
     "correctIndex": 2,
-    "category": "Events",
+    "category": "Concerts & Events",
     "difficulty": "hard"
   },
   {
@@ -425,7 +425,7 @@
       "1978"
     ],
     "correctIndex": 0,
-    "category": "Technology",
+    "category": "Music Tech",
     "difficulty": "medium"
   },
   {
@@ -438,7 +438,7 @@
       "New wave"
     ],
     "correctIndex": 1,
-    "category": "History",
+    "category": "Music History",
     "difficulty": "medium"
   },
   {
@@ -451,7 +451,7 @@
       "Anthrax"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -464,7 +464,7 @@
       "Whitney Houston"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -477,7 +477,7 @@
       "Prince"
     ],
     "correctIndex": 0,
-    "category": "Collaborations",
+    "category": "Duets & Collabs",
     "difficulty": "easy"
   },
   {
@@ -490,7 +490,7 @@
       "Ratt"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -503,7 +503,7 @@
       "Rust in Peace"
     ],
     "correctIndex": 1,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "medium"
   },
   {
@@ -516,7 +516,7 @@
       "Depeche Mode"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -529,7 +529,7 @@
       "Queen"
     ],
     "correctIndex": 2,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -542,7 +542,7 @@
       "L.A. Guns"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -555,7 +555,7 @@
       "Madonna"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -568,7 +568,7 @@
       "Knight Rider"
     ],
     "correctIndex": 0,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "easy"
   },
   {
@@ -581,7 +581,7 @@
       "Anthrax"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -594,7 +594,7 @@
       "New Order"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -607,7 +607,7 @@
       "George Michael with models"
     ],
     "correctIndex": 0,
-    "category": "MTV",
+    "category": "MTV & Videos",
     "difficulty": "medium"
   },
   {
@@ -620,7 +620,7 @@
       "Megadeth"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "medium"
   },
   {
@@ -633,7 +633,7 @@
       "Longing in Their Hearts"
     ],
     "correctIndex": 1,
-    "category": "Awards",
+    "category": "Awards & Honors",
     "difficulty": "hard"
   },
   {
@@ -646,7 +646,7 @@
       "New Order"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -659,7 +659,7 @@
       "New Order"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -668,11 +668,11 @@
     "options": [
       "Bonnie Tyler",
       "Quiet Riot",
-      "M\u00f6tley Cr\u00fce",
+      "Mötley Crüe",
       "Stevie Nicks"
     ],
     "correctIndex": 1,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "easy"
   },
   {
@@ -685,7 +685,7 @@
       "New Order"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -698,20 +698,7 @@
       "Whodini"
     ],
     "correctIndex": 0,
-    "category": "Songs",
-    "difficulty": "easy"
-  },
-  {
-    "id": "q0131",
-    "question": "Which ZZ Top song features the lyric 'Every girl's crazy 'bout a sharp dressed man'?",
-    "options": [
-      "Legs",
-      "Sharp Dressed Man",
-      "Gimme All Your Lovin'",
-      "Tush"
-    ],
-    "correctIndex": 1,
-    "category": "Lyrics",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -724,7 +711,7 @@
       "Kansas"
     ],
     "correctIndex": 2,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "easy"
   },
   {
@@ -737,7 +724,7 @@
       "Whitesnake"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "medium"
   },
   {
@@ -750,7 +737,7 @@
       "The Headhunters"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -763,7 +750,7 @@
       "Session Musician"
     ],
     "correctIndex": 0,
-    "category": "Events",
+    "category": "Concerts & Events",
     "difficulty": "medium"
   },
   {
@@ -776,7 +763,7 @@
       "David Morales"
     ],
     "correctIndex": 0,
-    "category": "Production",
+    "category": "Behind the Music",
     "difficulty": "hard"
   },
   {
@@ -789,7 +776,7 @@
       "Controversy"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -802,7 +789,7 @@
       "Richard Marx"
     ],
     "correctIndex": 1,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -815,7 +802,7 @@
       "Debbie Gibson"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -828,7 +815,7 @@
       "Session Musician"
     ],
     "correctIndex": 0,
-    "category": "Events",
+    "category": "Concerts & Events",
     "difficulty": "medium"
   },
   {
@@ -841,7 +828,7 @@
       "Hall and Oates"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -854,7 +841,7 @@
       "Stay Hungry"
     ],
     "correctIndex": 1,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "hard"
   },
   {
@@ -867,7 +854,7 @@
       "1984"
     ],
     "correctIndex": 2,
-    "category": "Technology",
+    "category": "Music Tech",
     "difficulty": "hard"
   },
   {
@@ -880,7 +867,7 @@
       "Joan Jett"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -893,7 +880,7 @@
       "Pink Floyd"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -906,7 +893,7 @@
       "Walkman Invention"
     ],
     "correctIndex": 0,
-    "category": "History",
+    "category": "Music History",
     "difficulty": "medium"
   },
   {
@@ -919,7 +906,7 @@
       "The Power Station"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -932,7 +919,7 @@
       "Genesis P-Orridge"
     ],
     "correctIndex": 1,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -958,7 +945,7 @@
       "Lionel Richie"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -971,7 +958,7 @@
       "Social Distortion"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -984,7 +971,7 @@
       "Love Can Build a Bridge"
     ],
     "correctIndex": 2,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -992,12 +979,12 @@
     "question": "Who sang 'The Number of the Beast'?",
     "options": [
       "Iron Maiden",
-      "M\u00f6tley Cr\u00fce",
+      "Mötley Crüe",
       "Judas Priest",
       "Quiet Riot"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -1010,7 +997,7 @@
       "Walkman Invention"
     ],
     "correctIndex": 0,
-    "category": "History",
+    "category": "Music History",
     "difficulty": "medium"
   },
   {
@@ -1023,7 +1010,7 @@
       "N.W.A"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -1036,7 +1023,7 @@
       "Air of December"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -1049,7 +1036,7 @@
       "Session Musician"
     ],
     "correctIndex": 0,
-    "category": "Production",
+    "category": "Behind the Music",
     "difficulty": "hard"
   },
   {
@@ -1062,7 +1049,7 @@
       "Session Musician"
     ],
     "correctIndex": 0,
-    "category": "Charts",
+    "category": "Chart Trivia",
     "difficulty": "medium"
   },
   {
@@ -1075,7 +1062,7 @@
       "Pink Floyd"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -1088,7 +1075,7 @@
       "New Order"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -1101,7 +1088,7 @@
       "George Harrison"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -1114,7 +1101,7 @@
       "Foreigner"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -1127,7 +1114,7 @@
       "Asia"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -1140,7 +1127,7 @@
       "Tankard"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -1153,7 +1140,7 @@
       "The Cars"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1166,7 +1153,7 @@
       "She Bop"
     ],
     "correctIndex": 1,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -1179,7 +1166,7 @@
       "Poison"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1192,7 +1179,7 @@
       "Tankard"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -1205,7 +1192,7 @@
       "Little Sister"
     ],
     "correctIndex": 1,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1218,7 +1205,7 @@
       "Tina Turner"
     ],
     "correctIndex": 1,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -1231,7 +1218,7 @@
       "Out There"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1244,7 +1231,7 @@
       "Cinderella"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -1257,7 +1244,7 @@
       "Tony Banks"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -1270,7 +1257,7 @@
       "Obituary"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -1283,7 +1270,7 @@
       "B.B. King"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1296,7 +1283,7 @@
       "Vince Clarke and Andy Bell"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "medium"
   },
   {
@@ -1309,7 +1296,7 @@
       "Cocteau Twins"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -1322,7 +1309,7 @@
       "Chicago"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "easy"
   },
   {
@@ -1335,7 +1322,7 @@
       "Depeche Mode"
     ],
     "correctIndex": 1,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -1348,7 +1335,7 @@
       "R.E.M."
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1361,7 +1348,7 @@
       "Session Musician"
     ],
     "correctIndex": 0,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "medium"
   },
   {
@@ -1374,7 +1361,7 @@
       "Van Halen"
     ],
     "correctIndex": 1,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -1387,7 +1374,7 @@
       "Quit music"
     ],
     "correctIndex": 1,
-    "category": "History",
+    "category": "Music History",
     "difficulty": "hard"
   },
   {
@@ -1400,7 +1387,7 @@
       "Like a Prayer"
     ],
     "correctIndex": 1,
-    "category": "Production",
+    "category": "Behind the Music",
     "difficulty": "medium"
   },
   {
@@ -1413,7 +1400,7 @@
       "New Order"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -1426,7 +1413,7 @@
       "Footloose"
     ],
     "correctIndex": 0,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "easy"
   },
   {
@@ -1439,7 +1426,7 @@
       "Duran Duran"
     ],
     "correctIndex": 3,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -1452,7 +1439,7 @@
       "The Alarm"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -1465,7 +1452,7 @@
       "Chris Columbus"
     ],
     "correctIndex": 0,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "medium"
   },
   {
@@ -1478,7 +1465,7 @@
       "Jimmie Vaughan"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -1491,7 +1478,7 @@
       "The Allman Brothers Band"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -1504,7 +1491,7 @@
       "MC Hammer"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1517,7 +1504,7 @@
       "Session Musician"
     ],
     "correctIndex": 0,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "easy"
   },
   {
@@ -1530,7 +1517,7 @@
       "Never Let Me Down"
     ],
     "correctIndex": 1,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "medium"
   },
   {
@@ -1543,7 +1530,7 @@
       "1970s"
     ],
     "correctIndex": 2,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "easy"
   },
   {
@@ -1556,7 +1543,7 @@
       "Michael Jackson"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -1569,7 +1556,7 @@
       "The Who"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -1582,7 +1569,7 @@
       "John Deacon"
     ],
     "correctIndex": 2,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "easy"
   },
   {
@@ -1595,7 +1582,7 @@
       "George Michael"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1608,7 +1595,7 @@
       "Lethal Injection"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -1621,7 +1608,7 @@
       "1968"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1634,7 +1621,7 @@
       "Peter Gabriel"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -1647,7 +1634,7 @@
       "Eddie Van Halen"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -1660,7 +1647,7 @@
       "Sign o' the Times"
     ],
     "correctIndex": 0,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "easy"
   },
   {
@@ -1673,7 +1660,7 @@
       "Fashion line"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -1686,7 +1673,7 @@
       "Olivia Newton-John"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "easy"
   },
   {
@@ -1699,7 +1686,7 @@
       "Martha Reeves"
     ],
     "correctIndex": 0,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "hard"
   },
   {
@@ -1707,12 +1694,12 @@
     "question": "'Look What the Cat Dragged In' was a 1986 debut album by which band?",
     "options": [
       "Poison",
-      "M\u00f6tley Cr\u00fce",
+      "Mötley Crüe",
       "Ratt",
       "Dokken"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "medium"
   },
   {
@@ -1725,7 +1712,7 @@
       "New Order"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -1738,7 +1725,7 @@
       "Stevie Nicks"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "easy"
   },
   {
@@ -1751,7 +1738,7 @@
       "Think of Laura"
     ],
     "correctIndex": 2,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "easy"
   },
   {
@@ -1764,7 +1751,7 @@
       "Hypnotize"
     ],
     "correctIndex": 1,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -1777,7 +1764,7 @@
       "Prince"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -1790,7 +1777,7 @@
       "Every Rose Has Its Thorn"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1803,7 +1790,7 @@
       "Counting Crows"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "medium"
   },
   {
@@ -1816,7 +1803,7 @@
       "Love's Recovery"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -1829,7 +1816,7 @@
       "The English Beat"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1842,7 +1829,7 @@
       "Eurythmics"
     ],
     "correctIndex": 2,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "easy"
   },
   {
@@ -1851,11 +1838,11 @@
     "options": [
       "Ratt",
       "Poison",
-      "M\u00f6tley Cr\u00fce",
+      "Mötley Crüe",
       "Quiet Riot"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -1868,7 +1855,7 @@
       "Bad Brains"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "medium"
   },
   {
@@ -1881,7 +1868,7 @@
       "Eric Clapton"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1894,7 +1881,7 @@
       "Terminator X"
     ],
     "correctIndex": 1,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "medium"
   },
   {
@@ -1907,7 +1894,7 @@
       "You're a Strange Animal"
     ],
     "correctIndex": 1,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1920,7 +1907,7 @@
       "Walkman Invention"
     ],
     "correctIndex": 0,
-    "category": "History",
+    "category": "Music History",
     "difficulty": "hard"
   },
   {
@@ -1933,7 +1920,7 @@
       "Cinderella"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -1946,7 +1933,7 @@
       "Black and white"
     ],
     "correctIndex": 0,
-    "category": "MTV",
+    "category": "MTV & Videos",
     "difficulty": "hard"
   },
   {
@@ -1959,7 +1946,7 @@
       "99 Luftballons"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -1972,7 +1959,7 @@
       "Bruce Swedien"
     ],
     "correctIndex": 0,
-    "category": "Production",
+    "category": "Behind the Music",
     "difficulty": "hard"
   },
   {
@@ -1985,7 +1972,7 @@
       "Endless Love"
     ],
     "correctIndex": 1,
-    "category": "Charts",
+    "category": "Chart Trivia",
     "difficulty": "medium"
   },
   {
@@ -1998,7 +1985,7 @@
       "Stop motion animation"
     ],
     "correctIndex": 0,
-    "category": "MTV",
+    "category": "MTV & Videos",
     "difficulty": "medium"
   },
   {
@@ -2011,7 +1998,7 @@
       "New Order"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -2024,7 +2011,7 @@
       "Heavy metal"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -2037,7 +2024,7 @@
       "The Prayer"
     ],
     "correctIndex": 0,
-    "category": "Awards",
+    "category": "Awards & Honors",
     "difficulty": "medium"
   },
   {
@@ -2050,7 +2037,7 @@
       "Journey"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -2063,7 +2050,7 @@
       "Murray"
     ],
     "correctIndex": 1,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "easy"
   },
   {
@@ -2076,7 +2063,7 @@
       "Europe"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -2089,7 +2076,7 @@
       "Madonna"
     ],
     "correctIndex": 1,
-    "category": "Charts",
+    "category": "Chart Trivia",
     "difficulty": "easy"
   },
   {
@@ -2102,7 +2089,7 @@
       "Counting Crows"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -2115,7 +2102,7 @@
       "Hand on Your Heart"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -2128,7 +2115,7 @@
       "Walkman Invention"
     ],
     "correctIndex": 0,
-    "category": "History",
+    "category": "Music History",
     "difficulty": "easy"
   },
   {
@@ -2141,7 +2128,7 @@
       "Walk This Way"
     ],
     "correctIndex": 1,
-    "category": "History",
+    "category": "Music History",
     "difficulty": "easy"
   },
   {
@@ -2154,7 +2141,7 @@
       "Winger"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -2167,7 +2154,7 @@
       "1990s"
     ],
     "correctIndex": 2,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "easy"
   },
   {
@@ -2180,7 +2167,7 @@
       "Slowdive"
     ],
     "correctIndex": 1,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -2193,7 +2180,7 @@
       "Nelson"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -2206,7 +2193,7 @@
       "Pearl Jam"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -2219,7 +2206,7 @@
       "Conscious rap"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "medium"
   },
   {
@@ -2232,7 +2219,7 @@
       "Ratt"
     ],
     "correctIndex": 1,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -2245,7 +2232,7 @@
       "Journey"
     ],
     "correctIndex": 1,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -2258,7 +2245,7 @@
       "Peter Gabriel"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -2271,7 +2258,7 @@
       "The Go-Go's"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "easy"
   },
   {
@@ -2284,7 +2271,7 @@
       "All Night Long"
     ],
     "correctIndex": 2,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "medium"
   },
   {
@@ -2297,7 +2284,7 @@
       "Anthrax"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -2310,7 +2297,7 @@
       "Samantha Fox"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -2323,7 +2310,7 @@
       "1987"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "medium"
   },
   {
@@ -2336,7 +2323,7 @@
       "Session Musician"
     ],
     "correctIndex": 0,
-    "category": "Production",
+    "category": "Behind the Music",
     "difficulty": "hard"
   },
   {
@@ -2349,7 +2336,7 @@
       "Walkman Invention"
     ],
     "correctIndex": 0,
-    "category": "History",
+    "category": "Music History",
     "difficulty": "hard"
   },
   {
@@ -2362,7 +2349,7 @@
       "Walkman Invention"
     ],
     "correctIndex": 0,
-    "category": "History",
+    "category": "Music History",
     "difficulty": "medium"
   },
   {
@@ -2375,7 +2362,7 @@
       "Depeche Mode"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "medium"
   },
   {
@@ -2388,7 +2375,7 @@
       "Scorpions"
     ],
     "correctIndex": 0,
-    "category": "Production",
+    "category": "Behind the Music",
     "difficulty": "hard"
   },
   {
@@ -2401,7 +2388,7 @@
       "The Rolling Stones"
     ],
     "correctIndex": 3,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -2414,7 +2401,7 @@
       "All of these"
     ],
     "correctIndex": 0,
-    "category": "Production",
+    "category": "Behind the Music",
     "difficulty": "hard"
   },
   {
@@ -2427,7 +2414,7 @@
       "The Breeders"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -2440,7 +2427,7 @@
       "Arkansas Traveler"
     ],
     "correctIndex": 1,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "hard"
   },
   {
@@ -2453,7 +2440,7 @@
       "Army of Lovers"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -2466,7 +2453,7 @@
       "Stevie Wonder"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "medium"
   },
   {
@@ -2479,7 +2466,7 @@
       "New Order"
     ],
     "correctIndex": 0,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -2492,7 +2479,7 @@
       "Suzanne Vega"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
   },
   {
@@ -2505,7 +2492,7 @@
       "Sweet Jane"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "medium"
   },
   {
@@ -2518,7 +2505,7 @@
       "Dirty Mind"
     ],
     "correctIndex": 0,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "easy"
   },
   {
@@ -2531,7 +2518,7 @@
       "Harry Dean Stanton"
     ],
     "correctIndex": 0,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "hard"
   },
   {
@@ -2544,7 +2531,7 @@
       "The S.O.S. Band"
     ],
     "correctIndex": 0,
-    "category": "Soundtracks",
+    "category": "Soundtrack Trivia",
     "difficulty": "hard"
   },
   {
@@ -2557,7 +2544,7 @@
       "None have short beards"
     ],
     "correctIndex": 2,
-    "category": "Artists",
+    "category": "Artist Trivia",
     "difficulty": "hard"
   },
   {
@@ -2570,7 +2557,7 @@
       "Chicago"
     ],
     "correctIndex": 2,
-    "category": "History",
+    "category": "Music History",
     "difficulty": "hard"
   },
   {
@@ -2583,7 +2570,7 @@
       "Billy Idol"
     ],
     "correctIndex": 0,
-    "category": "Albums",
+    "category": "Album Trivia",
     "difficulty": "easy"
   },
   {
@@ -2596,7 +2583,20 @@
       "No Ordinary Love"
     ],
     "correctIndex": 1,
-    "category": "Songs",
+    "category": "Song Trivia",
     "difficulty": "hard"
+  },
+  {
+    "id": "q6023",
+    "question": "What was the best-selling single of 1983 in the United States?",
+    "options": [
+      "Every Breath You Take",
+      "Billie Jean",
+      "Flashdance...What a Feeling",
+      "Total Eclipse of the Heart"
+    ],
+    "correctIndex": 0,
+    "category": "Song Trivia",
+    "difficulty": "easy"
   }
 ]

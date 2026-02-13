@@ -441,7 +441,7 @@ struct TriviaGameView: View {
         question: "Which Michael Jackson album became the best-selling album of all time?",
         options: ["Bad", "Thriller", "Off the Wall", "Dangerous"],
         correctIndex: 1,
-        category: "Albums",
+        category: "Album Trivia",
         difficulty: "easy"
     )
 
