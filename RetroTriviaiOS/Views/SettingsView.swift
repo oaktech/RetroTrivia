@@ -212,11 +212,12 @@ struct CreditsView: View {
                             .foregroundStyle(Color("ElectricBlue"))
 
                         MusicCreditRow(
-                            title: "Afterglow Love",
-                            artist: "e s c p",
+                            title: "Electric Lullaby",
+                            artist: "Electronic Senses",
                             usage: "Menu Music",
-                            url: "https://www.escp.space",
-                            license: "CC BY 4.0"
+                            url: "https://soundcloud.com/electronicsenses",
+                            license: "CC BY-SA 3.0",
+                            promotedBy: "free-stock-music.com"
                         )
 
                         MusicCreditRow(
@@ -234,13 +235,33 @@ struct CreditsView: View {
                         .background(.white.opacity(0.1))
                         .padding(.horizontal, 24)
 
+                    // Sound Effects
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Sound Effects")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundStyle(Color("ElectricBlue"))
+
+                        CreditLine(label: "Correct answer sound", credit: "chrisiex1 via Pixabay")
+                        CreditLine(label: "Wrong answer sound", credit: "freesound_community via Pixabay")
+                        CreditLine(label: "Button click sound", credit: "CreatorsHome via Pixabay")
+                        CreditLine(label: "Music toggle sound", credit: "Homemade_SFX via Pixabay")
+                        CreditLine(label: "Wrong buzzer sound", credit: "freesound_community via Pixabay")
+                        CreditLine(label: "Back button sound", credit: "Emiliano Dleon via Pixabay")
+                        CreditLine(label: "Node unlock sound", credit: "Mixkit")
+                    }
+                    .padding(.horizontal, 24)
+
+                    Divider()
+                        .background(.white.opacity(0.1))
+                        .padding(.horizontal, 24)
+
                     // License info
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Licenses")
                             .font(.system(size: 16, weight: .bold, design: .rounded))
                             .foregroundStyle(Color("ElectricBlue"))
 
-                        Text("CC BY 4.0 — Creative Commons Attribution 4.0 International")
+                        Text("CC BY-SA 3.0 — Creative Commons Attribution-ShareAlike 3.0 Unported")
                             .font(.caption2)
                             .foregroundStyle(.white.opacity(0.6))
 
@@ -248,7 +269,7 @@ struct CreditsView: View {
                             .font(.caption2)
                             .foregroundStyle(.white.opacity(0.6))
 
-                        Text("These licenses allow free use, including commercial, with attribution to the original artist.")
+                        Text("Sound effects from Pixabay and Mixkit are used under their respective free licenses, which allow commercial use without attribution.")
                             .font(.caption2)
                             .foregroundStyle(.white.opacity(0.4))
                             .padding(.top, 4)
@@ -327,6 +348,23 @@ struct MusicCreditRow: View {
         .padding(12)
         .background(.white.opacity(0.05))
         .cornerRadius(8)
+    }
+}
+
+struct CreditLine: View {
+    let label: String
+    let credit: String
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.white.opacity(0.6))
+            Spacer()
+            Text(credit)
+                .font(.caption2)
+                .foregroundStyle(.white.opacity(0.4))
+        }
     }
 }
 

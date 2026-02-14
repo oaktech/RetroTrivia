@@ -41,7 +41,7 @@ extension TriviaQuestion {
     }
 
     /// Convert TriviaQuestion to a CloudKit record
-    /// - Parameter sortOrder: Optional sort order for random sampling (1-6008)
+    /// - Parameter sortOrder: Optional sort order for random sampling (1-5321)
     /// - Returns: CKRecord representing this question
     func toCloudKitRecord(sortOrder: Int? = nil) -> CKRecord {
         let record = CKRecord(recordType: "Question")
@@ -51,8 +51,8 @@ extension TriviaQuestion {
         record["category"] = category ?? "Song Trivia"
         record["difficulty"] = difficulty ?? "medium"
         record["isActive"] = Int64(1)
-        // sortOrder enables efficient random sampling for large datasets (6K+)
-        record["sortOrder"] = Int64(sortOrder ?? Int.random(in: 1...6008))
+        // sortOrder enables efficient random sampling for large datasets (5K+)
+        record["sortOrder"] = Int64(sortOrder ?? Int.random(in: 1...5321))
         return record
     }
 }

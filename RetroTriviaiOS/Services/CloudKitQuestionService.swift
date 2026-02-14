@@ -68,7 +68,7 @@ class CloudKitQuestionService {
     /// Fetch random questions using sortOrder field for efficient random sampling
     /// This is the preferred method for large datasets (6K+ questions)
     ///
-    /// Requires `sortOrder` field (Int64, 1-6008) on Question records for true randomization.
+    /// Requires `sortOrder` field (Int64, 1-5321) on Question records for true randomization.
     /// Falls back to createdAt sorting if sortOrder not available.
     ///
     /// - Parameters:
@@ -81,9 +81,9 @@ class CloudKitQuestionService {
         difficulty: String? = nil,
         excludeIDs: Set<String> = []
     ) async throws -> [TriviaQuestion] {
-        // Generate a random range to sample from (for 6K+ questions with sortOrder 1-6008)
-        let rangeSize = 600  // Sample from a random 10% slice
-        let maxSortOrder = 6008
+        // Generate a random range to sample from (for 5K+ questions with sortOrder 1-5321)
+        let rangeSize = 530  // Sample from a random 10% slice
+        let maxSortOrder = 5321
         let rangeStart = Int.random(in: 1...(maxSortOrder - rangeSize))
         let rangeEnd = rangeStart + rangeSize
 

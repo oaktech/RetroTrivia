@@ -16,14 +16,13 @@ All audio is managed by `AudioManager.swift`, an @Observable singleton that hand
 
 ### Current Music Tracks
 
-**Menu Music:** "Afterglow Love" by e s c p
+**Menu Music:** "Electric Lullaby" by Electronic Senses
 - File: `menu-music.mp3` (8.3 MB)
 - Plays on: Home screen
-- Website: https://www.escp.space
-- Bandcamp: https://escp-music.bandcamp.com
-- License: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- SoundCloud: https://soundcloud.com/electronicsenses
+- Music promoted by: https://www.free-stock-music.com
+- License: CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/deed.en_US)
 - Commercial use: Allowed with attribution
-- Attribution: "Afterglow Love by | e s c p | https://www.escp.space"
 
 **Gameplay Music:** "Retro" by jiglr
 - File: `gameplay-music.mp3` (8.3 MB)
@@ -298,8 +297,8 @@ Same process as music:
 
 **Current Audio Assets:**
 
-✅ **menu-music.mp3** - "Afterglow Love" by e s c p
-- License: CC BY 4.0
+✅ **menu-music.mp3** - "Electric Lullaby" by Electronic Senses
+- License: CC BY-SA 3.0
 - Credit required: Yes — provided in-app Credits screen
 - Commercial use: Allowed with attribution
 
@@ -308,10 +307,16 @@ Same process as music:
 - Credit required: Yes — provided in-app Credits screen
 - Commercial use: Allowed with attribution
 
-⚠️ **Sound Effects**
-- Sources not documented — verify licensing for each effect
-- Keep attribution if required
-- Replace with original/licensed effects if provenance cannot be confirmed
+✅ **Sound Effects** (Pixabay)
+- celebration.mp3 — chrisiex1 via Pixabay
+- wrong-buzzer.mp3 — freesound_community via Pixabay
+- button-tap.mp3 — CreatorsHome via Pixabay
+- music-toggle.mp3 — Homemade_SFX via Pixabay
+- back-button.mp3 — Emiliano Dleon via Pixabay
+- License: Pixabay Content License (commercial use allowed, no attribution required)
+
+✅ **node-unlock.wav** (Mixkit)
+- License: Mixkit Sound Effects Free License (commercial use allowed, no attribution required)
 
 ---
 

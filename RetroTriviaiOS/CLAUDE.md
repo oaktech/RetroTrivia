@@ -85,7 +85,7 @@ UserDefaults/CloudKit persistence
 ```
 
 ### Question Loading Strategy
-1. **Primary**: CloudKit random sampling (1-6008 range)
+1. **Primary**: CloudKit random sampling (1-5321 range)
 2. **Fallback**: QuestionCacheManager (offline support)
 3. **Emergency**: Bundled questions.json (app always playable)
 
@@ -119,7 +119,7 @@ Color Constants:
 - High score updates when currentPosition exceeds highScorePosition
 
 ### CloudKit Integration
-- Random sampling via sortOrder field (1-6008)
+- Random sampling via sortOrder field (1-5321)
 - Rate limiting: 200 questions per batch with 500ms delay
 - Graceful fallback: CloudKit → Cache → Bundled
 - Network errors are recoverable (user continues with cached/bundled)
@@ -155,7 +155,7 @@ Color Constants:
 - Tests minimal (recommend unit tests for GameState logic)
 - View components could be smaller (some exceed 150 lines)
 - Consider MVVM-C for future architectural refactoring
-- CloudKit random sampling scales well to 6,008 questions
+- CloudKit random sampling scales well to 5,321 questions
 
 ## Useful Commands for Debugging
 
