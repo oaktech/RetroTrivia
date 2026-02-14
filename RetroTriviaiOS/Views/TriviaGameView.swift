@@ -9,6 +9,7 @@ import Combine
 struct TriviaGameView: View {
     @Environment(AudioManager.self) var audioManager
     @Environment(GameState.self) var gameState
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
     let question: TriviaQuestion
     var gameTimeRemaining: Double? = nil
@@ -32,6 +33,10 @@ struct TriviaGameView: View {
     @State private var timerIsActive = false
     @State private var urgencyPulse = false
     @State private var lastTickSecond: Int = -1
+
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
 
     private var isShowingOverlay: Bool {
         showCelebration || showWrong || showTimeout
@@ -80,145 +85,79 @@ struct TriviaGameView: View {
     }
 
     var body: some View {
-        ZStack {
-            // Background
-            LinearGradient(
-                colors: [
-                    Color("RetroPurple"),
-                    Color("RetroPurple").opacity(0.8),
-                    Color.black
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+        GeometryReader { geometry in
+            ZStack {
+                // Background
+                LinearGradient(
+                    colors: [
+                        Color("RetroPurple"),
+                        Color("RetroPurple").opacity(0.8),
+                        Color.black
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
 
-            VStack(spacing: 40) {
-                // Header with quit button and game timer
-                HStack {
-                    if let quit = onQuit {
-                        Button(action: {
-                            audioManager.playSoundEffect(named: "back-button")
-                            quit()
-                        }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "xmark.circle")
-                                Text("Quit")
-                            }
-                            .font(.system(size: 16, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.red.opacity(0.9))
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(.red.opacity(0.15))
-                                    .stroke(.red.opacity(0.4), lineWidth: 1)
+                if metrics.isIPad {
+                    iPadLayout
+                } else {
+                    iPhoneLayout
+                }
+
+                // Dim overlay when showing answer feedback
+                if isShowingOverlay {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
+                        .transition(.opacity)
+                }
+
+                // Overlays
+                if showCelebration {
+                    CelebrationOverlay {
+                        handleOverlayComplete(isCorrect: true)
+                    }
+                }
+
+                if showWrong {
+                    WrongAnswerOverlay(correctAnswer: shuffledOptions.indices.contains(shuffledCorrectIndex) ? shuffledOptions[shuffledCorrectIndex] : question.options[question.correctIndex]) {
+                        handleOverlayComplete(isCorrect: false)
+                    }
+                }
+
+                if showTimeout {
+                    TimeoutOverlay {
+                        handleOverlayComplete(isCorrect: false)
+                    }
+                }
+
+                // Urgency vignette overlay — uses GeometryReader
+                if urgencyLevel != .none {
+                    let vignetteSize = min(geometry.size.width, geometry.size.height)
+                    Rectangle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    Color.clear,
+                                    Color.clear,
+                                    urgencyVignetteColor.opacity(urgencyVignetteOpacity * (urgencyPulse ? 1.2 : 0.8))
+                                ],
+                                center: .center,
+                                startRadius: vignetteSize * 0.3,
+                                endRadius: vignetteSize * 0.8
                             )
-                        }
-                    }
-                    Spacer()
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 8)
-
-                // Game timer bar
-                if let remaining = gameTimeRemaining {
-                    gameTimerBar(remaining: remaining)
-                }
-
-                Spacer()
-
-                // Per-question timer
-                if gameState.gameSettings.timerEnabled {
-                    CountdownTimerView(
-                        timeRemaining: timeRemaining,
-                        totalTime: Double(gameState.gameSettings.timerDuration)
-                    )
-                }
-
-                // Lives display
-                if let lives = livesRemaining {
-                    HStack(spacing: 6) {
-                        ForEach(0..<startingLives, id: \.self) { i in
-                            Image(systemName: i < lives ? "heart.fill" : "heart")
-                                .font(.system(size: 20))
-                                .foregroundStyle(Color("NeonPink"))
-                        }
-                    }
-                }
-
-                // Question
-                Text(question.question)
-                    .retroHeading()
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Spacer()
-
-                // Answer buttons in 2x2 grid
-                EqualHeightGrid(columns: 2, spacing: 20) {
-                    ForEach(0..<question.options.count, id: \.self) { index in
-                        answerButton(index: index)
-                    }
-                }
-                .padding(.horizontal, 20)
-
-                Spacer()
-            }
-
-            // Dim overlay when showing answer feedback
-            if isShowingOverlay {
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .allowsHitTesting(false)
-                    .transition(.opacity)
-            }
-
-            // Overlays
-            if showCelebration {
-                CelebrationOverlay {
-                    handleOverlayComplete(isCorrect: true)
-                }
-            }
-
-            if showWrong {
-                WrongAnswerOverlay(correctAnswer: shuffledOptions.indices.contains(shuffledCorrectIndex) ? shuffledOptions[shuffledCorrectIndex] : question.options[question.correctIndex]) {
-                    handleOverlayComplete(isCorrect: false)
-                }
-            }
-
-            if showTimeout {
-                TimeoutOverlay {
-                    handleOverlayComplete(isCorrect: false)
-                }
-            }
-
-            // Urgency vignette overlay (screen edge glow when time is running out)
-            if urgencyLevel != .none {
-                Rectangle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                Color.clear,
-                                Color.clear,
-                                urgencyVignetteColor.opacity(urgencyVignetteOpacity * (urgencyPulse ? 1.2 : 0.8))
-                            ],
-                            center: .center,
-                            startRadius: UIScreen.main.bounds.width * 0.3,
-                            endRadius: UIScreen.main.bounds.width * 0.8
                         )
-                    )
-                    .ignoresSafeArea()
-                    .allowsHitTesting(false)
-                    .animation(.easeInOut(duration: urgencyLevel == .critical ? 0.3 : 0.5), value: urgencyPulse)
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
+                        .animation(.easeInOut(duration: urgencyLevel == .critical ? 0.3 : 0.5), value: urgencyPulse)
+                }
             }
         }
         .sensoryFeedback(.impact(weight: .light), trigger: buttonTapTrigger)
         .sensoryFeedback(.success, trigger: correctAnswerTrigger)
         .sensoryFeedback(.error, trigger: wrongAnswerTrigger)
         .onAppear {
-            // Shuffle answer positions so the correct answer isn't always in the same slot
             let indices = (0..<question.options.count).shuffled()
             shuffledOptions = indices.map { question.options[$0] }
             shuffledCorrectIndex = indices.firstIndex(of: question.correctIndex) ?? 0
@@ -234,7 +173,6 @@ struct TriviaGameView: View {
             if timeRemaining > 0.1 {
                 timeRemaining -= 0.1
 
-                // Tick sound in last 5 seconds
                 let currentSecond = Int(ceil(timeRemaining))
                 if currentSecond >= 1, currentSecond <= 5, currentSecond != lastTickSecond {
                     lastTickSecond = currentSecond
@@ -255,15 +193,14 @@ struct TriviaGameView: View {
         .onChange(of: gameTimeRemaining) { oldValue, newValue in
             guard let remaining = newValue else { return }
 
-            // Trigger urgency pulse at thresholds
             let shouldPulse: Bool
             switch urgencyLevel {
             case .critical:
-                shouldPulse = true // every second
+                shouldPulse = true
             case .high:
-                shouldPulse = Int(remaining) % 2 == 0 // every 2 seconds
+                shouldPulse = Int(remaining) % 2 == 0
             case .moderate:
-                shouldPulse = Int(remaining) % 3 == 0 // every 3 seconds
+                shouldPulse = Int(remaining) % 3 == 0
             case .none:
                 shouldPulse = false
             }
@@ -277,17 +214,287 @@ struct TriviaGameView: View {
         }
     }
 
+    // MARK: - iPad "Center Stage" Layout
+
+    private var iPadLayout: some View {
+        ZStack {
+            // Stage spotlight atmosphere
+            StageSpotlightOverlay()
+
+            VStack(spacing: 0) {
+                // Header: quit left, level info right
+                iPadTriviaHeader
+
+                Spacer()
+
+                // Spotlit question card
+                iPadQuestionCard
+
+                Spacer()
+                    .frame(maxHeight: 24)
+
+                // Game show answer tiles in 2x2 grid
+                EqualHeightGrid(columns: 2, spacing: 16) {
+                    ForEach(0..<question.options.count, id: \.self) { index in
+                        GameShowAnswerTile(
+                            index: index,
+                            text: shuffledOptions.indices.contains(index) ? shuffledOptions[index] : "",
+                            isSelected: selectedIndex == index,
+                            isCorrect: hasAnswered && index == shuffledCorrectIndex,
+                            hasAnswered: hasAnswered,
+                            action: { handleAnswer(index) }
+                        )
+                    }
+                }
+                .frame(maxWidth: metrics.answerAreaMaxWidth)
+                .padding(.horizontal, 40)
+
+                Spacer()
+
+                // Footer bar: lives | LED timer | per-Q countdown
+                iPadFooterBar
+            }
+        }
+    }
+
+    private var iPadTriviaHeader: some View {
+        HStack {
+            if let quit = onQuit {
+                Button(action: {
+                    audioManager.playSoundEffect(named: "back-button")
+                    quit()
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "xmark.circle")
+                        Text("Quit")
+                    }
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.red.opacity(0.9))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(.red.opacity(0.15))
+                            .stroke(.red.opacity(0.4), lineWidth: 1)
+                    )
+                }
+            }
+
+            Spacer()
+
+            // Game timer bar (if play mode)
+            if let remaining = gameTimeRemaining {
+                gameTimerBar(remaining: remaining)
+                    .frame(maxWidth: 300)
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 8)
+    }
+
+    private var iPadQuestionCard: some View {
+        VStack(spacing: 16) {
+            Text(question.question)
+                .font(.system(size: metrics.questionFontSize, weight: .bold, design: .rounded))
+                .foregroundStyle(Color("NeonYellow"))
+                .shadow(color: Color("NeonYellow").opacity(0.6), radius: 6)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            // Metadata pills
+            HStack(spacing: 8) {
+                metadataPill(text: question.category ?? "80s Music", color: Color("ElectricBlue"))
+                metadataPill(text: (question.difficulty ?? "mixed").capitalized, color: difficultyColor)
+            }
+        }
+        .padding(32)
+        .frame(maxWidth: metrics.questionCardMaxWidth)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.04))
+                .stroke(Color("ElectricBlue").opacity(0.3), lineWidth: 1)
+        )
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(
+                    RadialGradient(
+                        colors: [Color.white.opacity(0.03), Color.clear],
+                        center: .top,
+                        startRadius: 0,
+                        endRadius: 300
+                    )
+                )
+        )
+    }
+
+    private var iPadFooterBar: some View {
+        HStack(spacing: 24) {
+            // Lives (left)
+            if let lives = livesRemaining {
+                HStack(spacing: 6) {
+                    ForEach(0..<startingLives, id: \.self) { i in
+                        Image(systemName: i < lives ? "heart.fill" : "heart")
+                            .font(.system(size: 22))
+                            .foregroundStyle(Color("NeonPink"))
+                            .shadow(color: Color("NeonPink").opacity(i < lives ? 0.5 : 0), radius: 4)
+                    }
+                }
+            }
+
+            Spacer()
+
+            // LED game timer (center) — if play mode
+            if let remaining = gameTimeRemaining {
+                LEDClockTimerView(timeRemaining: remaining, totalTime: gameTimerDuration)
+                    .scaleEffect(0.8)
+            }
+
+            Spacer()
+
+            // Per-question countdown (right)
+            if gameState.gameSettings.timerEnabled {
+                HStack(spacing: 8) {
+                    Image(systemName: "stopwatch")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Color("ElectricBlue"))
+                    CountdownTimerView(
+                        timeRemaining: timeRemaining,
+                        totalTime: Double(gameState.gameSettings.timerDuration),
+                        size: 56,
+                        lineWidth: 4,
+                        fontSize: 16
+                    )
+                }
+            }
+        }
+        .padding(.horizontal, 32)
+        .padding(.vertical, 16)
+        .background(
+            LinearGradient(
+                colors: [Color.clear, Color.black.opacity(0.3)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
+    }
+
+    // MARK: - iPhone Layout (unchanged)
+
+    private var iPhoneLayout: some View {
+        VStack(spacing: 40) {
+            triviaHeader
+
+            // Game timer bar
+            if let remaining = gameTimeRemaining {
+                gameTimerBar(remaining: remaining)
+            }
+
+            Spacer()
+
+            // Per-question timer
+            if gameState.gameSettings.timerEnabled {
+                CountdownTimerView(
+                    timeRemaining: timeRemaining,
+                    totalTime: Double(gameState.gameSettings.timerDuration)
+                )
+            }
+
+            // Lives display
+            if let lives = livesRemaining {
+                HStack(spacing: 6) {
+                    ForEach(0..<startingLives, id: \.self) { i in
+                        Image(systemName: i < lives ? "heart.fill" : "heart")
+                            .font(.system(size: 20))
+                            .foregroundStyle(Color("NeonPink"))
+                    }
+                }
+            }
+
+            // Question
+            Text(question.question)
+                .retroHeading()
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer()
+
+            // Answer buttons in 2x2 grid
+            EqualHeightGrid(columns: 2, spacing: 20) {
+                ForEach(0..<question.options.count, id: \.self) { index in
+                    answerButton(index: index)
+                }
+            }
+            .padding(.horizontal, 20)
+
+            Spacer()
+        }
+    }
+
+    // MARK: - Shared Components
+
+    private var triviaHeader: some View {
+        HStack {
+            if let quit = onQuit {
+                Button(action: {
+                    audioManager.playSoundEffect(named: "back-button")
+                    quit()
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "xmark.circle")
+                        Text("Quit")
+                    }
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.red.opacity(0.9))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(.red.opacity(0.15))
+                            .stroke(.red.opacity(0.4), lineWidth: 1)
+                    )
+                }
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 8)
+    }
+
+    @ViewBuilder
+    private func metadataPill(text: String, color: Color) -> some View {
+        Text(text)
+            .font(.system(size: 13, weight: .bold, design: .rounded))
+            .foregroundStyle(color)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(
+                Capsule()
+                    .fill(color.opacity(0.15))
+                    .stroke(color.opacity(0.4), lineWidth: 1)
+            )
+    }
+
+    private var difficultyColor: Color {
+        switch (question.difficulty ?? "").lowercased() {
+        case "easy": return Color("ElectricBlue")
+        case "medium": return Color("NeonYellow")
+        case "hard": return Color("NeonPink")
+        default: return Color("ElectricBlue")
+        }
+    }
+
     @ViewBuilder
     private func answerButton(index: Int) -> some View {
         Button(action: {
             handleAnswer(index)
         }) {
             Text(shuffledOptions.indices.contains(index) ? shuffledOptions[index] : "")
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .font(.system(size: metrics.answerFontSize, weight: .semibold, design: .rounded))
                 .foregroundStyle(textColor(for: index))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 16)
-                .padding(.vertical, 18)
+                .padding(.vertical, metrics.answerVerticalPadding)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(backgroundColor(for: index))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -360,7 +567,6 @@ struct TriviaGameView: View {
         guard !hasAnswered else { return }
         timerIsActive = false
 
-        // Light tap feedback (sound + haptic)
         audioManager.playSoundEffect(named: "button-tap")
         buttonTapTrigger += 1
 
@@ -369,7 +575,6 @@ struct TriviaGameView: View {
 
         let isCorrect = index == shuffledCorrectIndex
 
-        // Show appropriate overlay with haptic (overlay handles the sound)
         if isCorrect {
             correctAnswerTrigger.toggle()
             showCelebration = true
@@ -380,12 +585,10 @@ struct TriviaGameView: View {
     }
 
     private func handleOverlayComplete(isCorrect: Bool) {
-        // Hide overlays
         showCelebration = false
         showWrong = false
         showTimeout = false
 
-        // Small delay before dismissing to ensure smooth animation
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             onAnswer(isCorrect)
         }

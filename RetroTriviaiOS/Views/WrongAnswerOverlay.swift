@@ -7,6 +7,7 @@ import SwiftUI
 
 struct WrongAnswerOverlay: View {
     @Environment(AudioManager.self) var audioManager
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
     let correctAnswer: String
     let onComplete: () -> Void
@@ -14,14 +15,30 @@ struct WrongAnswerOverlay: View {
     @State private var isAnimating = false
     @State private var shakeOffset: CGFloat = 0
 
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
+
     var body: some View {
         ZStack {
             Color.black.opacity(0.5)
                 .ignoresSafeArea()
 
+            // iPad spotlight backdrop
+            if metrics.isIPad {
+                RadialGradient(
+                    colors: [Color.red.opacity(0.06), Color.clear],
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: 400
+                )
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+            }
+
             VStack(spacing: 20) {
                 Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 80))
+                    .font(.system(size: 80 * metrics.overlayIconScale))
                     .foregroundStyle(.red)
                     .shadow(color: .red, radius: 20)
                     .scaleEffect(isAnimating ? 1.0 : 0.3)
@@ -29,7 +46,7 @@ struct WrongAnswerOverlay: View {
                     .offset(x: shakeOffset)
 
                 Text("WRONG")
-                    .font(.system(size: 56, weight: .black, design: .rounded))
+                    .font(.system(size: 56 * metrics.overlayTextScale, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [.red, .orange],
@@ -57,16 +74,15 @@ struct WrongAnswerOverlay: View {
                 .scaleEffect(isAnimating ? 1.0 : 0.5)
                 .opacity(isAnimating ? 1 : 0)
             }
+            .frame(maxWidth: metrics.overlayMaxWidth)
         }
         .onAppear {
-            // Play wrong buzzer sound
             audioManager.playSoundEffect(named: "wrong-buzzer")
 
             withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
                 isAnimating = true
             }
 
-            // Shake animation
             withAnimation(
                 .easeInOut(duration: 0.1)
                 .repeatCount(4, autoreverses: true)
@@ -74,7 +90,6 @@ struct WrongAnswerOverlay: View {
                 shakeOffset = 10
             }
 
-            // Auto-dismiss after 1.5 seconds
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 onComplete()
             }

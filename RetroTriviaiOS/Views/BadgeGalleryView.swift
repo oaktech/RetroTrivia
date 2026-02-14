@@ -7,13 +7,16 @@ import SwiftUI
 
 struct BadgeGalleryView: View {
     @Environment(BadgeManager.self) private var badgeManager
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let onClose: () -> Void
 
-    private let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible()),
-        GridItem(.flexible())
-    ]
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
+
+    private var columns: [GridItem] {
+        Array(repeating: GridItem(.flexible()), count: metrics.badgeGridColumns)
+    }
 
     var body: some View {
         ZStack {
@@ -51,6 +54,7 @@ struct BadgeGalleryView: View {
                 .padding(.horizontal, 40)
                 .padding(.bottom, 32)
             }
+            .frame(maxWidth: metrics.badgeGalleryMaxWidth)
         }
     }
 }

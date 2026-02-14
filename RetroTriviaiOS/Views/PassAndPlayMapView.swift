@@ -8,6 +8,7 @@ import SwiftUI
 struct PassAndPlayMapView: View {
     @Environment(AudioManager.self) var audioManager
     @Environment(QuestionManager.self) var questionManager
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let session: PassAndPlaySession
     let onDone: () -> Void
 
@@ -19,55 +20,43 @@ struct PassAndPlayMapView: View {
     @State private var scrollProxy: ScrollViewProxy? = nil
 
     private let maxLevel = 25
-    private let nodeSpacing: CGFloat = 100
+
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
 
     var body: some View {
         ZStack {
             RetroGradientBackground()
 
+            if metrics.isIPad {
+                StageSpotlightOverlay()
+            }
+
             VStack(spacing: 0) {
                 // Header
                 header
 
-                // Scrollable map
-                ScrollViewReader { proxy in
-                    ScrollView {
+                if metrics.isIPad {
+                    // iPad: "The Arena" — snaking grid + player podium
+                    GeometryReader { geometry in
                         VStack(spacing: 0) {
-                            Color.clear.frame(height: 100)
-
-                            // Map nodes with player dots
-                            ForEach((0...maxLevel).reversed(), id: \.self) { level in
-                                VStack(spacing: 0) {
-                                    MapNodeView(
-                                        levelIndex: level,
-                                        isCurrentPosition: false,
-                                        currentPosition: 0,
-                                        isAnimatingTarget: animatingNodeLevel == level,
-                                        playerDots: getPlayerDotsForLevel(level)
-                                    )
-                                    .id(level)
-
-                                    // Connecting line
-                                    if level > 0 {
-                                        Rectangle()
-                                            .fill(Color.white.opacity(0.2))
-                                            .frame(width: 2, height: 30)
-                                            .padding(.vertical, 8)
-                                    }
-                                }
-                            }
-
-                            Color.clear.frame(height: 100)
+                            Spacer()
+                            SnakeGridMapView(
+                                currentPosition: 0,
+                                maxLevel: maxLevel,
+                                playerDots: buildPlayerDotsMap(),
+                                isMultiplayer: true
+                            )
+                            .padding(.horizontal, 40)
+                            .frame(maxHeight: geometry.size.height * 0.65)
+                            Spacer()
+                            // Player podium bar
+                            iPadPlayerPodiumBar
                         }
                     }
-                    .onChange(of: session.maxPosition) { _, newMaxPosition in
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            proxy.scrollTo(newMaxPosition, anchor: .center)
-                        }
-                    }
-                    .onAppear {
-                        scrollProxy = proxy
-                    }
+                } else {
+                    mapContent
                 }
             }
 
@@ -114,11 +103,71 @@ struct PassAndPlayMapView: View {
         }
         .onAppear {
             audioManager.playGameplayMusic()
-            // Load questions asynchronously
             Task {
                 await loadQuestionsPool()
             }
         }
+    }
+
+    // MARK: - iPad Player Sidebar
+
+    @ViewBuilder
+    private var iPadPlayerSidebar: some View {
+        VStack(spacing: 16) {
+            Text("PLAYERS")
+                .font(.system(size: 13, weight: .black, design: .rounded))
+                .foregroundStyle(.white.opacity(0.6))
+                .tracking(2)
+                .padding(.top, 8)
+
+            ForEach(session.players, id: \.id) { player in
+                let isCurrent = player.id == session.currentPlayer.id
+                VStack(spacing: 8) {
+                    HStack(spacing: 8) {
+                        Circle()
+                            .fill(player.color)
+                            .frame(width: 14, height: 14)
+                        Text(player.name)
+                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                    }
+
+                    HStack(spacing: 12) {
+                        VStack(spacing: 2) {
+                            Text("Pos")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.5))
+                            Text("\(player.position)")
+                                .font(.custom("Orbitron-Bold", size: 16))
+                                .monospacedDigit()
+                                .foregroundStyle(player.color)
+                        }
+                        VStack(spacing: 2) {
+                            Text("Score")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.5))
+                            Text("\(player.correctAnswers)/\(player.questionsAnswered)")
+                                .font(.system(size: 13, weight: .bold, design: .rounded))
+                                .monospacedDigit()
+                                .foregroundStyle(.white.opacity(0.8))
+                        }
+                    }
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(player.color.opacity(isCurrent ? 0.15 : 0.05))
+                        .stroke(player.color.opacity(isCurrent ? 0.6 : 0.2), lineWidth: isCurrent ? 2 : 1)
+                )
+                .shadow(color: isCurrent ? player.color.opacity(0.4) : .clear, radius: isCurrent ? 8 : 0)
+            }
+
+            Spacer()
+        }
+        .padding(12)
+        .background(Color.black.opacity(0.15))
     }
 
     // MARK: - Header
@@ -171,30 +220,131 @@ struct PassAndPlayMapView: View {
                 )
             }
 
-            // Players standings (mini)
-            HStack(spacing: 8) {
-                ForEach(session.players, id: \.id) { player in
-                    VStack(spacing: 2) {
-                        Circle()
-                            .fill(player.color)
-                            .frame(width: 8, height: 8)
-                        Text(player.name)
-                            .font(.system(size: 10, weight: .semibold, design: .rounded))
-                            .lineLimit(1)
-                        Text("\(player.position)")
-                            .font(.system(size: 12, weight: .bold, design: .rounded))
-                            .foregroundStyle(player.color)
+            // Players standings (mini) — iPhone only (iPad has sidebar)
+            if !metrics.isIPad {
+                HStack(spacing: 8) {
+                    ForEach(session.players, id: \.id) { player in
+                        VStack(spacing: 2) {
+                            Circle()
+                                .fill(player.color)
+                                .frame(width: 8, height: 8)
+                            Text(player.name)
+                                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                .lineLimit(1)
+                            Text("\(player.position)")
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .foregroundStyle(player.color)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(Color("RetroPurple").opacity(0.5))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 6)
-                    .background(Color("RetroPurple").opacity(0.5))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
                 }
+                .padding(.horizontal, 4)
             }
-            .padding(.horizontal, 4)
         }
         .padding()
+    }
+
+    // MARK: - Map Content
+
+    private var mapContent: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Color.clear.frame(height: 100)
+
+                    if metrics.isIPad {
+                        // iPad: Zigzag path
+                        ForEach((0...maxLevel).reversed(), id: \.self) { level in
+                            let xOffset = sin(Double(level) * .pi / 3.0) * Double(metrics.mapZigzagAmplitude)
+                            VStack(spacing: 0) {
+                                MapNodeView(
+                                    levelIndex: level,
+                                    isCurrentPosition: false,
+                                    currentPosition: 0,
+                                    isAnimatingTarget: animatingNodeLevel == level,
+                                    playerDots: getPlayerDotsForLevel(level),
+                                    sizeMultiplier: metrics.mapNodeSizeMultiplier
+                                )
+                                .id(level)
+                                .offset(x: CGFloat(xOffset))
+
+                                if level > 0 {
+                                    let nextXOffset = sin(Double(level - 1) * .pi / 3.0) * Double(metrics.mapZigzagAmplitude)
+                                    ZigzagConnectorSimple(
+                                        fromX: CGFloat(xOffset),
+                                        toX: CGFloat(nextXOffset),
+                                        height: 40
+                                    )
+                                    .padding(.vertical, 4)
+                                }
+                            }
+                        }
+                    } else {
+                        // iPhone: Straight path
+                        ForEach((0...maxLevel).reversed(), id: \.self) { level in
+                            VStack(spacing: 0) {
+                                MapNodeView(
+                                    levelIndex: level,
+                                    isCurrentPosition: false,
+                                    currentPosition: 0,
+                                    isAnimatingTarget: animatingNodeLevel == level,
+                                    playerDots: getPlayerDotsForLevel(level)
+                                )
+                                .id(level)
+
+                                if level > 0 {
+                                    Rectangle()
+                                        .fill(Color.white.opacity(0.2))
+                                        .frame(width: 2, height: 30)
+                                        .padding(.vertical, 8)
+                                }
+                            }
+                        }
+                    }
+
+                    Color.clear.frame(height: 100)
+                }
+            }
+            .onChange(of: session.maxPosition) { _, newMaxPosition in
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    proxy.scrollTo(newMaxPosition, anchor: .center)
+                }
+            }
+            .onAppear {
+                scrollProxy = proxy
+            }
+        }
+    }
+
+    // MARK: - iPad Player Podium Bar
+
+    private var iPadPlayerPodiumBar: some View {
+        HStack(spacing: 12) {
+            ForEach(session.players, id: \.id) { player in
+                PlayerPodiumCard(
+                    name: player.name,
+                    color: player.color,
+                    position: player.position,
+                    score: "\(player.correctAnswers)/\(player.questionsAnswered)",
+                    isCurrent: player.id == session.currentPlayer.id
+                )
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 12)
+    }
+
+    /// Build a dictionary mapping level positions to player colors for the snake grid.
+    private func buildPlayerDotsMap() -> [Int: [Color]] {
+        var map: [Int: [Color]] = [:]
+        for player in session.players {
+            map[player.position, default: []].append(player.color)
+        }
+        return map
     }
 
     // MARK: - Helpers
@@ -212,13 +362,11 @@ struct PassAndPlayMapView: View {
     }
 
     private func loadNextQuestion() {
-        // Find next unanswered question from the pool (respecting session's asked questions)
         if let question = questionManager.questionPool.first(where: { !session.askedQuestionIDs.contains($0.id) }) {
             session.askedQuestionIDs.insert(question.id)
-            questionManager.markQuestionAsked(question.id)  // Also mark in question manager
+            questionManager.markQuestionAsked(question.id)
             currentQuestion = question
         } else {
-            // No more questions - game over
             session.isGameOver = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 showFinalStandings = true
@@ -227,8 +375,6 @@ struct PassAndPlayMapView: View {
     }
 
     private func handleAnswer(isCorrect: Bool) {
-        let oldPosition = session.currentPlayer.position
-
         if isCorrect {
             session.players[session.currentPlayerIndex].position += 1
             session.players[session.currentPlayerIndex].correctAnswers += 1
@@ -239,19 +385,15 @@ struct PassAndPlayMapView: View {
 
         session.players[session.currentPlayerIndex].questionsAnswered += 1
 
-        // Check win condition
         if session.checkWinCondition() {
             session.isGameOver = true
-            // Clear current question to dismiss sheet
             currentQuestion = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 showFinalStandings = true
             }
         } else {
-            // Advance to next player and show handoff immediately (before dismissing question)
             session.advanceToNextPlayer()
             showHandoff = true
-            // Then clear current question after handoff is showing
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 currentQuestion = nil
             }
@@ -259,7 +401,6 @@ struct PassAndPlayMapView: View {
     }
 
     private func playAgain() {
-        // Reset session
         session.players = session.players.map { player in
             var p = player
             p.position = 0
@@ -274,13 +415,35 @@ struct PassAndPlayMapView: View {
         showFinalStandings = false
         showHandoff = true
 
-        // Reset question manager
         questionManager.resetSession()
 
-        // Reload questions
         Task {
             await loadQuestionsPool()
         }
+    }
+}
+
+// MARK: - Simple Zigzag Connector (for Pass & Play map)
+
+private struct ZigzagConnectorSimple: View {
+    let fromX: CGFloat
+    let toX: CGFloat
+    let height: CGFloat
+
+    var body: some View {
+        Canvas { context, size in
+            var path = Path()
+            let startPoint = CGPoint(x: size.width / 2 + fromX, y: 0)
+            let endPoint = CGPoint(x: size.width / 2 + toX, y: size.height)
+            let controlPoint = CGPoint(
+                x: (startPoint.x + endPoint.x) / 2,
+                y: size.height / 2
+            )
+            path.move(to: startPoint)
+            path.addQuadCurve(to: endPoint, control: controlPoint)
+            context.stroke(path, with: .color(.white.opacity(0.2)), lineWidth: 2)
+        }
+        .frame(height: height)
     }
 }
 

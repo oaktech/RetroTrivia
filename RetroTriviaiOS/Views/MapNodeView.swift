@@ -10,7 +10,8 @@ struct MapNodeView: View {
     let isCurrentPosition: Bool
     let currentPosition: Int
     var isAnimatingTarget: Bool = false
-    var playerDots: [Color] = []  // NEW: Pass & Play player dots
+    var playerDots: [Color] = []
+    var sizeMultiplier: CGFloat = 1.0
 
     @State private var pulseScale: CGFloat = 1.0
     @State private var animationRotation: Double = 0
@@ -48,11 +49,11 @@ struct MapNodeView: View {
         ZStack {
             // Pass & Play: Show player dots if provided
             if !playerDots.isEmpty {
-                HStack(spacing: playerDots.count > 1 ? -8 : 0) {
+                HStack(spacing: playerDots.count > 1 ? -8 * sizeMultiplier : 0) {
                     ForEach(playerDots.indices, id: \.self) { index in
                         Circle()
                             .fill(playerDots[index])
-                            .frame(width: 24, height: 24)
+                            .frame(width: 24 * sizeMultiplier, height: 24 * sizeMultiplier)
                             .overlay(Circle().stroke(Color.white, lineWidth: 1.5))
                             .shadow(color: playerDots[index].opacity(0.6), radius: 8)
                     }
@@ -75,11 +76,11 @@ struct MapNodeView: View {
                     // Icon or number
                     if nodeState == .completed {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 32))
+                            .font(.system(size: 32 * sizeMultiplier))
                             .foregroundStyle(Color("NeonPink"))
                     } else {
                         Image(systemName: "music.note")
-                            .font(.system(size: 24, weight: .bold))
+                            .font(.system(size: 24 * sizeMultiplier, weight: .bold))
                             .foregroundStyle(iconColor)
                     }
                 }
@@ -130,15 +131,15 @@ struct MapNodeView: View {
     }
 
     private var nodeSize: CGFloat {
-        let baseSize: CGFloat = 50
-        let maxGrowth: CGFloat = 50
+        let baseSize: CGFloat = 50 * sizeMultiplier
+        let maxGrowth: CGFloat = 50 * sizeMultiplier
         let size = baseSize + (maxGrowth * intensityMultiplier)
         return isCurrentPosition ? size * 1.2 : size
     }
 
     private var borderWidth: CGFloat {
-        let baseBorder: CGFloat = 1.5
-        let maxBorder: CGFloat = 8
+        let baseBorder: CGFloat = 1.5 * sizeMultiplier
+        let maxBorder: CGFloat = 8 * sizeMultiplier
         let width = baseBorder + (maxBorder - baseBorder) * intensityMultiplier
         return isCurrentPosition ? width * 1.4 : width
     }

@@ -7,8 +7,13 @@ import SwiftUI
 
 struct PassAndPlaySetupView: View {
     @Environment(AudioManager.self) var audioManager
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let onStart: (PassAndPlaySession) -> Void
     let onCancel: () -> Void
+
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
 
     @State private var playerCount = 2
     @State private var playerNames: [String] = ["", ""]
@@ -215,6 +220,7 @@ struct PassAndPlaySetupView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
             }
+            .frame(maxWidth: metrics.passAndPlaySetupMaxWidth)
         }
     }
 

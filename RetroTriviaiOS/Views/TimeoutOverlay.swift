@@ -7,20 +7,37 @@ import SwiftUI
 
 struct TimeoutOverlay: View {
     @Environment(AudioManager.self) var audioManager
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
     let onComplete: () -> Void
 
     @State private var isAnimating = false
     @State private var shakeOffset: CGFloat = 0
 
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
+
     var body: some View {
         ZStack {
             Color.black.opacity(0.5)
                 .ignoresSafeArea()
 
+            // iPad spotlight backdrop
+            if metrics.isIPad {
+                RadialGradient(
+                    colors: [Color("NeonYellow").opacity(0.06), Color.clear],
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: 400
+                )
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+            }
+
             VStack(spacing: 20) {
                 Image(systemName: "clock.fill")
-                    .font(.system(size: 80))
+                    .font(.system(size: 80 * metrics.overlayIconScale))
                     .foregroundStyle(Color("NeonYellow"))
                     .shadow(color: Color("NeonYellow"), radius: 20)
                     .scaleEffect(isAnimating ? 1.0 : 0.3)
@@ -28,7 +45,7 @@ struct TimeoutOverlay: View {
                     .offset(x: shakeOffset)
 
                 Text("TIME'S UP!")
-                    .font(.system(size: 48, weight: .black, design: .rounded))
+                    .font(.system(size: 48 * metrics.overlayTextScale, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Color("NeonYellow"), .orange],
@@ -41,6 +58,7 @@ struct TimeoutOverlay: View {
                     .opacity(isAnimating ? 1 : 0)
                     .offset(x: shakeOffset)
             }
+            .frame(maxWidth: metrics.overlayMaxWidth)
         }
         .onAppear {
             audioManager.playSoundEffect(named: "wrong-buzzer")

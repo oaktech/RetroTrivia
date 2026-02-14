@@ -18,9 +18,14 @@ struct GameOverOverlay: View {
     let onComplete: () -> Void
 
     @Environment(GameCenterManager.self) private var gameCenterManager
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var isAnimating = false
     @State private var displayedScore = 0
     @State private var countUpTimer: Timer?
+
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
 
     private var titleText: String {
         switch reason {
@@ -41,16 +46,28 @@ struct GameOverOverlay: View {
             Color.black.opacity(0.85)
                 .ignoresSafeArea()
 
+            // iPad spotlight backdrop
+            if metrics.isIPad {
+                RadialGradient(
+                    colors: [Color("NeonPink").opacity(0.08), Color.clear],
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: 450
+                )
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+            }
+
             VStack(spacing: 24) {
                 Image(systemName: iconName)
-                    .font(.system(size: 72))
+                    .font(.system(size: 72 * metrics.overlayIconScale))
                     .foregroundStyle(Color("NeonPink"))
                     .shadow(color: Color("NeonPink"), radius: 20)
                     .scaleEffect(isAnimating ? 1.0 : 0.3)
                     .opacity(isAnimating ? 1 : 0)
 
                 Text(titleText)
-                    .font(.custom("PressStart2P-Regular", size: 28))
+                    .font(.custom("PressStart2P-Regular", size: 28 * metrics.overlayTextScale))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Color("NeonPink"), Color("HotMagenta")],
@@ -68,7 +85,7 @@ struct GameOverOverlay: View {
                         .foregroundStyle(.white.opacity(0.8))
 
                     Text("\(displayedScore)")
-                        .font(.custom("Orbitron-Bold", size: 52))
+                        .font(.custom("Orbitron-Bold", size: 52 * metrics.overlayTextScale))
                         .monospacedDigit()
                         .foregroundStyle(Color("NeonYellow"))
                         .shadow(color: Color("NeonYellow"), radius: 10)
@@ -133,19 +150,19 @@ struct GameOverOverlay: View {
                 .padding(.top, 8)
             }
             .padding(32)
+            .frame(maxWidth: metrics.gameOverMaxWidth)
         }
         .onAppear {
             withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
                 isAnimating = true
             }
 
-            // Start score count-up after spring animation settles
             guard score > 0 else {
                 displayedScore = 0
                 return
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                let steps = min(score, 60) // cap at 60 increments for smooth ~1s animation
+                let steps = min(score, 60)
                 let increment = max(1, score / steps)
                 let interval = 1.0 / Double(steps)
 

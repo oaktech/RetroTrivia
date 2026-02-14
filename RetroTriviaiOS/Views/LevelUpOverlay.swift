@@ -7,6 +7,7 @@ import SwiftUI
 
 struct LevelUpOverlay: View {
     @Environment(AudioManager.self) var audioManager
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let newTier: Int
     let onComplete: () -> Void
 
@@ -14,6 +15,10 @@ struct LevelUpOverlay: View {
     @State private var pulseScale: CGFloat = 1.0
     @State private var rotationDegrees: Double = 0
     @State private var hasCompleted = false
+
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
 
     private var tierName: String {
         switch newTier {
@@ -55,9 +60,21 @@ struct LevelUpOverlay: View {
                     onComplete()
                 }
 
+            // iPad spotlight backdrop
+            if metrics.isIPad {
+                RadialGradient(
+                    colors: [tierColor.opacity(0.1), Color.clear],
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: 450
+                )
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+            }
+
             // Particle burst
             ForEach(0..<40, id: \.self) { index in
-                ParticleBurst(index: index, isAnimating: isAnimating, color: tierColor)
+                ParticleBurst(index: index, isAnimating: isAnimating, color: tierColor, distance: metrics.particleBurstDistance)
             }
 
             VStack(spacing: 24) {
@@ -69,20 +86,20 @@ struct LevelUpOverlay: View {
                                 colors: [tierColor, tierColor.opacity(0.3)],
                                 center: .center,
                                 startRadius: 0,
-                                endRadius: 80
+                                endRadius: metrics.levelUpBadgeSize / 2
                             )
                         )
-                        .frame(width: 160, height: 160)
+                        .frame(width: metrics.levelUpBadgeSize, height: metrics.levelUpBadgeSize)
                         .shadow(color: tierColor, radius: 30)
                         .scaleEffect(pulseScale)
 
                     VStack(spacing: 4) {
                         Text("LEVEL")
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .font(.system(size: 16 * metrics.overlayTextScale, weight: .bold, design: .rounded))
                             .foregroundStyle(.white.opacity(0.9))
 
                         Text("\(displayLevel)")
-                            .font(.system(size: 64, weight: .black, design: .rounded))
+                            .font(.system(size: 64 * metrics.overlayTextScale, weight: .black, design: .rounded))
                             .foregroundStyle(.white)
                     }
                     .rotationEffect(.degrees(rotationDegrees))
@@ -92,7 +109,7 @@ struct LevelUpOverlay: View {
 
                 // Level name
                 Text(tierName.uppercased())
-                    .font(.system(size: 32, weight: .black, design: .rounded))
+                    .font(.system(size: 32 * metrics.overlayTextScale, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [tierColor, Color("NeonYellow")],
@@ -108,7 +125,7 @@ struct LevelUpOverlay: View {
                 HStack(spacing: 12) {
                     ForEach(0..<3, id: \.self) { index in
                         Image(systemName: "star.fill")
-                            .font(.system(size: 32))
+                            .font(.system(size: 32 * metrics.overlayIconScale))
                             .foregroundStyle(Color("NeonYellow"))
                             .shadow(color: Color("NeonYellow"), radius: 10)
                             .scaleEffect(isAnimating ? 1.0 : 0.3)
@@ -124,24 +141,20 @@ struct LevelUpOverlay: View {
             }
         }
         .onAppear {
-            // Play level up sound
             audioManager.playSoundEffect(named: "node-unlock", withExtension: "wav", volume: 1.0)
 
             withAnimation(.spring(response: 0.6, dampingFraction: 0.6)) {
                 isAnimating = true
             }
 
-            // Pulse animation
             withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
                 pulseScale = 1.1
             }
 
-            // Rotation animation
             withAnimation(.easeInOut(duration: 2.0)) {
                 rotationDegrees = 360
             }
 
-            // Auto-dismiss after 2 seconds
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 guard !hasCompleted else { return }
                 hasCompleted = true
@@ -155,6 +168,7 @@ struct ParticleBurst: View {
     let index: Int
     let isAnimating: Bool
     let color: Color
+    var distance: CGFloat = 200
 
     @State private var offset: CGSize = .zero
     @State private var opacity: Double = 1.0
@@ -163,7 +177,6 @@ struct ParticleBurst: View {
     var body: some View {
         let size = CGFloat.random(in: 8...16)
         let angle = Double(index) * (360.0 / 40.0)
-        let distance: CGFloat = 200
 
         Circle()
             .fill(color)

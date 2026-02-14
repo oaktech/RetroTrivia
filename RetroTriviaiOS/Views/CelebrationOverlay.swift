@@ -7,25 +7,42 @@ import SwiftUI
 
 struct CelebrationOverlay: View {
     @Environment(AudioManager.self) var audioManager
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
     let onComplete: () -> Void
 
     @State private var isAnimating = false
+
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
 
     var body: some View {
         ZStack {
             Color.black.opacity(0.3)
                 .ignoresSafeArea()
 
+            // iPad spotlight backdrop
+            if metrics.isIPad {
+                RadialGradient(
+                    colors: [Color("NeonYellow").opacity(0.08), Color.clear],
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: 400
+                )
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+            }
+
             // Confetti particles
             ForEach(0..<60, id: \.self) { index in
-                ConfettiPiece(index: index, isAnimating: isAnimating)
+                ConfettiPiece(index: index, isAnimating: isAnimating, spreadMin: metrics.confettiSpreadMin, spreadMax: metrics.confettiSpreadMax)
             }
 
             // "CORRECT!" text
             VStack(spacing: 20) {
                 Text("CORRECT!")
-                    .font(.system(size: 64, weight: .black, design: .rounded))
+                    .font(.system(size: 64 * metrics.overlayTextScale, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Color("NeonPink"), Color("NeonYellow")],
@@ -39,7 +56,7 @@ struct CelebrationOverlay: View {
                     .opacity(isAnimating ? 1 : 0)
 
                 Image(systemName: "star.fill")
-                    .font(.system(size: 48))
+                    .font(.system(size: 48 * metrics.overlayIconScale))
                     .foregroundStyle(Color("NeonYellow"))
                     .shadow(color: Color("NeonYellow"), radius: 10)
                     .scaleEffect(isAnimating ? 1.0 : 0.3)
@@ -48,14 +65,12 @@ struct CelebrationOverlay: View {
             }
         }
         .onAppear {
-            // Play celebration sound
             audioManager.playSoundEffect(named: "celebration")
 
             withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
                 isAnimating = true
             }
 
-            // Auto-dismiss after 1.5 seconds
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 onComplete()
             }
@@ -66,6 +81,8 @@ struct CelebrationOverlay: View {
 struct ConfettiPiece: View {
     let index: Int
     let isAnimating: Bool
+    var spreadMin: CGFloat = -200
+    var spreadMax: CGFloat = 200
 
     @State private var yOffset: CGFloat = -100
     @State private var xOffset: CGFloat = 0
@@ -89,7 +106,7 @@ struct ConfettiPiece: View {
             .rotationEffect(.degrees(rotation))
             .offset(x: xOffset, y: yOffset)
             .onAppear {
-                let startX = CGFloat.random(in: -200...200)
+                let startX = CGFloat.random(in: spreadMin...spreadMax)
                 let endX = startX + CGFloat.random(in: -50...50)
                 let delay = Double.random(in: 0...0.3)
 

@@ -8,11 +8,16 @@ import SwiftUI
 struct BadgeToastView: View {
     let badge: Badge
     var isVisible: Bool
+    @Environment(\.horizontalSizeClass) private var sizeClass
+
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
 
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: badge.iconName)
-                .font(.system(size: 24, weight: .bold))
+                .font(.system(size: metrics.badgeToastIconFont, weight: .bold))
                 .foregroundStyle(Color(badge.iconColor))
                 .shadow(color: Color(badge.iconColor), radius: 6)
 
@@ -22,7 +27,7 @@ struct BadgeToastView: View {
                     .foregroundStyle(.white.opacity(0.6))
                     .textCase(.uppercase)
                 Text(badge.title)
-                    .font(.system(size: 15, weight: .black, design: .rounded))
+                    .font(.system(size: metrics.badgeToastTitleFont, weight: .black, design: .rounded))
                     .foregroundStyle(Color("NeonYellow"))
                     .shadow(color: Color("NeonYellow").opacity(0.5), radius: 4)
             }

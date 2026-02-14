@@ -15,7 +15,10 @@ struct RetroButton: View {
     let variant: RetroButtonVariant
     let action: () -> Void
 
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var isPressed = false
+
+    private var isIPad: Bool { sizeClass == .regular }
 
     init(_ title: String, variant: RetroButtonVariant = .primary, action: @escaping () -> Void) {
         self.title = title
@@ -26,17 +29,15 @@ struct RetroButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.title3)
-                .fontWeight(.bold)
-                .fontDesign(.rounded)
+                .font(.system(size: isIPad ? 22 : 18, weight: .bold, design: .rounded))
                 .foregroundStyle(textColor)
-                .padding(.horizontal, 32)
-                .padding(.vertical, 16)
-                .frame(maxWidth: .infinity)
+                .padding(.horizontal, isIPad ? 40 : 32)
+                .padding(.vertical, isIPad ? 20 : 16)
+                .frame(maxWidth: isIPad ? 500 : .infinity)
                 .background(background)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: isIPad ? 14 : 12))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: isIPad ? 14 : 12)
                         .stroke(borderGradient, lineWidth: 3)
                 )
                 .shadow(color: glowColor.opacity(0.6), radius: isPressed ? 4 : 8)

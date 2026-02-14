@@ -7,24 +7,26 @@ import SwiftUI
 
 struct FinalStandingsView: View {
     @Environment(AudioManager.self) var audioManager
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let session: PassAndPlaySession
     let onPlayAgain: () -> Void
     let onHome: () -> Void
+
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
 
     private var sortedPlayers: [PassAndPlayPlayer] {
         session.players.enumerated().sorted { item1, item2 in
             let (index1, player1) = item1
             let (index2, player2) = item2
 
-            // Primary: sort by position (descending)
             if player1.position != player2.position {
                 return player1.position > player2.position
             }
-            // Tiebreaker 1: sort by correct answers (descending)
             if player1.correctAnswers != player2.correctAnswers {
                 return player1.correctAnswers > player2.correctAnswers
             }
-            // Final tiebreaker: maintain original order
             return index1 < index2
         }
         .map { $0.element }
@@ -40,7 +42,7 @@ struct FinalStandingsView: View {
 
                 // Game Over title
                 Text("GAME OVER")
-                    .font(.custom("PressStart2P-Regular", size: 26))
+                    .font(.custom("PressStart2P-Regular", size: metrics.isIPad ? 34 : 26))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Color("NeonPink"), Color("ElectricBlue")],
@@ -72,10 +74,10 @@ struct FinalStandingsView: View {
 
                         HStack(spacing: 16) {
                             Text(medal)
-                                .font(.system(size: 32))
+                                .font(.system(size: metrics.isIPad ? 40 : 32))
 
                             Text(player.name)
-                                .font(.system(size: 20, weight: .bold, design: .rounded))
+                                .font(.system(size: metrics.isIPad ? 24 : 20, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -89,15 +91,15 @@ struct FinalStandingsView: View {
                                     Image(systemName: "location.fill")
                                         .font(.system(size: 12))
                                     Text("\(player.position)")
-                                        .font(.custom("Orbitron-Bold", size: 16))
+                                        .font(.custom("Orbitron-Bold", size: metrics.isIPad ? 20 : 16))
                                         .monospacedDigit()
                                 }
                                 .foregroundStyle(player.color)
                             }
-                            .frame(width: 70)
+                            .frame(width: metrics.isIPad ? 85 : 70)
                         }
                         .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
+                        .padding(.vertical, metrics.isIPad ? 16 : 12)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(Color("RetroPurple").opacity(isWinner ? 0.8 : 0.5))
@@ -178,6 +180,7 @@ struct FinalStandingsView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
+            .frame(maxWidth: metrics.finalStandingsMaxWidth)
         }
     }
 

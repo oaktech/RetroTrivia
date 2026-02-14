@@ -12,6 +12,7 @@ struct GameMapView: View {
     @Environment(QuestionManager.self) var questionManager
     @Environment(GameCenterManager.self) var gameCenterManager
     @Environment(BadgeManager.self) var badgeManager
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let onBackTapped: () -> Void
 
     @State private var currentQuestion: TriviaQuestion?
@@ -57,7 +58,10 @@ struct GameMapView: View {
     }
 
     private let maxLevel = 25
-    private let nodeSpacing: CGFloat = 100
+
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
 
     private var currentTier: Int {
         gameState.currentPosition / 3
@@ -171,9 +175,8 @@ struct GameMapView: View {
     // MARK: - Progressive Intensity Helpers
 
     private func intensityMultiplier(for level: Int) -> Double {
-        // Intensity increases every 3 levels (creates distinct tiers)
         let tier = Double(level / 3)
-        let maxTier = Double(25 / 3) // 8 tiers total (0-8)
+        let maxTier = Double(25 / 3)
         return tier / maxTier
     }
 
@@ -186,8 +189,6 @@ struct GameMapView: View {
 
     private func lineColor(for level: Int) -> Color {
         let intensity = intensityMultiplier(for: level)
-
-        // First transition at tier 2 (0.25), then every 2 tiers (0.5, 0.75)
         if intensity < 0.25 {
             return Color("ElectricBlue")
         } else if intensity < 0.5 {
@@ -198,170 +199,100 @@ struct GameMapView: View {
     }
 
     var body: some View {
-        ZStack {
-            RetroGradientBackground()
+        GeometryReader { geometry in
+            ZStack {
+                RetroGradientBackground()
 
-            if !hasPlayedOnce {
-                // Show minimal loading state before first question appears
-                if isLoadingQuestions {
-                    ProgressView()
-                        .tint(Color("NeonPink"))
+                if metrics.isIPad {
+                    StageSpotlightOverlay()
                 }
-            }
 
-            VStack(spacing: 0) {
-                // Header with Back button and score
-                header
-
-                // Scrollable map
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            // Add top padding
-                            Color.clear.frame(height: 100)
-
-                            // Map nodes (reversed to show bottom-to-top)
-                            ForEach((0...maxLevel).reversed(), id: \.self) { level in
-                                VStack(spacing: 0) {
-                                    MapNodeView(
-                                        levelIndex: level,
-                                        isCurrentPosition: level == gameState.currentPosition,
-                                        currentPosition: gameState.currentPosition,
-                                        isAnimatingTarget: animatingNodeLevel == level
-                                    )
-                                    .id(level)
-
-                                    // Connecting line (except for the last node)
-                                    if level > 0 {
-                                        let isAnimatingLine = animatingLineLevel == level
-                                        Rectangle()
-                                            .fill(
-                                                LinearGradient(
-                                                    colors: [
-                                                        level <= gameState.currentPosition ? lineColor(for: level) : Color.white.opacity(0.2),
-                                                        level - 1 <= gameState.currentPosition ? lineColor(for: level - 1) : Color.white.opacity(0.2)
-                                                    ],
-                                                    startPoint: .top,
-                                                    endPoint: .bottom
-                                                )
-                                            )
-                                            .frame(width: lineWidth(for: level), height: 30)
-                                            .padding(.vertical, 8)
-                                            .overlay(
-                                                // Flash effect overlay
-                                                Rectangle()
-                                                    .fill(Color.white)
-                                                    .opacity(isAnimatingLine ? lineFlashIntensity : 0)
-                                                    .frame(width: lineWidth(for: level), height: 30)
-                                            )
-                                            .shadow(
-                                                color: isAnimatingLine
-                                                    ? Color("NeonYellow")
-                                                    : (level <= gameState.currentPosition ? lineColor(for: level).opacity(0.5) : .clear),
-                                                radius: isAnimatingLine
-                                                    ? 10 * lineFlashIntensity
-                                                    : (level <= gameState.currentPosition ? lineWidth(for: level) * 1.5 : 0)
-                                            )
-                                            .drawingGroup()
-                                    }
-                                }
-                            }
-
-                            // Add bottom padding
-                            Color.clear.frame(height: 100)
-                        }
-                    }
-                    .onChange(of: gameState.currentPosition) { oldValue, newValue in
-                        // Dramatic camera movement based on direction
-                        let isClimbing = newValue > oldValue
-                        let isFalling = newValue < oldValue
-
-                        if isClimbing || isFalling {
-                            // First: Quick movement with overshoot
-                            let overshootTarget = isClimbing ? min(newValue + 2, maxLevel) : max(newValue - 2, 0)
-
-                            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
-                                proxy.scrollTo(overshootTarget, anchor: .center)
-                            }
-
-                            // Then: Settle back to actual position
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
-                                    proxy.scrollTo(newValue, anchor: .center)
-                                }
-                            }
-                        } else {
-                            // Normal scroll for initial positioning
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                proxy.scrollTo(newValue, anchor: .center)
-                            }
-                        }
-                    }
-                    .onAppear {
-                        // Store proxy and scroll to current position
-                        scrollProxy = proxy
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            proxy.scrollTo(gameState.currentPosition, anchor: .center)
-                        }
+                if !hasPlayedOnce {
+                    if isLoadingQuestions {
+                        ProgressView()
+                            .tint(Color("NeonPink"))
                     }
                 }
 
-                // Play button at bottom
-                playButton
-            }
-            .opacity(hasPlayedOnce ? 1 : 0)
-
-            // Level up overlay
-            if showLevelUp {
-                LevelUpOverlay(newTier: levelUpTier) {
-                    showLevelUp = false
-                }
-            }
-
-            // Game over overlay
-            if showGameOver {
-                GameOverOverlay(
-                    score: gameState.currentPosition,
-                    reason: gameOverReason,
-                    newBadges: sessionBadges,
-                    onPlayAgain: {
-                        playAgain()
-                    }
-                ) {
-                    audioManager.playMenuMusic()
-                    onBackTapped()
-                }
-            }
-
-            // Badge toast (top of screen, below Dynamic Island / status bar)
-            if let toastBadge = activeBadgeToast {
-                VStack {
-                    BadgeToastView(badge: toastBadge, isVisible: showBadgeToast)
-                        .padding(.top, 8)
-                    Spacer()
-                }
-                .allowsHitTesting(false)
-                .zIndex(100)
-            }
-
-            // Urgency vignette overlay (screen edge glow when time is running out)
-            if urgencyLevel != .none {
-                Rectangle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                Color.clear,
-                                Color.clear,
-                                urgencyVignetteColor.opacity(urgencyVignetteOpacity * (urgencyPulse ? 1.2 : 0.8))
-                            ],
-                            center: .center,
-                            startRadius: UIScreen.main.bounds.width * 0.3,
-                            endRadius: UIScreen.main.bounds.width * 0.8
+                if metrics.isIPad {
+                    // iPad: "The Game Board" — snaking grid + podium bar
+                    VStack(spacing: 0) {
+                        iPadMapHeader
+                        Spacer()
+                        SnakeGridMapView(
+                            currentPosition: gameState.currentPosition,
+                            maxLevel: maxLevel
                         )
-                    )
-                    .ignoresSafeArea()
+                        .padding(.horizontal, 40)
+                        .frame(maxHeight: geometry.size.height * 0.6)
+                        Spacer()
+                        iPadPodiumBar
+                        iPadAutoAdvanceBar
+                    }
+                    .opacity(hasPlayedOnce ? 1 : 0)
+                } else {
+                    // iPhone: Original layout
+                    VStack(spacing: 0) {
+                        header
+                        mapContent(geometry: geometry)
+                        playButton
+                    }
+                    .opacity(hasPlayedOnce ? 1 : 0)
+                }
+
+                // Level up overlay
+                if showLevelUp {
+                    LevelUpOverlay(newTier: levelUpTier) {
+                        showLevelUp = false
+                    }
+                }
+
+                // Game over overlay
+                if showGameOver {
+                    GameOverOverlay(
+                        score: gameState.currentPosition,
+                        reason: gameOverReason,
+                        newBadges: sessionBadges,
+                        onPlayAgain: {
+                            playAgain()
+                        }
+                    ) {
+                        audioManager.playMenuMusic()
+                        onBackTapped()
+                    }
+                }
+
+                // Badge toast
+                if let toastBadge = activeBadgeToast {
+                    VStack {
+                        BadgeToastView(badge: toastBadge, isVisible: showBadgeToast)
+                            .padding(.top, 8)
+                        Spacer()
+                    }
                     .allowsHitTesting(false)
-                    .animation(.easeInOut(duration: urgencyLevel == .critical ? 0.3 : 0.5), value: urgencyPulse)
+                    .zIndex(100)
+                }
+
+                // Urgency vignette overlay — uses GeometryReader instead of UIScreen
+                if urgencyLevel != .none {
+                    let vignetteSize = min(geometry.size.width, geometry.size.height)
+                    Rectangle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    Color.clear,
+                                    Color.clear,
+                                    urgencyVignetteColor.opacity(urgencyVignetteOpacity * (urgencyPulse ? 1.2 : 0.8))
+                                ],
+                                center: .center,
+                                startRadius: vignetteSize * 0.3,
+                                endRadius: vignetteSize * 0.8
+                            )
+                        )
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
+                        .animation(.easeInOut(duration: urgencyLevel == .critical ? 0.3 : 0.5), value: urgencyPulse)
+                }
             }
         }
         .onReceive(gameTimer) { _ in
@@ -369,17 +300,15 @@ struct GameMapView: View {
             if gameTimeRemaining > 0 {
                 gameTimeRemaining -= 1
 
-                // Trigger urgency pulse animation at thresholds
                 if urgencyLevel != .none {
-                    // Pulse frequency increases with urgency
                     let shouldPulse: Bool
                     switch urgencyLevel {
                     case .critical:
-                        shouldPulse = true // every second
+                        shouldPulse = true
                     case .high:
-                        shouldPulse = Int(gameTimeRemaining) % 2 == 0 // every 2 seconds
+                        shouldPulse = Int(gameTimeRemaining) % 2 == 0
                     case .moderate:
-                        shouldPulse = Int(gameTimeRemaining) % 3 == 0 // every 3 seconds
+                        shouldPulse = Int(gameTimeRemaining) % 3 == 0
                     case .none:
                         shouldPulse = false
                     }
@@ -413,7 +342,6 @@ struct GameMapView: View {
             )
             .scaleEffect(questionCardScale)
             .onAppear {
-                // Snap effect: start slightly larger, then spring to normal
                 questionCardScale = 1.15
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0)) {
                     questionCardScale = 1.0
@@ -432,6 +360,407 @@ struct GameMapView: View {
                 .environment(badgeManager)
         }
         #endif
+    }
+
+    // MARK: - iPad Stats Sidebar
+
+    @ViewBuilder
+    private var iPadStatsSidebar: some View {
+        VStack(spacing: 20) {
+            // Tier badge
+            VStack(spacing: 6) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(tierColor.opacity(0.2))
+                        .stroke(tierColor.opacity(0.6), lineWidth: 2)
+
+                    VStack(spacing: 4) {
+                        Text("Tier \(currentTier + 1)")
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .foregroundStyle(tierColor)
+                        Text(tierName(for: currentTier))
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .foregroundStyle(tierColor.opacity(0.8))
+                    }
+                    .padding(.vertical, 12)
+                }
+                .frame(height: 70)
+                .shadow(color: tierColor.opacity(0.4), radius: 8)
+            }
+
+            // Streak
+            VStack(spacing: 6) {
+                Text("Streak")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.7))
+                HStack(spacing: 4) {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(currentStreak >= 5 ? Color("NeonPink") : .white.opacity(0.5))
+                    Text("\(currentStreak)")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(currentStreak >= 5 ? Color("NeonPink") : .white)
+                }
+            }
+
+            // Accuracy
+            if gameState.currentPosition > 0 || currentStreak > 0 {
+                VStack(spacing: 6) {
+                    Text("Accuracy")
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.7))
+                    Text("\(gameState.currentPosition)")
+                        .font(.custom("Orbitron-Bold", size: 18))
+                        .monospacedDigit()
+                        .foregroundStyle(Color("NeonYellow"))
+                }
+            }
+
+            // Lives (gauntlet mode)
+            if gameState.gameSettings.livesEnabled {
+                VStack(spacing: 6) {
+                    Text("Lives")
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.7))
+                    HStack(spacing: 4) {
+                        ForEach(0..<gameState.gameSettings.startingLives, id: \.self) { i in
+                            Image(systemName: i < gameState.livesRemaining ? "heart.fill" : "heart")
+                                .font(.system(size: 16))
+                                .foregroundStyle(Color("NeonPink"))
+                                .shadow(color: Color("NeonPink").opacity(i < gameState.livesRemaining ? 0.6 : 0), radius: 4)
+                        }
+                    }
+                }
+            }
+
+            // Recent badges
+            if !sessionBadges.isEmpty {
+                VStack(spacing: 6) {
+                    Text("Badges")
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.7))
+                    ForEach(sessionBadges.suffix(3)) { badge in
+                        HStack(spacing: 6) {
+                            Image(systemName: badge.iconName)
+                                .font(.system(size: 14))
+                                .foregroundStyle(Color(badge.iconColor))
+                            Text(badge.title)
+                                .font(.system(size: 11, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.8))
+                                .lineLimit(1)
+                        }
+                    }
+                }
+            }
+
+            Spacer()
+        }
+        .padding(16)
+        .background(Color.black.opacity(0.15))
+    }
+
+    // MARK: - iPad Game Board Header
+
+    private var iPadMapHeader: some View {
+        HStack {
+            Button(action: {
+                audioManager.playSoundEffect(named: "back-button")
+                audioManager.playMenuMusic()
+                onBackTapped()
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "xmark.circle")
+                    Text("Quit")
+                }
+                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .foregroundStyle(.red.opacity(0.9))
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(.red.opacity(0.15))
+                        .stroke(.red.opacity(0.4), lineWidth: 1)
+                )
+            }
+
+            Spacer()
+
+            // Center: Level + Tier name
+            VStack(spacing: 2) {
+                Text("LEVEL \(gameState.currentPosition) of \(maxLevel)")
+                    .font(.system(size: 14, weight: .black, design: .rounded))
+                    .foregroundStyle(.white)
+                    .tracking(1)
+                Text(tierName(for: currentTier).uppercased())
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .foregroundStyle(tierColor)
+                    .tracking(2)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(tierColor.opacity(0.1))
+                    .stroke(tierColor.opacity(0.3), lineWidth: 1)
+            )
+            #if DEBUG
+            .onLongPressGesture { showDebugBadgePanel = true }
+            #endif
+
+            Spacer()
+
+            // Right: LED clock or game timer
+            if gameState.gameSettings.leaderboardMode {
+                LEDClockTimerView(timeRemaining: gameTimeRemaining, totalTime: Double(GameSettings.leaderboardDuration))
+                    .scaleEffect(0.55)
+                    .frame(width: 140, height: 56)
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 8)
+        .padding(.bottom, 4)
+    }
+
+    // MARK: - iPad Podium Stats Bar
+
+    private var iPadPodiumBar: some View {
+        PodiumBar(items: {
+            var items: [PodiumItem] = []
+
+            items.append(PodiumItem(
+                icon: "flame.fill",
+                value: "\(currentStreak)",
+                label: "Streak",
+                color: currentStreak >= 5 ? Color("NeonPink") : Color("ElectricBlue"),
+                isHighlighted: currentStreak >= 5
+            ))
+
+            if gameState.currentPosition > 0 {
+                items.append(PodiumItem(
+                    icon: "target",
+                    value: "\(gameState.currentPosition)",
+                    label: "Correct",
+                    color: Color("NeonYellow")
+                ))
+            }
+
+            if gameState.gameSettings.livesEnabled {
+                let livesStr = String(repeating: "\u{2665}", count: gameState.livesRemaining)
+                items.append(PodiumItem(
+                    icon: "heart.fill",
+                    value: livesStr.isEmpty ? "0" : livesStr,
+                    label: "Lives",
+                    color: Color("NeonPink"),
+                    isHighlighted: gameState.livesRemaining <= 1
+                ))
+            }
+
+            if !sessionBadges.isEmpty {
+                items.append(PodiumItem(
+                    icon: "medal.fill",
+                    value: "x\(sessionBadges.count)",
+                    label: "Badges",
+                    color: Color("NeonYellow")
+                ))
+            }
+
+            return items
+        }())
+    }
+
+    // MARK: - iPad Auto-Advance Bar
+
+    private var iPadAutoAdvanceBar: some View {
+        VStack(spacing: 0) {
+            if showAutoAdvance {
+                GeometryReader { geometry in
+                    ZStack {
+                        Rectangle()
+                            .fill(Color.white.opacity(0.1))
+                            .frame(height: 6)
+
+                        Rectangle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color("NeonPink"), Color("ElectricBlue"), Color("HotMagenta")],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .frame(height: 6)
+                            .mask(
+                                HStack(spacing: 0) {
+                                    Spacer()
+                                    Rectangle()
+                                        .frame(width: geometry.size.width * autoAdvanceProgress)
+                                    Spacer()
+                                }
+                            )
+                    }
+                    .frame(height: 6)
+                    .clipShape(RoundedRectangle(cornerRadius: 3))
+                }
+                .frame(height: 6)
+                .padding(.horizontal, 40)
+                .padding(.vertical, 12)
+                .transition(.opacity)
+            }
+
+            if isLoadingQuestions {
+                Text("Loading questions...")
+                    .retroBody()
+                    .opacity(0.6)
+                    .padding(.bottom, 12)
+            } else if questionManager.questionPool.isEmpty {
+                Text("No questions available")
+                    .retroBody()
+                    .opacity(0.6)
+                    .padding(.bottom, 12)
+            }
+        }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private func tierName(for tier: Int) -> String {
+        switch tier {
+        case 0: return "Beginner"
+        case 1: return "Rising Star"
+        case 2: return "On Fire"
+        case 3: return "Hot Streak"
+        case 4: return "Supercharged"
+        case 5: return "Elite"
+        case 6: return "Champion"
+        case 7: return "Legendary"
+        case 8: return "Ultimate"
+        default: return "Level \(tier + 1)"
+        }
+    }
+
+    // MARK: - Map Content
+
+    @ViewBuilder
+    private func mapContent(geometry: GeometryProxy) -> some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Color.clear.frame(height: 100)
+
+                    if metrics.isIPad {
+                        // iPad: Zigzag path with curved connections
+                        ForEach((0...maxLevel).reversed(), id: \.self) { level in
+                            let xOffset = sin(Double(level) * .pi / 3.0) * Double(metrics.mapZigzagAmplitude)
+                            VStack(spacing: 0) {
+                                MapNodeView(
+                                    levelIndex: level,
+                                    isCurrentPosition: level == gameState.currentPosition,
+                                    currentPosition: gameState.currentPosition,
+                                    isAnimatingTarget: animatingNodeLevel == level,
+                                    sizeMultiplier: metrics.mapNodeSizeMultiplier
+                                )
+                                .id(level)
+                                .offset(x: CGFloat(xOffset))
+
+                                if level > 0 {
+                                    let isAnimatingLine = animatingLineLevel == level
+                                    let nextXOffset = sin(Double(level - 1) * .pi / 3.0) * Double(metrics.mapZigzagAmplitude)
+                                    ZigzagConnector(
+                                        fromX: CGFloat(xOffset),
+                                        toX: CGFloat(nextXOffset),
+                                        height: 40 * metrics.mapLineHeightMultiplier,
+                                        lineWidth: lineWidth(for: level),
+                                        color: level <= gameState.currentPosition ? lineColor(for: level) : Color.white.opacity(0.2),
+                                        flashIntensity: isAnimatingLine ? lineFlashIntensity : 0,
+                                        shadowColor: isAnimatingLine
+                                            ? Color("NeonYellow")
+                                            : (level <= gameState.currentPosition ? lineColor(for: level).opacity(0.5) : .clear),
+                                        shadowRadius: isAnimatingLine
+                                            ? 10 * lineFlashIntensity
+                                            : (level <= gameState.currentPosition ? lineWidth(for: level) * 1.5 : 0)
+                                    )
+                                    .padding(.vertical, 4)
+                                }
+                            }
+                        }
+                    } else {
+                        // iPhone: Straight vertical path (original)
+                        ForEach((0...maxLevel).reversed(), id: \.self) { level in
+                            VStack(spacing: 0) {
+                                MapNodeView(
+                                    levelIndex: level,
+                                    isCurrentPosition: level == gameState.currentPosition,
+                                    currentPosition: gameState.currentPosition,
+                                    isAnimatingTarget: animatingNodeLevel == level
+                                )
+                                .id(level)
+
+                                if level > 0 {
+                                    let isAnimatingLine = animatingLineLevel == level
+                                    Rectangle()
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [
+                                                    level <= gameState.currentPosition ? lineColor(for: level) : Color.white.opacity(0.2),
+                                                    level - 1 <= gameState.currentPosition ? lineColor(for: level - 1) : Color.white.opacity(0.2)
+                                                ],
+                                                startPoint: .top,
+                                                endPoint: .bottom
+                                            )
+                                        )
+                                        .frame(width: lineWidth(for: level), height: 30)
+                                        .padding(.vertical, 8)
+                                        .overlay(
+                                            Rectangle()
+                                                .fill(Color.white)
+                                                .opacity(isAnimatingLine ? lineFlashIntensity : 0)
+                                                .frame(width: lineWidth(for: level), height: 30)
+                                        )
+                                        .shadow(
+                                            color: isAnimatingLine
+                                                ? Color("NeonYellow")
+                                                : (level <= gameState.currentPosition ? lineColor(for: level).opacity(0.5) : .clear),
+                                            radius: isAnimatingLine
+                                                ? 10 * lineFlashIntensity
+                                                : (level <= gameState.currentPosition ? lineWidth(for: level) * 1.5 : 0)
+                                        )
+                                        .drawingGroup()
+                                }
+                            }
+                        }
+                    }
+
+                    Color.clear.frame(height: 100)
+                }
+            }
+            .onChange(of: gameState.currentPosition) { oldValue, newValue in
+                let isClimbing = newValue > oldValue
+                let isFalling = newValue < oldValue
+
+                if isClimbing || isFalling {
+                    let overshootTarget = isClimbing ? min(newValue + 2, maxLevel) : max(newValue - 2, 0)
+
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                        proxy.scrollTo(overshootTarget, anchor: .center)
+                    }
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                            proxy.scrollTo(newValue, anchor: .center)
+                        }
+                    }
+                } else {
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        proxy.scrollTo(newValue, anchor: .center)
+                    }
+                }
+            }
+            .onAppear {
+                scrollProxy = proxy
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    proxy.scrollTo(gameState.currentPosition, anchor: .center)
+                }
+            }
+        }
     }
 
     private func playAgain() {
@@ -457,7 +786,6 @@ struct GameMapView: View {
         audioManager.playSoundEffect(named: "wrong-buzzer")
         gameOverReason = reason
 
-        // Check game-over badges (first_play, first_gauntlet, flawless, survivor)
         let newBadges = badgeManager.checkBadges(
             position: gameState.currentPosition,
             streak: currentStreak,
@@ -469,7 +797,6 @@ struct GameMapView: View {
         enqueueBadgeToasts(newBadges)
 
         showGameOver = true
-        // Only submit score if playing in leaderboard mode
         if gameState.gameSettings.leaderboardMode {
             Task {
                 await gameCenterManager.submitScore(gameState.currentPosition)
@@ -600,8 +927,8 @@ struct GameMapView: View {
                 gameTimerDisplay
             }
 
-            // Lives display row
-            if gameState.gameSettings.livesEnabled {
+            // Lives display row (iPhone only — iPad shows in sidebar)
+            if gameState.gameSettings.livesEnabled && !metrics.isIPad {
                 HStack(spacing: 6) {
                     ForEach(0..<gameState.gameSettings.startingLives, id: \.self) { i in
                         Image(systemName: i < gameState.livesRemaining ? "heart.fill" : "heart")
@@ -617,17 +944,13 @@ struct GameMapView: View {
 
     private var playButton: some View {
         VStack(spacing: 0) {
-            // Auto-advance progress bar
             if showAutoAdvance {
-                // Single continuous gradient line burning from both ends
                 GeometryReader { geometry in
                     ZStack {
-                        // Background track
                         Rectangle()
                             .fill(Color.white.opacity(0.1))
                             .frame(height: 6)
 
-                        // Single continuous gradient line
                         Rectangle()
                             .fill(
                                 LinearGradient(
@@ -638,14 +961,10 @@ struct GameMapView: View {
                             )
                             .frame(height: 6)
                             .mask(
-                                // Mask that burns from outside edges toward center
                                 HStack(spacing: 0) {
                                     Spacer()
-
-                                    // Center portion (what remains visible as edges burn away)
                                     Rectangle()
                                         .frame(width: geometry.size.width * autoAdvanceProgress)
-
                                     Spacer()
                                 }
                             )
@@ -691,7 +1010,6 @@ struct GameMapView: View {
             isLoadingQuestions = false
             print("DEBUG: \(questionManager.getPoolStatus())")
 
-            // Auto-start first question once loaded
             if !questionManager.questionPool.isEmpty {
                 startTrivia()
             }
@@ -704,11 +1022,9 @@ struct GameMapView: View {
             return
         }
 
-        // Start game timer on first question (and record game start for badge tracking)
         if gameState.gameSettings.leaderboardMode && !gameTimerActive {
             gameTimerActive = true
             badgeManager.recordGameStarted()
-            // Check dedication badges right after incrementing count
             let newBadges = badgeManager.checkBadges(
                 position: gameState.currentPosition,
                 streak: currentStreak,
@@ -719,7 +1035,6 @@ struct GameMapView: View {
             )
             enqueueBadgeToasts(newBadges)
         } else if !gameState.gameSettings.leaderboardMode && !hasPlayedOnce {
-            // Gauntlet: record game start on the very first question
             badgeManager.recordGameStarted()
             let newBadges = badgeManager.checkBadges(
                 position: gameState.currentPosition,
@@ -732,7 +1047,6 @@ struct GameMapView: View {
             enqueueBadgeToasts(newBadges)
         }
 
-        // Play button tap sound
         audioManager.playSoundEffect(named: "button-tap")
 
         print("DEBUG: Selected question: \(question.question)")
@@ -758,11 +1072,9 @@ struct GameMapView: View {
         }
         let next = badgeToastQueue.removeFirst()
         activeBadgeToast = next
-        // Small delay then animate in
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             withAnimation { self.showBadgeToast = true }
         }
-        // Hold for 2 seconds, then slide out and show next
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
             withAnimation { self.showBadgeToast = false }
         }
@@ -785,12 +1097,10 @@ struct GameMapView: View {
             gameState.incrementPosition()
             let newTier = gameState.currentPosition / 3
 
-            // Trigger climbing animation (line above and target node above)
             animateClimbing(from: oldPosition, to: gameState.currentPosition)
 
             print("DEBUG: Position \(oldPosition) -> \(gameState.currentPosition), Tier \(oldTier) -> \(newTier)")
 
-            // Check badges after position update
             let newBadges = badgeManager.checkBadges(
                 position: gameState.currentPosition,
                 streak: currentStreak,
@@ -801,7 +1111,6 @@ struct GameMapView: View {
             )
             enqueueBadgeToasts(newBadges)
 
-            // Show level-up overlay when reaching a new tier (every 3 levels)
             if newTier > oldTier {
                 didLevelUp = true
                 print("DEBUG: Tier crossed! Showing level-up overlay...")
@@ -814,10 +1123,8 @@ struct GameMapView: View {
             currentStreak = 0
             gameState.decrementPosition()
 
-            // Trigger falling animation (line below and target node below)
             animateFalling(from: oldPosition, to: gameState.currentPosition)
 
-            // Check lives
             if gameState.gameSettings.livesEnabled {
                 gameState.livesRemaining -= 1
                 if gameState.livesRemaining <= 0 {
@@ -828,24 +1135,18 @@ struct GameMapView: View {
             }
         }
 
-        // Clear current question to dismiss the sheet
         currentQuestion = nil
-
-        // Start auto-advance immediately for fluid flow
         startAutoAdvance(extendedDuration: didLevelUp)
     }
 
     private func animateClimbing(from: Int, to: Int) {
-        // Animate the line going UP (the line from 'from' to 'to')
         animatingLineLevel = to
         animatingNodeLevel = to
 
-        // Flash animation for line
         withAnimation(.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true)) {
             lineFlashIntensity = 0.6
         }
 
-        // Reset after animation completes
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
             self.lineFlashIntensity = 0.0
             self.animatingLineLevel = nil
@@ -854,16 +1155,13 @@ struct GameMapView: View {
     }
 
     private func animateFalling(from: Int, to: Int) {
-        // Animate the line going DOWN (the line from 'from' to 'to')
         animatingLineLevel = from
         animatingNodeLevel = to
 
-        // Flash animation for line (red-tinted for falling)
         withAnimation(.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true)) {
             lineFlashIntensity = 0.4
         }
 
-        // Reset after animation completes
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
             self.lineFlashIntensity = 0.0
             self.animatingLineLevel = nil
@@ -872,19 +1170,15 @@ struct GameMapView: View {
     }
 
     private func startAutoAdvance(extendedDuration: Bool = false) {
-        // Reset progress
         autoAdvanceProgress = 1.0
         showAutoAdvance = true
 
-        // Use extended duration for level-up celebration, normal duration otherwise
         let duration: Double = extendedDuration ? 2.5 : 1.0
 
-        // Animate progress bar collapsing
         withAnimation(.linear(duration: duration)) {
             autoAdvanceProgress = 0.0
         }
 
-        // Auto-load next question after duration completes
         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
             if self.showAutoAdvance {
                 self.loadNextQuestion()
@@ -896,10 +1190,44 @@ struct GameMapView: View {
         showAutoAdvance = false
         autoAdvanceProgress = 1.0
 
-        // Small delay for visual snap effect
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             self.startTrivia()
         }
+    }
+}
+
+// MARK: - Zigzag Connector (iPad curved path between nodes)
+
+private struct ZigzagConnector: View {
+    let fromX: CGFloat
+    let toX: CGFloat
+    let height: CGFloat
+    let lineWidth: CGFloat
+    let color: Color
+    var flashIntensity: CGFloat = 0
+    var shadowColor: Color = .clear
+    var shadowRadius: CGFloat = 0
+
+    var body: some View {
+        Canvas { context, size in
+            var path = Path()
+            let startPoint = CGPoint(x: size.width / 2 + fromX, y: 0)
+            let endPoint = CGPoint(x: size.width / 2 + toX, y: size.height)
+            let controlPoint = CGPoint(
+                x: (startPoint.x + endPoint.x) / 2,
+                y: size.height / 2
+            )
+            path.move(to: startPoint)
+            path.addQuadCurve(to: endPoint, control: controlPoint)
+
+            context.stroke(path, with: .color(color), lineWidth: lineWidth)
+
+            if flashIntensity > 0 {
+                context.stroke(path, with: .color(.white.opacity(Double(flashIntensity))), lineWidth: lineWidth)
+            }
+        }
+        .frame(height: height)
+        .shadow(color: shadowColor, radius: shadowRadius)
     }
 }
 

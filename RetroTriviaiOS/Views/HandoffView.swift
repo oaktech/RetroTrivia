@@ -7,9 +7,14 @@ import SwiftUI
 
 struct HandoffView: View {
     @Environment(AudioManager.self) var audioManager
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let playerName: String
     let playerColor: Color
     let onReady: () -> Void
+
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
 
     var body: some View {
         ZStack {
@@ -22,7 +27,7 @@ struct HandoffView: View {
 
                 // Hand raised icon - indicates "it's your turn"
                 Image(systemName: "hand.raised.fill")
-                    .font(.system(size: 80))
+                    .font(.system(size: metrics.handoffIconSize))
                     .foregroundStyle(.white)
                     .opacity(0.9)
 
@@ -32,7 +37,7 @@ struct HandoffView: View {
                         .foregroundStyle(.white.opacity(0.85))
 
                     Text(playerName)
-                        .font(.system(size: 48, weight: .black, design: .rounded))
+                        .font(.system(size: metrics.handoffNameFont, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                         .shadow(color: Color.black.opacity(0.3), radius: 4)
                 }
@@ -60,7 +65,7 @@ struct HandoffView: View {
                             .font(.system(size: 20))
                             .foregroundStyle(playerColor)
                     }
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: metrics.handoffMaxWidth)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 16)
                     .background(Color.white)
@@ -70,6 +75,7 @@ struct HandoffView: View {
                 .padding(.horizontal, 40)
                 .padding(.bottom, 60)
             }
+            .frame(maxWidth: metrics.handoffMaxWidth)
         }
     }
 }

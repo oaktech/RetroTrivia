@@ -8,6 +8,9 @@ import SwiftUI
 struct CountdownTimerView: View {
     let timeRemaining: Double
     let totalTime: Double
+    var size: CGFloat = 64
+    var lineWidth: CGFloat = 5
+    var fontSize: CGFloat = 18
 
     @State private var pulseScale: CGFloat = 1.0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -27,23 +30,23 @@ struct CountdownTimerView: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(Color.white.opacity(0.12), lineWidth: 5)
+                .stroke(Color.white.opacity(0.12), lineWidth: lineWidth)
 
             Circle()
                 .trim(from: 0, to: fraction)
-                .stroke(timerColor, style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                .stroke(timerColor, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                 .rotationEffect(.degrees(-90))
                 .neonGlow(color: timerColor, radius: 8)
                 .animation(.linear(duration: 0.1), value: fraction)
 
             Text("\(Int(ceil(max(0, timeRemaining))))")
-                .font(.custom("Orbitron-Bold", size: 18))
+                .font(.custom("Orbitron-Bold", size: fontSize))
                 .monospacedDigit()
                 .foregroundStyle(timerColor)
                 .neonGlow(color: timerColor, radius: 4)
                 .contentTransition(.numericText())
         }
-        .frame(width: 64, height: 64)
+        .frame(width: size, height: size)
         .scaleEffect(pulseScale)
         .onChange(of: Int(ceil(timeRemaining))) { _, _ in
             guard isPulsing else { return }

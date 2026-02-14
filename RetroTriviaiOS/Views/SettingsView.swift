@@ -5,12 +5,17 @@ struct SettingsView: View {
     @Environment(GameState.self) private var gameState
     @Environment(QuestionManager.self) private var questionManager
     @Environment(AudioManager.self) private var audioManager
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
     // Developer mode
     @State private var devTapCount = 0
     @State private var showDevTools = false
     @State private var showCredits = false
     @State private var uploader = CloudKitUploader()
+
+    private var metrics: LayoutMetrics {
+        LayoutMetrics(horizontalSizeClass: sizeClass)
+    }
 
     var body: some View {
         ZStack {
@@ -180,6 +185,7 @@ struct SettingsView: View {
                 .padding(.horizontal, 50)
                 .padding(.bottom, 40)
             }
+            .frame(maxWidth: metrics.settingsMaxWidth)
         }
         .sheet(isPresented: $showCredits) {
             CreditsView()
