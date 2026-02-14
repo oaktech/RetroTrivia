@@ -17,6 +17,8 @@ struct SnakeGridMapView: View {
     var playerDots: [Int: [Color]] = [:]  // level -> player colors (for Pass & Play)
     var isMultiplayer: Bool = false
 
+    @State private var spotlightPulse = false
+
     private let columns = 5
     private let rows = 5
 
@@ -93,18 +95,23 @@ struct SnakeGridMapView: View {
                     let dots = playerDots[position] ?? []
 
                     ZStack {
-                        // Spotlight glow for current position
+                        // Breathing spotlight glow for current position
                         if position == currentPosition && !isMultiplayer {
                             Circle()
                                 .fill(
                                     RadialGradient(
-                                        colors: [Color("NeonPink").opacity(0.3), Color.clear],
+                                        colors: [
+                                            Color("NeonPink").opacity(spotlightPulse ? 0.35 : 0.2),
+                                            Color("NeonPink").opacity(spotlightPulse ? 0.15 : 0.05),
+                                            Color.clear
+                                        ],
                                         center: .center,
                                         startRadius: 0,
-                                        endRadius: nodeSize * 1.2
+                                        endRadius: nodeSize * (spotlightPulse ? 1.3 : 1.1)
                                     )
                                 )
-                                .frame(width: nodeSize * 2.5, height: nodeSize * 2.5)
+                                .frame(width: nodeSize * 2.8, height: nodeSize * 2.8)
+                                .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: spotlightPulse)
                         }
 
                         if isMultiplayer && !dots.isEmpty {
@@ -134,6 +141,9 @@ struct SnakeGridMapView: View {
                     }
                     .position(x: x, y: y)
                 }
+            }
+            .onAppear {
+                spotlightPulse = true
             }
         }
     }

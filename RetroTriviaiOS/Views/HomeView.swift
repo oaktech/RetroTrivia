@@ -197,7 +197,8 @@ struct HomeView: View {
                     subtitle: "Race the clock",
                     details: [("clock", "2 min"), ("trophy", "Ranked")],
                     accent: Color("NeonPink"),
-                    isHero: true
+                    isHero: true,
+                    entranceDelay: 0.1
                 ) {
                     audioManager.playSoundEffect(named: "button-tap")
                     questionManager.filterConfig.difficulty = .any
@@ -210,7 +211,8 @@ struct HomeView: View {
                     icon: "bolt.fill",
                     subtitle: "Survive or fail",
                     details: [("heart.fill", "3 lives"), ("infinity", "No clock")],
-                    accent: Color("ElectricBlue")
+                    accent: Color("ElectricBlue"),
+                    entranceDelay: 0.2
                 ) {
                     audioManager.playSoundEffect(named: "button-tap")
                     showDifficultyPicker = true
@@ -221,7 +223,8 @@ struct HomeView: View {
                     icon: "mic.fill",
                     subtitle: "Challenge friends",
                     details: [("person.2.fill", "2-4"), ("wifi.slash", "Local")],
-                    accent: Color("NeonYellow")
+                    accent: Color("NeonYellow"),
+                    entranceDelay: 0.3
                 ) {
                     audioManager.playSoundEffect(named: "button-tap")
                     activeSheet = .passAndPlaySetup
@@ -510,18 +513,23 @@ private struct StageDoorCard: View {
     let details: [(icon: String, text: String)]
     let accent: Color
     var isHero: Bool = false
+    var entranceDelay: Double = 0
     let action: () -> Void
+
+    @State private var appeared = false
+    @State private var glowPhase: CGFloat = 0
 
     var body: some View {
         Button(action: action) {
             VStack(spacing: 16) {
                 Spacer()
 
-                // Large icon
+                // Large icon with neon glow
                 Image(systemName: icon)
-                    .font(.system(size: 36, weight: .bold))
+                    .font(.system(size: 40, weight: .bold))
                     .foregroundStyle(accent)
-                    .shadow(color: accent.opacity(0.8), radius: 12)
+                    .shadow(color: accent.opacity(0.8), radius: 16)
+                    .shadow(color: accent.opacity(0.4), radius: 24)
 
                 // Title
                 Text(title)
@@ -551,11 +559,36 @@ private struct StageDoorCard: View {
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
-                    .strokeBorder(accent.opacity(isHero ? 0.6 : 0.3), lineWidth: isHero ? 2 : 1.5)
+                    .strokeBorder(
+                        isHero
+                            ? LinearGradient(
+                                colors: [accent, accent.opacity(0.3 + glowPhase * 0.4), accent],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                            : LinearGradient(
+                                colors: [accent.opacity(0.3), accent.opacity(0.3)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                        lineWidth: isHero ? 2 : 1.5
+                    )
             )
             .shadow(color: accent.opacity(isHero ? 0.4 : 0.15), radius: isHero ? 16 : 8)
         }
         .buttonStyle(ScaleButtonStyle())
+        .scaleEffect(appeared ? 1.0 : 0.85)
+        .opacity(appeared ? 1.0 : 0)
+        .onAppear {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(entranceDelay)) {
+                appeared = true
+            }
+            if isHero {
+                withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true).delay(entranceDelay + 0.6)) {
+                    glowPhase = 1.0
+                }
+            }
+        }
     }
 }
 

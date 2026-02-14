@@ -6,20 +6,26 @@
 import SwiftUI
 
 /// Layered atmospheric background for iPad game screens.
-/// Adds spotlight, vignette, and stage floor effects on top of RetroGradientBackground.
+/// Adds an animated breathing spotlight, edge vignette, and stage floor warmth.
 struct StageSpotlightOverlay: View {
     var spotlightRadius: CGFloat = 500
     var spotlightOpacity: Double = 0.03
     var vignetteOpacity: Double = 0.4
     var stageFloorOpacity: Double = 0.08
 
+    @State private var breathe = false
+
+    private var breatheAmount: Double {
+        breathe ? 1.3 : 0.7
+    }
+
     var body: some View {
         ZStack {
-            // Layer 2: Radial spotlight from top-center
+            // Layer 2: Breathing radial spotlight from top-center
             RadialGradient(
                 colors: [
-                    Color.white.opacity(spotlightOpacity),
-                    Color.white.opacity(spotlightOpacity * 0.5),
+                    Color.white.opacity(spotlightOpacity * breatheAmount),
+                    Color.white.opacity(spotlightOpacity * 0.5 * breatheAmount),
                     Color.clear
                 ],
                 center: UnitPoint(x: 0.5, y: 0.15),
@@ -42,23 +48,29 @@ struct StageSpotlightOverlay: View {
             )
             .ignoresSafeArea()
 
-            // Layer 4: Stage floor — subtle warm hint at very bottom
+            // Layer 4: Stage floor — subtle warm gradient at bottom
             VStack {
                 Spacer()
                 LinearGradient(
                     colors: [
                         Color.clear,
-                        Color("NeonPink").opacity(stageFloorOpacity * 0.5),
+                        Color("NeonPink").opacity(stageFloorOpacity * 0.3),
+                        Color("NeonPink").opacity(stageFloorOpacity * 0.6),
                         Color("NeonPink").opacity(stageFloorOpacity)
                     ],
                     startPoint: .top,
                     endPoint: .bottom
                 )
-                .frame(height: 120)
+                .frame(height: 140)
             }
             .ignoresSafeArea()
         }
         .allowsHitTesting(false)
+        .onAppear {
+            withAnimation(.easeInOut(duration: 3.0).repeatForever(autoreverses: true)) {
+                breathe = true
+            }
+        }
     }
 }
 

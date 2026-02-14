@@ -6,6 +6,7 @@
 import SwiftUI
 
 /// iPad answer button with game-show letter label (A/B/C/D).
+/// Features neon letter badge glow, press-scale animation, and smooth state transitions.
 struct GameShowAnswerTile: View {
     let index: Int
     let text: String
@@ -43,7 +44,7 @@ struct GameShowAnswerTile: View {
         return Color("RetroPurple").opacity(0.3)
     }
 
-    private var tileBorder: Color {
+    private var tileBorderColor: Color {
         if !hasAnswered {
             return letterColor.opacity(0.6)
         }
@@ -56,6 +57,19 @@ struct GameShowAnswerTile: View {
         return Color("ElectricBlue").opacity(0.3)
     }
 
+    private var tileShadowColor: Color {
+        if !hasAnswered {
+            return letterColor.opacity(0.2)
+        }
+        if isCorrect {
+            return .green.opacity(0.4)
+        }
+        if isSelected {
+            return .red.opacity(0.3)
+        }
+        return .clear
+    }
+
     private var textColor: Color {
         if !hasAnswered { return .white }
         if isCorrect || isSelected { return .white }
@@ -65,16 +79,20 @@ struct GameShowAnswerTile: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 16) {
-                // Letter badge
+                // Letter badge with neon glow
                 Text(letterLabel)
-                    .font(.system(size: 22, weight: .black, design: .rounded))
+                    .font(.system(size: 24, weight: .black, design: .rounded))
                     .foregroundStyle(hasAnswered ? textColor : letterColor)
-                    .frame(width: 40, height: 40)
+                    .frame(width: 44, height: 44)
                     .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(hasAnswered ? Color.clear : letterColor.opacity(0.15))
-                            .stroke(hasAnswered ? Color.clear : letterColor.opacity(0.4), lineWidth: 1.5)
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(hasAnswered ? Color.clear : letterColor.opacity(0.12))
                     )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(hasAnswered ? Color.clear : letterColor.opacity(0.5), lineWidth: 1.5)
+                    )
+                    .shadow(color: hasAnswered ? .clear : letterColor.opacity(0.4), radius: 8)
 
                 // Answer text
                 Text(text)
@@ -92,10 +110,23 @@ struct GameShowAnswerTile: View {
             .clipShape(RoundedRectangle(cornerRadius: 14))
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke(tileBorder, lineWidth: 2)
+                    .stroke(tileBorderColor, lineWidth: 2)
             )
+            .shadow(color: tileShadowColor, radius: 10)
+            .animation(.easeInOut(duration: 0.3), value: hasAnswered)
         }
+        .buttonStyle(AnswerTileButtonStyle())
         .disabled(hasAnswered)
+    }
+}
+
+/// Custom button style that scales on press for game-show dramatic feedback.
+private struct AnswerTileButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
+            .brightness(configuration.isPressed ? 0.05 : 0)
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
     }
 }
 

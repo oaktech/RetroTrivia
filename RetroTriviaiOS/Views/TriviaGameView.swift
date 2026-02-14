@@ -33,6 +33,8 @@ struct TriviaGameView: View {
     @State private var timerIsActive = false
     @State private var urgencyPulse = false
     @State private var lastTickSecond: Int = -1
+    @State private var questionCardAppeared = false
+    @State private var tilesAppeared = false
 
     private var metrics: LayoutMetrics {
         LayoutMetrics(horizontalSizeClass: sizeClass)
@@ -227,13 +229,15 @@ struct TriviaGameView: View {
 
                 Spacer()
 
-                // Spotlit question card
+                // Spotlit question card — entrance animation
                 iPadQuestionCard
+                    .scaleEffect(questionCardAppeared ? 1.0 : 0.92)
+                    .opacity(questionCardAppeared ? 1.0 : 0)
 
                 Spacer()
                     .frame(maxHeight: 24)
 
-                // Game show answer tiles in 2x2 grid
+                // Game show answer tiles in 2x2 grid — staggered entrance
                 EqualHeightGrid(columns: 2, spacing: 16) {
                     ForEach(0..<question.options.count, id: \.self) { index in
                         GameShowAnswerTile(
@@ -243,6 +247,13 @@ struct TriviaGameView: View {
                             isCorrect: hasAnswered && index == shuffledCorrectIndex,
                             hasAnswered: hasAnswered,
                             action: { handleAnswer(index) }
+                        )
+                        .opacity(tilesAppeared ? 1.0 : 0)
+                        .offset(y: tilesAppeared ? 0 : 20)
+                        .animation(
+                            .spring(response: 0.5, dampingFraction: 0.75)
+                            .delay(0.15 + Double(index) * 0.08),
+                            value: tilesAppeared
                         )
                     }
                 }
@@ -254,6 +265,12 @@ struct TriviaGameView: View {
                 // Footer bar: lives | LED timer | per-Q countdown
                 iPadFooterBar
             }
+        }
+        .onAppear {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.05)) {
+                questionCardAppeared = true
+            }
+            tilesAppeared = true
         }
     }
 
@@ -293,38 +310,59 @@ struct TriviaGameView: View {
     }
 
     private var iPadQuestionCard: some View {
-        VStack(spacing: 16) {
-            Text(question.question)
-                .font(.system(size: metrics.questionFontSize, weight: .bold, design: .rounded))
-                .foregroundStyle(Color("NeonYellow"))
-                .shadow(color: Color("NeonYellow").opacity(0.6), radius: 6)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
+        ZStack {
+            // Dramatic spotlight behind the card
+            RadialGradient(
+                colors: [
+                    Color("NeonYellow").opacity(0.04),
+                    Color("ElectricBlue").opacity(0.02),
+                    Color.clear
+                ],
+                center: .center,
+                startRadius: 0,
+                endRadius: 400
+            )
+            .frame(width: 800, height: 400)
+            .allowsHitTesting(false)
 
-            // Metadata pills
-            HStack(spacing: 8) {
-                metadataPill(text: question.category ?? "80s Music", color: Color("ElectricBlue"))
-                metadataPill(text: (question.difficulty ?? "mixed").capitalized, color: difficultyColor)
+            VStack(spacing: 16) {
+                Text(question.question)
+                    .font(.system(size: metrics.questionFontSize, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color("NeonYellow"))
+                    .shadow(color: Color("NeonYellow").opacity(0.6), radius: 8)
+                    .shadow(color: Color("NeonYellow").opacity(0.2), radius: 20)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                // Metadata pills
+                HStack(spacing: 10) {
+                    metadataPill(text: question.category ?? "80s Music", color: Color("ElectricBlue"))
+                    metadataPill(text: (question.difficulty ?? "mixed").capitalized, color: difficultyColor)
+                }
             }
-        }
-        .padding(32)
-        .frame(maxWidth: metrics.questionCardMaxWidth)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.04))
-                .stroke(Color("ElectricBlue").opacity(0.3), lineWidth: 1)
-        )
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    RadialGradient(
-                        colors: [Color.white.opacity(0.03), Color.clear],
-                        center: .top,
-                        startRadius: 0,
-                        endRadius: 300
+            .padding(.horizontal, 40)
+            .padding(.vertical, 32)
+            .frame(maxWidth: metrics.questionCardMaxWidth)
+            .background(
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(Color.white.opacity(0.03))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                Color("ElectricBlue").opacity(0.4),
+                                Color("NeonPink").opacity(0.2),
+                                Color("ElectricBlue").opacity(0.4)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
                     )
-                )
-        )
+            )
+        }
     }
 
     private var iPadFooterBar: some View {

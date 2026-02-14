@@ -33,10 +33,11 @@ private struct PodiumCard: View {
     let item: PodiumItem
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             Image(systemName: item.icon)
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: 18, weight: .bold))
                 .foregroundStyle(item.color)
+                .shadow(color: item.isHighlighted ? item.color.opacity(0.6) : .clear, radius: 6)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(item.value)
@@ -50,14 +51,17 @@ private struct PodiumCard: View {
             }
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.vertical, 12)
         .frame(maxWidth: .infinity)
         .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.white.opacity(0.04))
-                .stroke(item.color.opacity(item.isHighlighted ? 0.6 : 0.25), lineWidth: 1.5)
+            RoundedRectangle(cornerRadius: 12)
+                .fill(item.isHighlighted ? item.color.opacity(0.06) : Color.white.opacity(0.03))
         )
-        .shadow(color: item.isHighlighted ? item.color.opacity(0.3) : .clear, radius: 8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(item.color.opacity(item.isHighlighted ? 0.5 : 0.2), lineWidth: 1.5)
+        )
+        .shadow(color: item.isHighlighted ? item.color.opacity(0.25) : .clear, radius: 10)
     }
 }
 
