@@ -4,7 +4,7 @@
 
 RetroTrivia features a comprehensive audio system with:
 - **Background Music** - Two different tracks for menu and gameplay
-- **Sound Effects** - 8 different sound effects for user interactions
+- **Sound Effects** - 6 different sound effects for user interactions
 - **Volume Controls** - Separate controls for music and sound effects
 - **Persistence** - User preferences saved across app sessions
 
@@ -63,37 +63,29 @@ All sound effects are fully implemented and play during gameplay:
 
 **Volume:** 80%
 
-### 3. Wrong Answer (`wrong-answer.wav`, 336 KB)
+### 3. Wrong Buzzer (`wrong-buzzer.mp3`, 60 KB)
 **Plays when:**
 - User answers a question incorrectly
 - Wrong answer overlay appears
 - Position decreases on the map
+- Question times out
 
 **Volume:** 80%
 
-**Note:** Also includes `wrong-buzzer.mp3` (60 KB) as an alternative
-
-### 4. Question Start (`question-start.mp3`, 56 KB)
-**Plays when:**
-- Trivia question screen appears
-- New question is presented
-
-**Volume:** 80%
-
-### 5. Music Toggle (`music-toggle.mp3`, 15 KB)
+### 4. Music Toggle (`music-toggle.mp3`, 15 KB)
 **Plays when:**
 - User taps the speaker icon to toggle music on/off
 
 **Volume:** 80%
 
-### 6. Back Button (`back-button.mp3`, 3.0 KB)
+### 5. Back Button (`back-button.mp3`, 3.0 KB)
 **Plays when:**
 - User taps "Quit Game" button
 - Navigating back from game to menu
 
 **Volume:** 80%
 
-### 7. Node Unlock (`node-unlock.wav`, 516 KB)
+### 6. Node Unlock (`node-unlock.wav`, 274 KB)
 **Plays when:**
 - Player reaches a new position on the map
 - Visual map node animation triggers
@@ -143,7 +135,7 @@ resumeBackgroundMusic()            // Resume from pause
 
 // Sound Effects
 playSoundEffect(named: "button-tap")                    // MP3 default
-playSoundEffect(named: "wrong-answer", withExtension: "wav")  // Custom extension
+playSoundEffect(named: "wrong-buzzer")                        // Wrong answer buzzer
 playSoundEffect(named: "celebration", volume: 1.0)      // Custom volume
 ```
 
@@ -230,8 +222,7 @@ Same process as music:
 ### Effect Characteristics
 - **Button Tap:** Short click/beep (< 0.5s)
 - **Celebration:** Uplifting chime/fanfare (1-2s)
-- **Wrong Answer:** Descending tone/buzzer (1-2s)
-- **Question Start:** Attention-grabbing chirp (0.5s)
+- **Wrong Buzzer:** Descending tone/buzzer (1-2s)
 - **Music Toggle:** Subtle click (< 0.3s)
 - **Back Button:** Soft whoosh/click (< 0.5s)
 - **Node Unlock:** Rising tone/shimmer (0.5-1s)
@@ -254,19 +245,22 @@ Same process as music:
 - Node unlock sounds (on position change)
 
 **TriviaGameView:**
-- Question start sound
 - Button tap sounds
+- Tick sound (last 5 seconds of timer)
 
 **CelebrationOverlay:**
 - Celebration sound
 - Haptic feedback (separate from audio)
 
 **WrongAnswerOverlay:**
-- Wrong answer sound
+- Wrong buzzer sound
 - Haptic feedback (separate from audio)
 
+**TimeoutOverlay:**
+- Wrong buzzer sound
+
 **LevelUpOverlay:**
-- Enhanced celebration sound
+- Node unlock sound
 - Visual + audio fanfare
 
 ---
@@ -352,6 +346,6 @@ Potential audio improvements:
 
 ---
 
-**Last Updated:** 2026-02-07
+**Last Updated:** 2026-02-13
 **API Integration:** Complete
 **Audio System:** Fully Implemented

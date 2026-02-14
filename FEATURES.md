@@ -87,16 +87,16 @@ Alternate map skins (cassette tape theme, vinyl record theme) — no pay-to-win.
 - **Glow flare on release**: Border briefly brightens to white for 100ms on release — "juicy" press feedback
 
 ### Quick Wins Summary
-| Change | Effort | Impact |
-|--------|--------|--------|
-| Orbitron font for score/timer | Low | High |
-| Score count-up on game over | Low | High |
-| Grid opacity 0.25 | Trivial | Medium |
-| Letter labels (A/B/C/D) on answer buttons | Low | High |
-| Tick sound in last 5 seconds | Low | High |
-| White glow flare on button release | Low | Medium |
-| Slot-machine phrase transition | Medium | High |
-| Scanline overlay | Medium | High |
+| Change | Effort | Impact | Status |
+|--------|--------|--------|--------|
+| Orbitron font for score/timer | Low | High | Done |
+| Score count-up on game over | Low | High | Done |
+| Grid opacity 0.25 | Trivial | Medium | |
+| Letter labels (A/B/C/D) on answer buttons | Low | High | |
+| Tick sound in last 5 seconds | Low | High | Done |
+| White glow flare on button release | Low | Medium | |
+| Slot-machine phrase transition | Medium | High | |
+| Scanline overlay | Medium | High | |
 
 ---
 

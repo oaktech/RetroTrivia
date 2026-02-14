@@ -7,7 +7,7 @@
 ## ✨ Features
 
 ### Content
-- **6,000+ Curated Trivia Questions** - Carefully calibrated difficulty levels (Easy 30%, Medium 24%, Hard 46%)
+- **5,300+ Curated Trivia Questions** - Carefully calibrated difficulty levels (Easy 30%, Medium 26%, Hard 44%)
 - **Iconic 80s Artists & Hits** - Madonna, Prince, Michael Jackson, Whitney Houston, U2, Duran Duran, The Police, and 30+ more
 - **Smart Question Selection** - Difficulty filtering, automatic deduplication, never repeat questions in a session
 
@@ -28,7 +28,7 @@
 - **Difficulty Selection** - Filter questions by Easy, Medium, or Hard
 
 ### Technical Highlights
-- **CloudKit Question Delivery** - 6,000+ questions from cloud with intelligent random sampling
+- **CloudKit Question Delivery** - 5,300+ questions from cloud with intelligent random sampling
 - **Smart Fallback Strategy** - CloudKit → Local Cache (app always playable)
 - **Modern Swift Concurrency** - Async/await, MainActor safety, observation pattern
 - **Zero Dependencies** - Pure SwiftUI, no third-party libraries
@@ -76,7 +76,7 @@ RetroTriviaiOS/
 ├── Managers/             # AudioManager, GameCenterManager, BadgeManager
 ├── Extensions/           # TriviaQuestion+CloudKit
 ├── Audio/                # Background music (menu, gameplay) and sound effects
-├── Data/                 # questions.json (6,008 questions, bundled)
+├── Data/                 # questions.json (200 bundled questions for offline fallback)
 └── Assets.xcassets/      # Colors, images, app icon
 ```
 
