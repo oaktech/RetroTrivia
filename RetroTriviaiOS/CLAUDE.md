@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with th
 
 **Tech Stack:**
 - SwiftUI (iOS 17+)
-- CloudKit for 6,008 questions (public database)
+- CloudKit for 5,321 questions (public database)
 - UserDefaults for player progress
 - Bundled question fallback for offline play
 - Game Center leaderboard integration
