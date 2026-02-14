@@ -20,7 +20,7 @@
 - **Haptic Feedback** - Satisfying tactile feedback throughout gameplay
 
 ### Gameplay Features
-- **Candy Crush-style Progress Map** - Vertical map where correct answers move you up, wrong answers move you down (floor is level 0)
+- **Candy Crush-style Progress Map** - Vertical map where correct answers move you up, wrong answers move you down
 - **Countdown Timer** - Built-in per-question timer with urgency effects (pulsing at 30s/20s/10s)
 - **Game Center Leaderboard** - Global competitive rankings
 - **Badge Achievement System** - Unlock badges for various milestones and challenges
