@@ -474,15 +474,15 @@ private struct GameModeCard: View {
 
                     if let subtitle {
                         Text(subtitle)
-                            .font(.system(size: isIPad ? 18 : 15, weight: .medium, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.6))
+                            .font(.system(size: isIPad ? 20 : 17, weight: .medium, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.8))
                     }
 
                     HStack(spacing: isIPad ? 18 : 14) {
                         ForEach(0..<details.count, id: \.self) { i in
                             Label(details[i].text, systemImage: details[i].icon)
-                                .font(.system(size: isIPad ? 17 : 14, weight: .semibold, design: .rounded))
-                                .foregroundStyle(accent.opacity(isHero ? 1.0 : 0.8))
+                                .font(.system(size: isIPad ? 18 : 15, weight: .semibold, design: .rounded))
+                                .foregroundStyle(accent.opacity(isHero ? 1.0 : 0.9))
                         }
                     }
                 }
@@ -539,15 +539,15 @@ private struct StageDoorCard: View {
 
                 // Subtitle
                 Text(subtitle)
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.6))
+                    .font(.system(size: 18, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.8))
 
                 // Detail pills
                 VStack(spacing: 8) {
                     ForEach(0..<details.count, id: \.self) { i in
                         Label(details[i].text, systemImage: details[i].icon)
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            .foregroundStyle(accent.opacity(0.9))
+                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                            .foregroundStyle(accent)
                     }
                 }
 
