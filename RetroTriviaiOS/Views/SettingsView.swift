@@ -22,6 +22,10 @@ struct SettingsView: View {
             // Retro background
             RetroGradientBackground()
 
+            if metrics.isIPad {
+                StageSpotlightOverlay()
+            }
+
             VStack(spacing: 30) {
                 // Header
                 Text("Settings")
@@ -37,18 +41,18 @@ struct SettingsView: View {
                     // Category Display (locked/informational) - tap 5x for dev tools
                     HStack {
                         Text("Category")
-                            .retroBody()
+                            .font(.system(size: metrics.isIPad ? 16 : 14, weight: .semibold, design: .rounded))
                             .foregroundStyle(.white)
 
                         Spacer()
 
                         HStack(spacing: 6) {
                             Text("80s Trivia")
-                                .retroBody()
+                                .font(.system(size: metrics.isIPad ? 15 : 14, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color("ElectricBlue"))
 
                             Image(systemName: "lock.fill")
-                                .font(.caption)
+                                .font(.system(size: metrics.isIPad ? 14 : 12))
                                 .foregroundStyle(Color("ElectricBlue").opacity(0.6))
                         }
                     }
@@ -157,9 +161,9 @@ struct SettingsView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "music.note")
-                            .font(.caption)
+                            .font(.system(size: metrics.isIPad ? 15 : 12))
                         Text("Credits & Licenses")
-                            .font(.caption)
+                            .font(.system(size: metrics.isIPad ? 15 : 12, weight: .medium, design: .rounded))
                     }
                     .foregroundStyle(Color("ElectricBlue").opacity(0.8))
                 }
@@ -167,11 +171,11 @@ struct SettingsView: View {
                 // Info text
                 VStack(spacing: 8) {
                     Text("80s Trivia Game")
-                        .font(.caption)
+                        .font(.system(size: metrics.isIPad ? 14 : 12, design: .rounded))
                         .foregroundStyle(.white.opacity(0.6))
 
                     Text("Changes apply on next game")
-                        .font(.caption2)
+                        .font(.system(size: metrics.isIPad ? 12 : 10, design: .rounded))
                         .foregroundStyle(.white.opacity(0.4))
                 }
                 .multilineTextAlignment(.center)

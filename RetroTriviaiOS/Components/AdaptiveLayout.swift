@@ -64,10 +64,10 @@ struct LayoutMetrics {
 
     // MARK: - Modals
 
-    var settingsMaxWidth: CGFloat { isIPad ? 500 : .infinity }
+    var settingsMaxWidth: CGFloat { isIPad ? 600 : .infinity }
     var badgeGridColumns: Int { isIPad ? 3 : 2 }
     var badgeGalleryMaxWidth: CGFloat { isIPad ? 900 : .infinity }
-    var passAndPlaySetupMaxWidth: CGFloat { isIPad ? 600 : .infinity }
+    var passAndPlaySetupMaxWidth: CGFloat { isIPad ? 850 : .infinity }
     var difficultyPickerMaxWidth: CGFloat { isIPad ? 400 : .infinity }
     var handoffMaxWidth: CGFloat { isIPad ? 500 : .infinity }
     var finalStandingsMaxWidth: CGFloat { isIPad ? 700 : .infinity }
