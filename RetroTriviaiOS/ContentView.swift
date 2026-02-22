@@ -10,12 +10,17 @@ import SwiftUI
 struct ContentView: View {
     @Environment(GameState.self) var gameState
     @State private var showGameMap = false
+    @State private var showDailyChallenge = false
     @State private var passAndPlaySession: PassAndPlaySession?
 
     var body: some View {
         if showGameMap {
             GameMapView(onBackTapped: {
                 showGameMap = false
+            })
+        } else if showDailyChallenge {
+            DailyChallengeView(onDone: {
+                showDailyChallenge = false
             })
         } else if let session = passAndPlaySession {
             PassAndPlayMapView(session: session, onDone: {
@@ -25,6 +30,9 @@ struct ContentView: View {
             HomeView(
                 onPlayTapped: {
                     showGameMap = true
+                },
+                onDailyChallengeTapped: {
+                    showDailyChallenge = true
                 },
                 onPassAndPlayTapped: { session in
                     passAndPlaySession = session

@@ -65,6 +65,9 @@ struct SettingsView: View {
                         }
                     }
 
+                    // Notification Settings
+                    notificationSettings
+
                     // Developer Tools (hidden by default)
                     if showDevTools {
                         Divider()
@@ -155,6 +158,9 @@ struct SettingsView: View {
 
                 Spacer()
 
+                // Daily Challenge Stats
+                dailyChallengeStats
+
                 // Credits button
                 Button {
                     showCredits = true
@@ -193,6 +199,159 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showCredits) {
             CreditsView()
+        }
+    }
+
+    // MARK: - Notification Settings
+
+    private var notificationSettings: some View {
+        VStack(spacing: 15) {
+            Divider()
+                .background(Color("ElectricBlue").opacity(0.3))
+                .padding(.horizontal)
+
+            Text("Notifications")
+                .font(.system(size: metrics.isIPad ? 16 : 14, weight: .bold, design: .rounded))
+                .foregroundStyle(Color("ElectricBlue"))
+
+            let notifManager = NotificationManager.shared
+
+            if notifManager.isAuthorized {
+                Toggle(isOn: Binding(
+                    get: { notifManager.dailyChallengeEnabled },
+                    set: {
+                        notifManager.dailyChallengeEnabled = $0
+                        if $0 {
+                            notifManager.scheduleDailyChallengeReminder()
+                        }
+                    }
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Daily Challenge")
+                            .font(.system(size: metrics.isIPad ? 15 : 13, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white)
+                        Text("Reminder at 10:00 AM")
+                            .font(.system(size: metrics.isIPad ? 12 : 10, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.5))
+                    }
+                }
+                .tint(Color("NeonPink"))
+                .padding(.horizontal, 30)
+
+                Toggle(isOn: Binding(
+                    get: { notifManager.streakReminderEnabled },
+                    set: { notifManager.streakReminderEnabled = $0 }
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Streak Reminders")
+                            .font(.system(size: metrics.isIPad ? 15 : 13, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white)
+                        Text("Alert before your streak expires")
+                            .font(.system(size: metrics.isIPad ? 12 : 10, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.5))
+                    }
+                }
+                .tint(Color("NeonPink"))
+                .padding(.horizontal, 30)
+
+                Toggle(isOn: Binding(
+                    get: { notifManager.leaderboardEnabled },
+                    set: {
+                        notifManager.leaderboardEnabled = $0
+                        if $0 {
+                            notifManager.scheduleWeeklyLeaderboardReminder()
+                        }
+                    }
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Leaderboard")
+                            .font(.system(size: metrics.isIPad ? 15 : 13, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white)
+                        Text("Rank changes & weekly resets")
+                            .font(.system(size: metrics.isIPad ? 12 : 10, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.5))
+                    }
+                }
+                .tint(Color("NeonPink"))
+                .padding(.horizontal, 30)
+            } else if notifManager.hasRequestedPermission {
+                Text("Notifications are disabled in Settings")
+                    .font(.system(size: metrics.isIPad ? 13 : 11, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.5))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 30)
+            } else {
+                Button {
+                    Task {
+                        await notifManager.requestPermission()
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "bell.badge.fill")
+                            .foregroundStyle(Color("NeonPink"))
+                        Text("Enable Notifications")
+                            .font(.system(size: metrics.isIPad ? 15 : 13, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(Color("NeonPink").opacity(0.15))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color("NeonPink").opacity(0.4), lineWidth: 1)
+                    )
+                }
+            }
+        }
+    }
+
+    // MARK: - Daily Challenge Stats
+
+    private var dailyChallengeStats: some View {
+        let daily = DailyChallengeManager.shared
+        return Group {
+            if daily.totalCompleted > 0 {
+                VStack(spacing: 8) {
+                    Divider()
+                        .background(Color("ElectricBlue").opacity(0.3))
+                        .padding(.horizontal)
+
+                    Text("Daily Challenge")
+                        .font(.system(size: metrics.isIPad ? 14 : 12, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color("ElectricBlue"))
+
+                    HStack(spacing: 20) {
+                        VStack(spacing: 2) {
+                            Text("\(daily.currentStreak)")
+                                .font(.system(size: metrics.isIPad ? 20 : 16, weight: .black, design: .rounded))
+                                .foregroundStyle(Color("NeonPink"))
+                            Text("Streak")
+                                .font(.system(size: metrics.isIPad ? 11 : 9, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
+
+                        VStack(spacing: 2) {
+                            Text("\(daily.bestStreak)")
+                                .font(.system(size: metrics.isIPad ? 20 : 16, weight: .black, design: .rounded))
+                                .foregroundStyle(Color("NeonYellow"))
+                            Text("Best")
+                                .font(.system(size: metrics.isIPad ? 11 : 9, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
+
+                        VStack(spacing: 2) {
+                            Text("\(daily.totalCompleted)")
+                                .font(.system(size: metrics.isIPad ? 20 : 16, weight: .black, design: .rounded))
+                                .foregroundStyle(Color("ElectricBlue"))
+                            Text("Played")
+                                .font(.system(size: metrics.isIPad ? 11 : 9, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
+                    }
+                }
+                .padding(.bottom, 8)
+            }
         }
     }
 }
