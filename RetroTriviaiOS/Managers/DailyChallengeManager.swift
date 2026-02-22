@@ -152,5 +152,21 @@ class DailyChallengeManager {
         bestScore = 0
         lastCompletedDateString = nil
     }
+
+    /// Set arbitrary state for unit testing date-dependent logic.
+    func setTestState(lastCompletedDate: String?, currentStreak: Int) {
+        lastCompletedDateString = lastCompletedDate
+        self.currentStreak = currentStreak
+    }
+
+    /// Expose date formatting for test assertions.
+    static func formatDate(_ date: Date) -> String {
+        dateFormatter.string(from: date)
+    }
+
+    /// Re-run streak validation (normally only called at init).
+    func debugValidateStreak() {
+        validateStreak()
+    }
     #endif
 }

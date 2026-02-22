@@ -305,4 +305,21 @@ class NotificationManager {
     func cancelAllNotifications() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
     }
+
+    // MARK: - Debug
+
+    #if DEBUG
+    func resetAll() {
+        dailyChallengeEnabled = true
+        streakReminderEnabled = true
+        leaderboardEnabled = true
+        authorizationStatus = .notDetermined
+        cancelAllNotifications()
+    }
+
+    /// Directly set authorization status for testing.
+    func setAuthorizationStatus(_ status: UNAuthorizationStatus) {
+        authorizationStatus = status
+    }
+    #endif
 }
