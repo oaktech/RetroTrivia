@@ -14,6 +14,7 @@ struct HomeView: View {
     @Environment(BadgeManager.self) var badgeManager
     @Environment(\.horizontalSizeClass) private var sizeClass
     let onPlayTapped: () -> Void
+    let onDailyChallengeTapped: () -> Void
     let onPassAndPlayTapped: (PassAndPlaySession) -> Void
 
     enum SheetType: Identifiable {
@@ -186,8 +187,15 @@ struct HomeView: View {
                 }
             }
 
+            // Daily Challenge banner
+            DailyChallengeCard(isIPad: true) {
+                audioManager.playSoundEffect(named: "button-tap")
+                onDailyChallengeTapped()
+            }
+            .padding(.horizontal, 40)
+
             Spacer()
-                .frame(maxHeight: 40)
+                .frame(maxHeight: 24)
 
             // Three game mode "stage door" cards side by side
             HStack(spacing: 20) {
@@ -290,6 +298,13 @@ struct HomeView: View {
                     }
                     .padding(.top, 8)
                 }
+
+                // Daily Challenge
+                DailyChallengeCard(isIPad: false) {
+                    audioManager.playSoundEffect(named: "button-tap")
+                    onDailyChallengeTapped()
+                }
+                .padding(.horizontal, 20)
 
                 VStack(spacing: 12) {
                     GameModeCard(
@@ -629,6 +644,102 @@ private struct EqualizerBarsView: View {
     }
 }
 
+// MARK: - Daily Challenge Card
+
+private struct DailyChallengeCard: View {
+    let isIPad: Bool
+    let action: () -> Void
+
+    private var dailyManager: DailyChallengeManager { .shared }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 0) {
+                // Gradient accent strip
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color("NeonPink"), Color("ElectricBlue")],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: isIPad ? 5 : 4)
+                    .shadow(color: Color("NeonPink").opacity(0.9), radius: 6)
+                    .padding(.vertical, 6)
+
+                VStack(alignment: .leading, spacing: isIPad ? 8 : 6) {
+                    HStack {
+                        Text("Daily Challenge")
+                            .font(.system(size: isIPad ? 24 : 18, weight: .black, design: .rounded))
+                            .foregroundStyle(.white)
+
+                        Spacer()
+
+                        if dailyManager.isTodayCompleted {
+                            Label("Done", systemImage: "checkmark.circle.fill")
+                                .font(.system(size: isIPad ? 14 : 12, weight: .bold, design: .rounded))
+                                .foregroundStyle(.green)
+                        } else {
+                            Text("NEW")
+                                .font(.system(size: isIPad ? 12 : 10, weight: .black, design: .rounded))
+                                .foregroundStyle(.black)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(Color("NeonYellow"))
+                                .clipShape(Capsule())
+                        }
+                    }
+
+                    HStack(spacing: isIPad ? 18 : 14) {
+                        Label("\(DailyChallengeManager.questionCount) Qs", systemImage: "questionmark.circle")
+                            .font(.system(size: isIPad ? 15 : 13, weight: .semibold, design: .rounded))
+                            .foregroundStyle(Color("ElectricBlue"))
+
+                        if dailyManager.currentStreak > 0 {
+                            Label("\(dailyManager.currentStreak) day streak", systemImage: "flame.fill")
+                                .font(.system(size: isIPad ? 15 : 13, weight: .semibold, design: .rounded))
+                                .foregroundStyle(Color("NeonPink"))
+                        }
+
+                        if dailyManager.bestScore > 0 {
+                            Label("Best: \(dailyManager.bestScore)/\(DailyChallengeManager.questionCount)", systemImage: "star.fill")
+                                .font(.system(size: isIPad ? 15 : 13, weight: .semibold, design: .rounded))
+                                .foregroundStyle(Color("NeonYellow"))
+                        }
+                    }
+                }
+                .padding(.leading, isIPad ? 24 : 16)
+
+                Spacer()
+            }
+            .padding(.horizontal, isIPad ? 20 : 16)
+            .padding(.vertical, isIPad ? 20 : 14)
+            .background(
+                LinearGradient(
+                    colors: [Color("NeonPink").opacity(0.08), Color("ElectricBlue").opacity(0.08)],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: isIPad ? 16 : 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: isIPad ? 16 : 14)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [Color("NeonPink").opacity(0.5), Color("ElectricBlue").opacity(0.5)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ),
+                        lineWidth: 1.5
+                    )
+            )
+            .shadow(color: Color("NeonPink").opacity(0.2), radius: 8)
+        }
+        .buttonStyle(ScaleButtonStyle())
+    }
+}
+
 // MARK: - Difficulty Picker Overlay
 
 private struct DifficultyPickerOverlay: View {
@@ -725,7 +836,7 @@ private struct DifficultyPickerOverlay: View {
 }
 
 #Preview {
-    HomeView(onPlayTapped: {}, onPassAndPlayTapped: { _ in })
+    HomeView(onPlayTapped: {}, onDailyChallengeTapped: {}, onPassAndPlayTapped: { _ in })
         .environment(GameState())
         .environment(AudioManager.shared)
         .environment(QuestionManager())

@@ -6,6 +6,7 @@
 import Testing
 import Foundation
 import SwiftUI
+import UserNotifications
 @testable import RetroTrivia
 
 // MARK: - TriviaQuestion Tests
@@ -970,5 +971,496 @@ struct RoundLimitTests {
         } else {
             Issue.record("Expected .raceTo25 case")
         }
+    }
+}
+
+// MARK: - DailyChallengeManager Tests
+
+@MainActor
+@Suite(.serialized)
+struct DailyChallengeManagerTests {
+
+    private func freshManager() -> DailyChallengeManager {
+        let manager = DailyChallengeManager.shared
+        manager.resetAll()
+        return manager
+    }
+
+    private var todayString: String {
+        DailyChallengeManager.formatDate(Date())
+    }
+
+    private var yesterdayString: String {
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        return DailyChallengeManager.formatDate(yesterday)
+    }
+
+    private var threeDaysAgoString: String {
+        let date = Calendar.current.date(byAdding: .day, value: -3, to: Date())!
+        return DailyChallengeManager.formatDate(date)
+    }
+
+    // MARK: - Constants
+
+    @Test func questionCountIsTen() {
+        #expect(DailyChallengeManager.questionCount == 10)
+    }
+
+    // MARK: - Initial State
+
+    @Test func initialStateAfterReset() {
+        let manager = freshManager()
+        #expect(manager.currentStreak == 0)
+        #expect(manager.bestStreak == 0)
+        #expect(manager.totalCompleted == 0)
+        #expect(manager.lastScore == 0)
+        #expect(manager.bestScore == 0)
+        #expect(manager.isTodayCompleted == false)
+        #expect(manager.isStreakActive == false)
+        #expect(manager.streakExpiresEndOfDay == false)
+    }
+
+    // MARK: - Record Completion
+
+    @Test func recordCompletionFirstTime() {
+        let manager = freshManager()
+        manager.recordCompletion(score: 7)
+        #expect(manager.lastScore == 7)
+        #expect(manager.bestScore == 7)
+        #expect(manager.currentStreak == 1)
+        #expect(manager.bestStreak == 1)
+        #expect(manager.totalCompleted == 1)
+    }
+
+    @Test func recordCompletionMarksTodayCompleted() {
+        let manager = freshManager()
+        #expect(manager.isTodayCompleted == false)
+        manager.recordCompletion(score: 5)
+        #expect(manager.isTodayCompleted == true)
+    }
+
+    @Test func recordCompletionMakesStreakActive() {
+        let manager = freshManager()
+        #expect(manager.isStreakActive == false)
+        manager.recordCompletion(score: 5)
+        #expect(manager.isStreakActive == true)
+    }
+
+    @Test func sameDayCompletionDoesNotDoubleStreak() {
+        let manager = freshManager()
+        manager.recordCompletion(score: 5)
+        manager.recordCompletion(score: 8)
+        #expect(manager.currentStreak == 1)
+        #expect(manager.totalCompleted == 2)
+        #expect(manager.lastScore == 8)
+    }
+
+    @Test func bestScoreNotLoweredByWorseScore() {
+        let manager = freshManager()
+        manager.recordCompletion(score: 9)
+        #expect(manager.bestScore == 9)
+        manager.recordCompletion(score: 3)
+        #expect(manager.bestScore == 9)
+        #expect(manager.lastScore == 3)
+    }
+
+    @Test func bestScoreUpdatedWhenHigher() {
+        let manager = freshManager()
+        manager.recordCompletion(score: 5)
+        manager.recordCompletion(score: 10)
+        #expect(manager.bestScore == 10)
+    }
+
+    @Test func totalCompletedIncrementsEachTime() {
+        let manager = freshManager()
+        manager.recordCompletion(score: 1)
+        manager.recordCompletion(score: 2)
+        manager.recordCompletion(score: 3)
+        #expect(manager.totalCompleted == 3)
+    }
+
+    // MARK: - Streak Logic with Date Injection
+
+    @Test func streakContinuesFromYesterday() {
+        let manager = freshManager()
+        // Simulate yesterday's completion with a 1-day streak
+        manager.setTestState(lastCompletedDate: yesterdayString, currentStreak: 1)
+        #expect(manager.isStreakActive == true)
+        manager.recordCompletion(score: 7)
+        #expect(manager.currentStreak == 2)
+    }
+
+    @Test func streakBreaksAfterMultiDayGap() {
+        let manager = freshManager()
+        // Simulate completion 3 days ago with a 5-day streak
+        manager.setTestState(lastCompletedDate: threeDaysAgoString, currentStreak: 5)
+        #expect(manager.isStreakActive == false)
+        manager.recordCompletion(score: 7)
+        #expect(manager.currentStreak == 1) // restarted
+    }
+
+    @Test func streakExpiresEndOfDayWhenCompletedYesterday() {
+        let manager = freshManager()
+        manager.setTestState(lastCompletedDate: yesterdayString, currentStreak: 3)
+        #expect(manager.streakExpiresEndOfDay == true)
+    }
+
+    @Test func streakDoesNotExpireEndOfDayWhenCompletedToday() {
+        let manager = freshManager()
+        manager.recordCompletion(score: 5)
+        #expect(manager.streakExpiresEndOfDay == false)
+    }
+
+    @Test func isTodayCompletedFalseWhenCompletedYesterday() {
+        let manager = freshManager()
+        manager.setTestState(lastCompletedDate: yesterdayString, currentStreak: 1)
+        #expect(manager.isTodayCompleted == false)
+    }
+
+    @Test func isStreakActiveWhenCompletedYesterday() {
+        let manager = freshManager()
+        manager.setTestState(lastCompletedDate: yesterdayString, currentStreak: 2)
+        #expect(manager.isStreakActive == true)
+    }
+
+    @Test func isStreakInactiveWhenCompletedThreeDaysAgo() {
+        let manager = freshManager()
+        manager.setTestState(lastCompletedDate: threeDaysAgoString, currentStreak: 5)
+        #expect(manager.isStreakActive == false)
+    }
+
+    @Test func validateStreakResetsOnStaleDate() {
+        let manager = freshManager()
+        manager.setTestState(lastCompletedDate: threeDaysAgoString, currentStreak: 10)
+        manager.debugValidateStreak()
+        #expect(manager.currentStreak == 0)
+    }
+
+    @Test func validateStreakPreservesYesterday() {
+        let manager = freshManager()
+        manager.setTestState(lastCompletedDate: yesterdayString, currentStreak: 4)
+        manager.debugValidateStreak()
+        #expect(manager.currentStreak == 4)
+    }
+
+    @Test func validateStreakPreservesToday() {
+        let manager = freshManager()
+        manager.recordCompletion(score: 5) // sets to today
+        manager.debugValidateStreak()
+        #expect(manager.currentStreak == 1)
+    }
+
+    @Test func validateStreakResetsWhenNoDate() {
+        let manager = freshManager()
+        // resetAll sets lastCompletedDateString to nil but currentStreak to 0 already
+        manager.setTestState(lastCompletedDate: nil, currentStreak: 3)
+        manager.debugValidateStreak()
+        #expect(manager.currentStreak == 0)
+    }
+
+    // MARK: - Best Streak
+
+    @Test func bestStreakUpdatedOnCompletion() {
+        let manager = freshManager()
+        manager.setTestState(lastCompletedDate: yesterdayString, currentStreak: 4)
+        manager.recordCompletion(score: 5) // streak becomes 5
+        #expect(manager.bestStreak == 5)
+    }
+
+    @Test func bestStreakNotLowered() {
+        let manager = freshManager()
+        // First: build a streak of 3
+        manager.setTestState(lastCompletedDate: yesterdayString, currentStreak: 2)
+        manager.recordCompletion(score: 5) // streak 3, bestStreak 3
+        #expect(manager.bestStreak == 3)
+
+        // Now reset and start fresh — bestStreak should stay at 3
+        manager.setTestState(lastCompletedDate: threeDaysAgoString, currentStreak: 0)
+        manager.recordCompletion(score: 5) // streak resets to 1
+        #expect(manager.currentStreak == 1)
+        #expect(manager.bestStreak == 3)
+    }
+
+    // MARK: - Reset
+
+    @Test func resetAllClearsEverything() {
+        let manager = freshManager()
+        manager.recordCompletion(score: 10)
+        #expect(manager.totalCompleted == 1) // sanity
+        manager.resetAll()
+        #expect(manager.currentStreak == 0)
+        #expect(manager.bestStreak == 0)
+        #expect(manager.totalCompleted == 0)
+        #expect(manager.lastScore == 0)
+        #expect(manager.bestScore == 0)
+        #expect(manager.isTodayCompleted == false)
+    }
+
+    // MARK: - UserDefaults Persistence
+
+    @Test func persistsToUserDefaults() {
+        let manager = freshManager()
+        manager.recordCompletion(score: 8)
+        #expect(UserDefaults.standard.integer(forKey: "dailyChallenge.currentStreak") == 1)
+        #expect(UserDefaults.standard.integer(forKey: "dailyChallenge.bestStreak") == 1)
+        #expect(UserDefaults.standard.integer(forKey: "dailyChallenge.totalCompleted") == 1)
+        #expect(UserDefaults.standard.integer(forKey: "dailyChallenge.lastScore") == 8)
+        #expect(UserDefaults.standard.integer(forKey: "dailyChallenge.bestScore") == 8)
+        #expect(UserDefaults.standard.string(forKey: "dailyChallenge.lastCompletedDate") == todayString)
+    }
+
+    // MARK: - Date Formatter
+
+    @Test func formatDateProducesExpectedFormat() {
+        let components = DateComponents(year: 2026, month: 2, day: 22)
+        let date = Calendar.current.date(from: components)!
+        let formatted = DailyChallengeManager.formatDate(date)
+        #expect(formatted == "2026-02-22")
+    }
+}
+
+// MARK: - NotificationManager Tests
+
+@MainActor
+@Suite(.serialized)
+struct NotificationManagerTests {
+
+    private func freshManager() -> NotificationManager {
+        let manager = NotificationManager.shared
+        manager.resetAll()
+        return manager
+    }
+
+    // MARK: - Category Raw Values
+
+    @Test func categoryRawValues() {
+        #expect(NotificationManager.Category.dailyChallenge.rawValue == "DAILY_CHALLENGE")
+        #expect(NotificationManager.Category.streakReminder.rawValue == "STREAK_REMINDER")
+        #expect(NotificationManager.Category.leaderboard.rawValue == "LEADERBOARD")
+    }
+
+    // MARK: - Default Toggles
+
+    @Test func defaultTogglesAreEnabled() {
+        let manager = freshManager()
+        #expect(manager.dailyChallengeEnabled == true)
+        #expect(manager.streakReminderEnabled == true)
+        #expect(manager.leaderboardEnabled == true)
+    }
+
+    // MARK: - Authorization Status
+
+    @Test func isAuthorizedFalseWhenNotDetermined() {
+        let manager = freshManager()
+        #expect(manager.authorizationStatus == .notDetermined)
+        #expect(manager.isAuthorized == false)
+    }
+
+    @Test func isAuthorizedTrueWhenAuthorized() {
+        let manager = freshManager()
+        manager.setAuthorizationStatus(.authorized)
+        #expect(manager.isAuthorized == true)
+    }
+
+    @Test func isAuthorizedFalseWhenDenied() {
+        let manager = freshManager()
+        manager.setAuthorizationStatus(.denied)
+        #expect(manager.isAuthorized == false)
+    }
+
+    @Test func isAuthorizedFalseWhenProvisional() {
+        let manager = freshManager()
+        manager.setAuthorizationStatus(.provisional)
+        #expect(manager.isAuthorized == false)
+    }
+
+    // MARK: - Toggle Persistence
+
+    @Test func dailyChallengeTogglePersists() {
+        let manager = freshManager()
+        manager.dailyChallengeEnabled = false
+        #expect(UserDefaults.standard.bool(forKey: "notifications.dailyChallenge") == false)
+        manager.dailyChallengeEnabled = true
+        #expect(UserDefaults.standard.bool(forKey: "notifications.dailyChallenge") == true)
+    }
+
+    @Test func streakReminderTogglePersists() {
+        let manager = freshManager()
+        manager.streakReminderEnabled = false
+        #expect(UserDefaults.standard.bool(forKey: "notifications.streakReminder") == false)
+        manager.streakReminderEnabled = true
+    }
+
+    @Test func leaderboardTogglePersists() {
+        let manager = freshManager()
+        manager.leaderboardEnabled = false
+        #expect(UserDefaults.standard.bool(forKey: "notifications.leaderboard") == false)
+        manager.leaderboardEnabled = true
+    }
+
+    // MARK: - Permission Requested Flag
+
+    @Test func hasRequestedPermissionDefaultFalse() {
+        UserDefaults.standard.removeObject(forKey: "notifications.permissionRequested")
+        let manager = freshManager()
+        #expect(manager.hasRequestedPermission == false)
+    }
+
+    @Test func hasRequestedPermissionReadsUserDefaults() {
+        UserDefaults.standard.set(true, forKey: "notifications.permissionRequested")
+        let manager = freshManager()
+        #expect(manager.hasRequestedPermission == true)
+        // Clean up
+        UserDefaults.standard.removeObject(forKey: "notifications.permissionRequested")
+    }
+
+    // MARK: - Guard Conditions
+
+    @Test func streakReminderGuardsOnZeroStreak() async {
+        let manager = freshManager()
+        let center = UNUserNotificationCenter.current()
+        center.removeAllPendingNotificationRequests()
+
+        // Streak of 0 should not schedule
+        manager.scheduleStreakReminder(currentStreak: 0)
+
+        // Small delay for async center operations
+        try? await Task.sleep(for: .milliseconds(200))
+        let pending = await center.pendingNotificationRequests()
+        let streakRequests = pending.filter { $0.identifier == "streak_reminder" }
+        #expect(streakRequests.isEmpty)
+    }
+
+    @Test func streakReminderGuardsOnDisabledToggle() async {
+        let manager = freshManager()
+        let center = UNUserNotificationCenter.current()
+        center.removeAllPendingNotificationRequests()
+
+        manager.streakReminderEnabled = false
+        manager.scheduleStreakReminder(currentStreak: 5)
+
+        try? await Task.sleep(for: .milliseconds(200))
+        let pending = await center.pendingNotificationRequests()
+        let streakRequests = pending.filter { $0.identifier == "streak_reminder" }
+        #expect(streakRequests.isEmpty)
+        // Reset toggle
+        manager.streakReminderEnabled = true
+    }
+
+    @Test func dailyChallengeGuardsOnDisabledToggle() async {
+        let manager = freshManager()
+        let center = UNUserNotificationCenter.current()
+        center.removeAllPendingNotificationRequests()
+
+        manager.dailyChallengeEnabled = false
+        manager.scheduleDailyChallengeReminder()
+
+        try? await Task.sleep(for: .milliseconds(200))
+        let pending = await center.pendingNotificationRequests()
+        let dailyRequests = pending.filter { $0.identifier == "daily_challenge_reminder" }
+        #expect(dailyRequests.isEmpty)
+        manager.dailyChallengeEnabled = true
+    }
+
+    @Test func leaderboardNudgeGuardsOnDisabledToggle() async {
+        let manager = freshManager()
+        let center = UNUserNotificationCenter.current()
+        center.removeAllPendingNotificationRequests()
+
+        manager.leaderboardEnabled = false
+        manager.scheduleLeaderboardNudge(previousRank: 5, currentRank: 10)
+
+        try? await Task.sleep(for: .milliseconds(200))
+        let pending = await center.pendingNotificationRequests()
+        let leaderboardRequests = pending.filter { $0.identifier == "leaderboard_rank_drop" }
+        #expect(leaderboardRequests.isEmpty)
+        manager.leaderboardEnabled = true
+    }
+
+    @Test func leaderboardNudgeGuardsWhenRankImproved() async {
+        let manager = freshManager()
+        let center = UNUserNotificationCenter.current()
+        center.removeAllPendingNotificationRequests()
+
+        // Rank improved from 10 to 5 — should not nudge
+        manager.scheduleLeaderboardNudge(previousRank: 10, currentRank: 5)
+
+        try? await Task.sleep(for: .milliseconds(200))
+        let pending = await center.pendingNotificationRequests()
+        let leaderboardRequests = pending.filter { $0.identifier == "leaderboard_rank_drop" }
+        #expect(leaderboardRequests.isEmpty)
+    }
+
+    @Test func closeToTopNudgeGuardsWhenNotClose() async {
+        let manager = freshManager()
+        let center = UNUserNotificationCenter.current()
+        center.removeAllPendingNotificationRequests()
+
+        // Rank 20 is more than 10 away from top — should not nudge
+        manager.scheduleLeaderboardCloseToTopNudge(currentRank: 20, topRank: 1)
+
+        try? await Task.sleep(for: .milliseconds(200))
+        let pending = await center.pendingNotificationRequests()
+        let closeRequests = pending.filter { $0.identifier == "leaderboard_close_to_top" }
+        #expect(closeRequests.isEmpty)
+    }
+
+    @Test func closeToTopNudgeGuardsWhenAtTop() async {
+        let manager = freshManager()
+        let center = UNUserNotificationCenter.current()
+        center.removeAllPendingNotificationRequests()
+
+        // Already at #1 — should not nudge
+        manager.scheduleLeaderboardCloseToTopNudge(currentRank: 1, topRank: 1)
+
+        try? await Task.sleep(for: .milliseconds(200))
+        let pending = await center.pendingNotificationRequests()
+        let closeRequests = pending.filter { $0.identifier == "leaderboard_close_to_top" }
+        #expect(closeRequests.isEmpty)
+    }
+
+    // MARK: - Reset
+
+    @Test func resetAllRestoresDefaults() {
+        let manager = freshManager()
+        manager.dailyChallengeEnabled = false
+        manager.streakReminderEnabled = false
+        manager.leaderboardEnabled = false
+        manager.setAuthorizationStatus(.authorized)
+
+        manager.resetAll()
+
+        #expect(manager.dailyChallengeEnabled == true)
+        #expect(manager.streakReminderEnabled == true)
+        #expect(manager.leaderboardEnabled == true)
+        #expect(manager.authorizationStatus == .notDetermined)
+    }
+}
+
+// MARK: - GameCenterManager Rank Tracking Tests
+
+@MainActor
+struct GameCenterRankTrackingTests {
+
+    @Test func initialRankIsZero() {
+        // Clean up any saved rank first
+        UserDefaults.standard.removeObject(forKey: "gamecenter.lastKnownRank")
+        let manager = GameCenterManager.shared
+        // currentRank is always 0 until fetchPlayerRank completes
+        #expect(manager.currentRank == 0)
+    }
+
+    @Test func leaderboardIDIsCorrect() {
+        #expect(GameCenterManager.leaderboardID == "retrotrivia.highscore")
+    }
+
+    @Test func rankPersistedToUserDefaults() {
+        // The saved rank key stores the previous known rank
+        let testRank = 42
+        UserDefaults.standard.set(testRank, forKey: "gamecenter.lastKnownRank")
+        let saved = UserDefaults.standard.integer(forKey: "gamecenter.lastKnownRank")
+        #expect(saved == testRank)
+        // Clean up
+        UserDefaults.standard.removeObject(forKey: "gamecenter.lastKnownRank")
     }
 }

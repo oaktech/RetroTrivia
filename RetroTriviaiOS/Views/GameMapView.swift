@@ -802,6 +802,13 @@ struct GameMapView: View {
                 await gameCenterManager.submitScore(gameState.currentPosition)
             }
         }
+
+        // Request notification permission after the user's first completed game
+        if !NotificationManager.shared.hasRequestedPermission {
+            Task {
+                await NotificationManager.shared.requestPermission()
+            }
+        }
     }
 
     private var header: some View {
